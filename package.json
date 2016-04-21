@@ -1,0 +1,15 @@
+{
+  "name": "debug-expr",
+  "description": "",
+  "license": "MIT",
+  "author": "Yevgeny Zharov <krantadan@mail.ru>",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kahless/debug-expr.git"
+  },
+  "main": "debug-expr.js",
+  "devDependencies": {
+    "eslint": "^2.8.0"
+  }
+}

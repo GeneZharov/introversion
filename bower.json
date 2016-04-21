@@ -1,0 +1,8 @@
+{
+  "name": "debug-expr",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "./debug-expr.js",
+  "ignore": [],
+  "dependencies": {}
+}
