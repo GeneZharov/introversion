@@ -54,7 +54,7 @@ function Val() {
     var a = normalize(arguments);
     var id = a.id;
     var args = a.data;
-    if (debug) {
+    if (D.debug) {
         logVal(id, args);
         if (a.break) {
             id;   // Passed ID
@@ -104,10 +104,10 @@ function Fn() {
                 debugger;
             }
             var result = userFunc.apply(this, args); // <-- Your function
-            if (debug) logFn(id, args, result);
+            if (D.debug) logFn(id, args, result);
             return result;
         } catch (error) {
-            if (debug) logFn(id, args, null, error);
+            if (D.debug) logFn(id, args, null, error);
             throw error;
         }
     };
@@ -115,18 +115,18 @@ function Fn() {
 
 
 function debugVal(action) {
-    debug = true;
+    D.debug = true;
     var result = action();
-    debug = false;
+    D.debug = false;
     return result;
 }
 
 
 function debugFn(action) {
     return function () {
-        debug = true;
+        D.debug = true;
         var result = action.apply(this, arguments);
-        debug = false;
+        D.debug = false;
         return result;
     };
 }
@@ -146,37 +146,38 @@ function offF(action) {
 }
 
 
-var debug = false; // If debug was enabled with _onF() or _onV()
+var D = {};
 
-// Obtaining global object
-var root;
+D.debug = false; // If debug was enabled with D.onF() or D.onV()
+
+D.v     = val.bind(this, false);
+D.v.deb = val.bind(this, true);
+D.V     = Val.bind(this, false);
+D.V.deb = val.bind(this, true);
+D.f     = fn.bind(this, false);
+D.f.deb = fn.bind(this, true);
+D.F     = Fn.bind(this, false);
+D.F.deb = Fn.bind(this, true);
+
+D.v.off = offWatch.bind(this, false);
+D.V.off = offWatch.bind(this, false);
+D.f.off = offWatch.bind(this, false);
+D.F.off = offWatch.bind(this, false);
+
+D.onF = debugFn;
+D.onV = debugVal;
+
+D.onV.off = offV;
+D.onF.off = offF;
+
+
+// Obtaining the global object
 if (typeof module === 'object'
  && typeof module.exports === 'object'
 ) {
-    root = global;
+    global.D = D;
 } else {
-    root = self;
+    self.D = D;
 }
-
-root._v     = val.bind(this, false);
-root._v.deb = val.bind(this, true);
-root._V     = Val.bind(this, false);
-root._V.deb = val.bind(this, true);
-root._f     = fn.bind(this, false);
-root._f.deb = fn.bind(this, true);
-root._F     = Fn.bind(this, false);
-root._F.deb = Fn.bind(this, true);
-
-root._v.off = offWatch;
-root._V.off = offWatch;
-root._f.off = offWatch;
-root._F.off = offWatch;
-
-root._onF = debugFn;
-root._onV = debugVal;
-
-root._onV.off = offV;
-root._onF.off = offF;
-
 
 } () );
