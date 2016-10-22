@@ -1,8 +1,8 @@
 {
-  "name": "debug-expr",
+  "name": "echolot",
   "version": "0.0.1",
   "license": "MIT",
-  "main": "lib/debug-expr.js",
+  "main": "lib/echolot.js",
   "ignore": [],
   "dependencies": {}
 }

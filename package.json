@@ -1,13 +1,13 @@
 {
-  "name": "debug-expr",
+  "name": "@kahless/echolot",
   "description": "",
   "license": "MIT",
   "author": "Yevgeny Zharov <krantadan@mail.ru>",
   "version": "0.0.1",
-  "main": "lib/debug-expr.js",
+  "main": "lib/echolot.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kahless/debug-expr.git"
+    "url": "https://github.com/kahless/echolot.git"
   },
   "scripts": {
     "test": "karma start",
