@@ -18,7 +18,7 @@ const globals = {
 module.exports = {
     env: {browser: true, node: true},
     parserOptions: {ecmaVersion: 6},
-    globals: Object.assign({D: true}, globals.jasmine),
+    globals: Object.assign({echolot: true}, globals.jasmine),
     rules: {
         "semi": 2,
         "comma-dangle": 2,
