@@ -3,7 +3,7 @@
   "description": "",
   "license": "MIT",
   "author": "Yevgeny Zharov <krantadan@mail.ru>",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "lib/echolot.js",
   "repository": {
     "type": "git",
