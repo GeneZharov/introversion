@@ -1,47 +1,48 @@
 Echolot.js
 ==========
 
-Библиотека для отладки выражений в JavaScript. Особенно полезна для отладки 
-кода, написанного в функциональном стиле.
+It is a library for debugging JavaScript expressions. It is especially useful 
+for a code in a functional style.
 
 Motivation
 ----------
 
-Проблема в том, что традиционные инструменты отладки JavaScript применимы 
-минимум к инструкции. Например можно вставить инструкцию `debugger;` или 
-поставить останов на инструкцию в отладчике. Есть разные способы распечатать 
-значение, например `console.log()`, но как правило они должны быть добавлены в 
-код как отдельная инструкция.
+Traditional JavaScript debugging tools are applicable to statements. For 
+example you can insert a `debugger` statement; or you can create a breakpoint 
+on a statement in a debugger window. There are several ways to print a value, 
+for example `console.log()`, but usually these functions should be inserted in 
+code as separate statements.
 
-Преимущество Echolot в том, что он позволяет отлаживать не инструкции, а 
-входящие в неё выражения, что позволяет не изменять сильно структуру кода.
+Echolot offers tools for a more flexible debugging, for debugging expressions, 
+that construct statements. This allows not to split an expression into separate 
+statements for debugging purpose.
 
-Например есть функция:
+Suppose you have a function:
 
     const calc = x => x + 1;
 
-Если для отладки требуется узнать значение "x", то придётся переписать функцию 
-в императивном стиле, в виде набора инструкций:
+If you wish to know an "x" value, you have to rewrite this function in an 
+imperative style, as a set of statements:
 
     const calc = x => {
         console.log(x);
         return x + 1;
     };
 
-Библиотека позволяет не тратить на это время и не отходить от функциональной 
-парадигмы. Например два способа как можно решить ту же задачу:
+Echolot allows not to waste time on it and not to break the functional 
+paradigm. For example, here are 2 ways to solve the same problem:
 
-    const calc = x => E.v(x) + 1; // Распечатать выражение "x"
-    const calc = E.f(x => x + 1); // Распечатывать параметры и возврат arrow-функции
+    const calc = x => E.v(x) + 1; // Print the "x" expression
+    const calc = E.f(x => x + 1); // Print parameters and a return value of an arrow function
 
-Более сложный пример с использованием функциональной библиотеки 
+More complex example with the use of the functional library called
 [Ramda](http://ramdajs.com):
 
     // extract :: [[Item]] -> [a]
     //   Item = {enabled: Boolean, raw: a}
     const extract = R.pipe(
         R.map(R.last),
-        E.f(R.filter(R.prop("enabled"))), // Покажет что идёт на второй шаг pipe'а
+        E.f(R.filter(R.prop("enabled"))), // Print what is passed on the second pipe's step
         R.map(R.prop("raw"))
     );
     $http.post("myURL" extract(links));
@@ -49,15 +50,15 @@ Motivation
 
 Install
 -------
-Используйте какой-то из пакетных менеджеров:
+With a package manager:
 
-    npm install echolot --save-dev
-    bower install echolot --save-dev
+    npm install echolotjs --save-dev
+    bower install echolotjs --save-dev
 
 
 Initialization
 --------------
-Рекомендуемый способ инициализировать библиотеку для большого проекта:
+This is a recommended way to initialize the library for a big project:
 
     // In browser
     window.E = echolot;
@@ -65,8 +66,8 @@ Initialization
     // In Node.js
     global.E = require("echolot");
 
-Либо, если скриптов мало, или по каким-то причинам не хочется замусоривать 
-глобальную область видимости:
+If you have just a few scripts, or if you don't want to waste the global scope, 
+you can assign into a local scope:
 
     // In browser
     const E = echolot;
@@ -77,64 +78,60 @@ Initialization
 
 Watching a Value
 ----------------
-Утилита `E.v()` ("v" означает "value") просто распечатывает массив из принятых 
-в качестве аргументов значений. Главное отличие от `console.log()` в том, что 
-последний аргумент становится возвратом функции, что позволяет безопасно 
-оборачивать в `E.v()` любое значение.
+`E.v()` ("v" stands for "value") merely prints an array of values passed as 
+arguments. The main difference from `console.log()` is that the last argument 
+becomes a returned value. This lets you to safely wrap any value in the 
+`E.v()`.
 
-Например есть функция и её вызов:
+Suppose you have a function and it's call:
 
     const random = x => Math.floor(Math.random() * x) + 10;
     random(1);
 
-Можно легко обернуть в `E.v()` любое значение в выражении:
+You can wrap in the `E.v()` any value in an expression:
 
     const random = x => Math.floor(E.v(Math.random()) * x) + 10;
     random(1); //=> V: [ 0.504418952113608 ]
 
-Можно добавить к распечатке любые другие нужные значения:
+It is possible to add any other values for printing:
 
     const random = x => Math.floor(E.v(x, this, "mystr", Math.random()) * x) + 10;
     random(1); //=> V: [ 1, {}, 'mystr', 0.8474771121023132 ]
 
-Это может быть особенно полезно, если в коде расставлено одновременно сразу 
-несколько watcher'ов и нужно как-то различать их выводы:
+It can be especially useful, if there are several watchers at the same time, 
+and you need a way to distinguish their output from each other:
 
     const fn = x => x > 0 ? E.v(x * 1.25) : E.v(x / 9);
 
-Тогда можно передавать первым аргументом какой-нибудь маркер, например строку.
+Then you can pass any marker as a first argument, a string, for example:
 
     const fn = x => x > 0 ? E.v("positive", x * 1.25) : E.v("negative", x / 9);
     fn(5);   //=> V: [ 'positive', 6.25 ]
     fn(-81); //=> V: [ 'negative', -9 ]
 
-Но обычно проще использовать в качестве маркеров просто цифры:
+But usually it is more convenient to merely use digits:
 
     const fn = x => x > 0 ? E.v(0, x * 1.25) : E.v(1, x / 9);
     fn(5);   //=> V: [ 0, 6.25 ]
     fn(-81); //=> V: [ 1, -9 ]
 
 
-
 Watching a Function
 -------------------
-Утилита `E.f()` ("f" означает "function") предназначена для слежения за 
-функцией. Она полезна, если нужно не просто разово распечатать значение, а 
-распечатывать аргументы и возврат функции каждый раз, когда она вызывается. 
-Если функция выбросит исключение, то оно также будет распечатано, а затем 
-выброшено снова. После того как функцию обернули в `E.f()`, её можно безопасно 
-использовать как и раньше, все аргументы и возврат будут беспрепятственно 
-проксироваться.
+`E.f()` ("f" stands for "function") is designed to watch for a function. It is 
+used for printing arguments and a returned value each time a function is 
+called. If a function throws an exception, this exception will be printed and 
+then rethrown again. A wrapped in the `E.f()` function can be used in the same 
+way as an unwrapped one: all arguments and a returned value will be proxied.
 
-Например:
+Suppose you have:
 
     const transform = x => 2 * x;
     const arr = [1, 2, 3];
     const result = arr.map(transform);
 
-Теперь можно обернуть в `E.f()` функцию, чтобы получить новую функцию, которая 
-будет действовать точно также, но при этом будет сообщать информацию о своих 
-вызовах.
+Now you can wrap the function in the `E.f()` call to obtain a new function with 
+the same behavior but it will additionally print information about it's calls.
 
     const result = arr.map(E.f(transform));
 
@@ -150,10 +147,10 @@ Watching a Function
     //=> F Params: [3, 2, [1,2,3]]
     //=> F Result: 6
 
-Как и `E.v()`, утилита `E.f()` может принимать на распечатку дополнительно 
-любые другие значения, которые будут распечатываться вместе с информацией о 
-вызове функции. Но надо понимать, что последний аргумент должен быть непременно 
-функцией, которую нужно отслеживать и которая вернёт результат вызова.
+`E.f()` can accept any additional values for printing that will be printed with 
+the information about a function call, just like `E.v()` do. But the last 
+argument must always be a function that you want to watch and get a return 
+value from.
 
     const myvar = true;
     const result = arr.map(E.f(1, "mystr", myvar, transform));
@@ -171,108 +168,104 @@ Watching a Function
     //=> F Result: 6
 
 
-
 Watching a Method
 -----------------
-Утилита `E.m()` ("m" означает "method") похожа на `E.f()`, но дополнительно 
-позволяет проксировать внутрь "this", а значит может быть навешена на метод, 
-который непременно нуждается в корректном "this". `E.f()` и `E.debF()` в такой 
-ситуации приведут к ошибке.
+`E.m()` ("m" stands for "method") is similar to `E.f()`, but it let's to pass 
+`this` inside, so it can be applied to a method that needs a correct `this`. 
+`E.f()` would cause an error in such case.
 
-Если есть вызов метода:
+If you have a method call:
 
     o1.o2.o3.method(5)
 
-То нужно разбить это выражение на два: объект и строка с путём до метода. 
-Например эти вызовы дают один и тот же результат:
+Then you need to split this expression to an object and a string that 
+represents a path to the method inside that object. The following calls produce 
+the same result:
 
     E.m(o1,".o2.o3.method")(5);
     E.m(o1.o2,".o3.method")(5);
     E.m(o1.o2.o3,".method")(5);
 
-В остальном утилита действует аналогично `E.f()`.
+The rest behaviour is the same as for the `E.f()` function.
 
 
 Quiet Mode
 ----------
-Для всех утилит наблюдения за значениями (`E.v()`, `E.f()`, `E.m()`), а также 
-их условных аналогов (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`) существуют 
-модификации с именем в верхнем регистре (`E.V()`, `E.F()`, `E.M()`, `E.mb.V()`, 
-`E.mb.F()`, `E.mb.M()`). Они делают тоже самое, но не распечатывают последний 
-принятый аргумент. То есть они не для того чтобы распечатать исходное обернутое 
-значение, а для того чтобы распечатать дополнительные переданные аргументы. Ну 
-например плевать на то как вызывается функция и какой у неё возврат. Важно 
-просто узнать вызывается она или нет.
+For all the watching functions (`E.v()`, `E.f()`, `E.m()`) and their 
+conditional alternatives (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`) there are 
+modified versions with the name in an upper case (`E.V()`, `E.F()`, `E.M()`, 
+`E.mb.V()`, `E.mb.F()`, `E.mb.M()`). They do the same job except of printing 
+the last accepted argument. This means that their purpose is not to print the 
+wrapped value, but to print additional arguments. This is useful if you don't 
+care about the way a function is called or about its returned value. You just 
+need to know if it have been invoked or not.
 
-Например, если есть:
+Suppose you have:
 
     const fn = x = > x + 1;
     fn();
 
-И приходилось это заменять на:
+You had to replace it with:
 
     const fn = x => {
-        console.log("KJLKJLK");
+        console.log("Invoked!");
         return x + 1;
     };
-    fn(); //=> KJLKJLK
+    fn(); //=> Invoked!
 
-То теперь достаточно написать:
+But now you can write:
 
-    const fn = x => E.V("KJKJKJ", x) + 1;
-    fn(); //=> [ 'KJKJKJ' ]
+    const fn = E.F("Invoked!", x = > x + 1);
+    fn(); //=> [ 'Invoked!' ]
 
-Или так:
+Or even:
 
-    const fn = E.F("KJKJKJ", x = > x + 1);
-    fn(); //=> [ 'KJKJKJ' ]
+    const fn = x = > x + 1;
+    E.F("Invoked!", fn)(); //=> [ 'Invoked!' ]
 
 
 Breakpoint Mode
 ---------------
-Для всех утилит наблюдения за значениями (`E.v()`, `E.f()`, `E.m()`), а также 
-их условных аналогов (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`) существуют 
-модификации, заканчивающиеся на знак подчёркивания (`E.v_()`, `E.f_()`, 
-`E.m_()`, `E.mb.v_()`, `E.mb.f_()`, `E.mb.m_()`). Вместо того, чтобы выводить 
-информацию в консоль, они создают точку останова с помощью инструкции 
-"debugger", чтобы из отладчика можно было осмотреться и пройти вверх по стеку 
-вызовов. По задумке, символ подчёркивания символизирует то, что в этом месте 
-выполнение программы приостанавливается.
+For all the watching functions (`E.v()`, `E.f()`, `E.m()`) and their 
+conditional alternatives (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`) there are 
+modified versions with an underscore appended (`E.v_()`, `E.f_()`, `E.m_()`, 
+`E.mb.v_()`, `E.mb.f_()`, `E.mb.m_()`). Instead of printing data to console 
+they create a breakpoint with the "debugger" statement. This can help to look 
+around and walk through the call stack. An underscore in the function names 
+symbolizes the break in a program execution.
 
 
 Conditional Watchers
 --------------------
-Допустим есть js-модуль и unit-тесты для него. Один из 30 тестов фэйлит и, 
-чтобы понять причину, требуется распечатать значение где-то очень глубоко в 
-модуле, которое много раз в нём вычисляется при каждом тесте. Если 
-распечатывать его для каждого из тестов, то в консоли получится несколько сотен 
-значений, в которых будет очень сложно найти нужные. Чтобы этого избежать, надо 
-использовать условные аналоги утилит из объекта `E.mb` ("mb" значит "maybe"). 
-По умолчанию эти аналоги (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`, `E.mb.V()`, 
-`E.mb.F()`, `E.mb.M()`, `E.mb.v_()`, `E.mb.f_()`, `E.mb.m_()`) никак себя не 
-проявляют. Чтобы они вывели в консоль данные или поставили останов, их надо 
-специальным образом "включить".
+Suppose you have a JavaScript module and unit tests for it. One of the 30 tests 
+fails. You need to know some value that is calculated many times somewhere deep 
+inside the module for debugging purposes. But if you print this value each time 
+it is evaluated for every test there would be hundreds of records. To avoid 
+this mess you should use conditional versions of utilities that resides in an 
+object `E.mb` ("mb" stands for "maybe"). By default, these conditional 
+utilities (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`, `E.mb.V()`, `E.mb.F()`, 
+`E.mb.M()`, `E.mb.v_()`, `E.mb.f_()`, `E.mb.m_()`) do nothing. They need to be 
+"enabled" to print some data or to create a breakpoint.
 
-Допустим есть модуль и тест для него:
+Suppose you have a module and a unit test for it:
 
     // module.js
     function action(x) {
-        // ... предположим, что это большая функция со сложной логикой.
+        // ... big function with a complicated code
         const y = x * 8;
         return y ^ Math.PI;
     }
 
     // module.spec.js
     describe("action()", () => {
-        // ... десяток других тестов для функции action()
+        // ... other tests for the function action()
         it("should perform a complex calculation", () => {
             const res = action(2);
             expect(res).toBe(16);
         });
     });
 
-Для начала нужно обернуть желаемое выражение в вызов условной утилиты из 
-`E.mb`:
+First you need to wrap a desired expression in a conditional function:
 
     // module.js
     function action(x) {
@@ -280,67 +273,106 @@ Conditional Watchers
         return E.mb.v(y) ^ Math.PI;
     }
 
-Далее перед тем как вычислять это выражение нужно где-то "включить" условную 
-утилиту. Это можно сделать вручную, выставив флаг `E.enabled`:
+Then you need to "enable" the conditional watcher somewhere in the code. You 
+can do it manually with the `E.enabled` flag:
 
     E.enabled = true;
     const res = action(2);
     E.enabled = false;
 
-Поскольку это функциональная библиотека, то существуют функции, которые делают 
-то же самое:
+Since echolot is a functional library there are functions that perform the same 
+job:
 
     E.deb();
     const res = action(2);
     E.off();
 
-Если требуется включить условную отладку для вызова некоторой функции, то на 
-этот случай есть специальная утилита:
+There is a special sugar for enabling conditional watchers inside the function 
+call:
 
     const res = E.debF(action)(2);
 
-Существует также утилита на случай, если надо обернуть любое выражение или 
-набор инструкций. Эта утилита — кандидат на удаление в будущих версиях.
+And there is also a utility for enabling conditional watchers in an arbitrary 
+expression. Though this utility is probably going to be deprecated in the next 
+versions.
 
     const res = E.debV(() => action(2));
-        // Включает отладку для выражения: action(2)
+        // Enable debugging for the action(2) expression
+
+
+Shorthands
+----------
+You can use some functions above as methods of an any object so you don't have 
+to waste time on wrapping expressions in parenthesis. For example, instead of:
+
+    this.error = E.f("myerr", dataUtil.ngError)(e.data);
+
+You can edit just a single place in code:
+
+    this.error = dataUtil.ngError.E.f("myerr")(e.data);
+
+To make this available, echolot need to be initialized in a special way:
+
+    window.E = echolot.inject("E"); // In browser
+    global.E = require("echolot").inject("E"); // In Node.js
+
+`inject()` adds methods to the `Object` prototype and returns an ordinary set 
+of functions that Echolot usually exports. It accepts a name that is placed in 
+the prototype. This name is safely added with the `enumerable: false` flag.
+
+A list of implemented methods:
+
+    E.v(name)  <=> name.E.v()
+    E.f(func)  <=> func.E.f()
+    E.V(name)  <=> name.E.V()
+    E.F(func)  <=> func.E.F()
+    E._v(name) <=> name.E._v()
+    E._f(func) <=> func.E._f()
+
+    E.mb.v(name)  <=> name.E.mb.v()
+    E.mb.f(func)  <=> func.E.mb.f()
+    E.mb.V(name)  <=> name.E.mb.V()
+    E.mb.F(func)  <=> func.E.mb.F()
+    E.mb._v(name) <=> name.E.mb._v()
+    E.mb._f(func) <=> func.E.mb._f()
+
+Be careful with `null` and `undefined`. It can't be converted into an object so 
+an attempt to call its methods will cause a TypeError.
 
 
 Options
 -------
-E.conf — объект с опциями.
+`E.conf` is an object with options.
 
 ### print
     print :: (a, b, c, ...) -> String
 
-Это функция, используемая для вывода данных.
-По умолчанию: `console.log`
+It is a function for printing data. Defaults to `console.log`.
 
 ### format
     format :: Boolean
 
-Форматировать ли текст для Node.js. Будет использован нодный пакет "util". 
-Выставляется по умолчанию, если в глобальной области видимости обнаружена 
-нодная модульная система.
+If `true` output will be specially formatted by nodejs with the "util" package. 
+Defaults to `true` if the node's module system is found.
 
 * * *
 
-Следующие опции форматирования, актуальны, если `E.conf.format === true`
+Options below take place only if `E.conf.format === true`
 
 ### enumerable
     enumerable :: Boolean
 
-Распечатывать ли не перечисляемые поля объектов.
-По умолчанию: `false`
+If `true`, object's enumerable symbols and properties will be printed. Defaults 
+to `false`.
 
 ### depth
     depth :: Number | Null
 
-Глубина, на которую распечатывать объекты.
-По умолчанию: `2`
+Specifies the depth of objects that you want to see in output. Pass `null` to 
+print with the maximum depth. Defaults to 2.
 
 ### color
     color :: Boolean
 
-Разукрашивать ли распечатанные значения.
-Выставляется автоматически, если stdout соединён с терминалом.
+If `true` the output will be colored.
+It is set automaticaly if stdout is connected to a terminal.

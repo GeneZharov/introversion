@@ -1,7 +1,18 @@
 {
-  "name": "echolot",
-  "version": "0.0.4",
+  "name": "echolotjs",
+  "description": "The library for debugging JavaScript expressions, useful for a functional programming",
+  "keywords": [
+    "js",
+    "functional",
+    "debug"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kahless/echolotjs.git"
+  },
+  "version": "0.1.0",
   "license": "MIT",
+  "authors": "Yevgeny Zharov <krantadan@mail.ru>",
   "main": "lib/echolot.js",
   "ignore": [],
   "dependencies": {}
