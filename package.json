@@ -1,6 +1,6 @@
 {
   "name": "echolotjs",
-  "description": "The library for debugging JavaScript expressions, useful for a functional programming",
+  "description": "The library for debugging JavaScript expressions, useful for functional programming",
   "keywords": [
     "js",
     "functional",
