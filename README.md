@@ -88,7 +88,7 @@ Suppose you have a function and it's call:
     const random = x => Math.floor(Math.random() * x) + 10;
     random(1);
 
-You can wrap in the `E.v()` any value in an expression:
+You can wrap in the `E.v()` any value in the expression:
 
     const random = x => Math.floor(E.v(Math.random()) * x) + 10;
     random(1); //=> V: [ 0.504418952113608 ]
@@ -366,10 +366,10 @@ If `true`, object's enumerable symbols and properties will be printed. Defaults
 to `false`.
 
 ### depth
-    depth :: Number | Null
+    depth :: Number
 
-Specifies the depth of objects that you want to see in output. Pass `null` to 
-print with the maximum depth. Defaults to 2.
+Specifies the depth of objects that you want to see in output. Pass `Infinity` 
+to print with the maximum depth. Defaults to `2`.
 
 ### color
     color :: Boolean

@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "author": "Yevgeny Zharov <krantadan@mail.ru>",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "lib/echolot.js",
   "homepage": "https://github.com/kahless/echolotjs",
   "bugs": {
