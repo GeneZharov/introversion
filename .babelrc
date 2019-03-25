@@ -1,0 +1,30 @@
+{
+  "plugins": [
+    "transform-flow-strip-types",
+    "transform-es2015-modules-commonjs"
+  ],
+  "env": {
+    "es": {
+      "ignore": [
+        "__tests__"
+      ]
+    },
+    "commonjs": {
+      "plugins": [
+        ["transform-es2015-modules-commonjs", { "loose": true }]
+      ],
+      "ignore": [
+        "__tests__"
+      ]
+    },
+    "umd": {
+      "plugins": [
+        ["transform-es2015-modules-umd", { "loose": true }]
+      ],
+      "ignore": [
+        "__tests__"
+      ],
+      "moduleId": "Introversion"
+    }
+  }
+}

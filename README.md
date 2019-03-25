@@ -1,378 +1,274 @@
-Echolot.js
-==========
+Introversion.js
+===============
 
-It is a library for debugging JavaScript expressions. It is especially useful 
-for a code in a functional style.
+Tool for debugging JavaScript expressions. Works great with functional code.
+
+
+Contents
+--------
+* [Motivation](#motivation)
+* [Installation](#installation)
+* [Usage](#usage)
+    * [Values](#values)
+    * [Functions](#functions)
+    * [Methods](#methods)
+    * [Quiet mode](#quiet-mode)
+    * [Breakpoint mode](#breakpoint-mode)
+    * [Mute mode](#mute-mode)
+* [Configuration](#configuration)
+    * [Global configuration](#global-configuration)
+    * [In-place configuration](#in-place-configuration)
+    * [Options](#options)
+* [License](#license)
+
 
 Motivation
 ----------
 
-Traditional JavaScript debugging tools are applicable to statements. For 
-example you can insert a `debugger` statement; or you can create a breakpoint 
-on a statement in a debugger window. There are several ways to print a value, 
-for example `console.log()`, but usually these functions should be inserted in 
-code as separate statements.
+Suppose you have an arrow function, and you need to check a value inside of 
+this function:
 
-Echolot offers tools for a more flexible debugging, for debugging expressions, 
-that construct statements. This allows not to split an expression into separate 
-statements for debugging purpose.
+    const fn = n => n + 1; // what's in "n"?
 
-Suppose you have a function:
+In order to merely use `console.log()` you'll have to rewrite this function 
+into multiple statements:
 
-    const calc = x => x + 1;
-
-If you wish to know an "x" value, you have to rewrite this function in an 
-imperative style, as a set of statements:
-
-    const calc = x => {
-        console.log(x);
-        return x + 1;
+    const fn = n => {
+      console.log(n);
+      return n + 1;
     };
 
-Echolot allows not to waste time on it and not to break the functional 
-paradigm. For example, here are 2 ways to solve the same problem:
+Introversion allows you to simply wrap the desired value without rewriting 
+anything:
 
-    const calc = x => E.v(x) + 1; // Print the "x" expression
-    const calc = E.f(x => x + 1); // Print parameters and a return value of an arrow function
-
-More complex example with the use of the functional library called
-[Ramda](http://ramdajs.com):
-
-    // extract :: [[Item]] -> [a]
-    //   Item = {enabled: Boolean, raw: a}
-    const extract = R.pipe(
-        R.map(R.last),
-        E.f(R.filter(R.prop("enabled"))), // Print what is passed on the second pipe's step
-        R.map(R.prop("raw"))
-    );
-    $http.post("myURL" extract(links));
+    const fn = n => I.v(n) + 1; // log value
+    // ...or
+    const fn = I.f(n => n + 1); // log every function call (parameters and return value)
 
 
-Install
--------
-With a package manager:
+Installation
+------------
 
-    npm install echolotjs --save-dev
-    bower install echolotjs --save-dev
+    npm install introversion --save-dev
 
+Usually, it is convenient to setup Introversion into global scope. In order to 
+do this add the following in your main script:
 
-Initialization
---------------
-This is a recommended way to initialize the library for a big project:
+    import I from "introversion";
 
-    // In browser
-    window.E = echolot;
-
-    // In Node.js
-    global.E = require("echolot");
-
-If you have just a few scripts, or if you don't want to waste the global scope, 
-you can assign into a local scope:
-
-    // In browser
-    const E = echolot;
-
-    // In Node.js
-    const E = require("echolot");
+    I.config({...}); // if necessary
+    window.I = I; // for browser
+    global.I = I; // for node
 
 
-Watching a Value
-----------------
-`E.v()` ("v" stands for "value") merely prints an array of values passed as 
-arguments. The main difference from `console.log()` is that the last argument 
-becomes a returned value. This lets you to safely wrap any value in the 
-`E.v()`.
+Usage
+-----
 
-Suppose you have a function and it's call:
+### Values
 
-    const random = x => Math.floor(Math.random() * x) + 10;
-    random(1);
+`I.v()` (“v” stands for “value”) merely prints an array of its arguments. The 
+main difference between `console.log()` is that the last argument is returned. 
+Therefore it is safe to wrap almost any expression in `I.v()` without breaking 
+your code down.
 
-You can wrap in the `E.v()` any value in the expression:
-
-    const random = x => Math.floor(E.v(Math.random()) * x) + 10;
+    const random = n => Math.floor(I.v(Math.random()) * n) + 10;
     random(1); //=> V: [ 0.504418952113608 ]
 
-It is possible to add any other values for printing:
+You can print any other values alongside with the wrapped expression. Just pass 
+them as arguments. Only the last argument is returned, so extra arguments won't 
+affect your code:
 
-    const random = x => Math.floor(E.v(x, this, "mystr", Math.random()) * x) + 10;
+    const random = n => Math.floor(I.v(num, this, "mystr", Math.random()) * n) 10;
     random(1); //=> V: [ 1, {}, 'mystr', 0.8474771121023132 ]
 
-It can be especially useful, if there are several watchers at the same time, 
-and you need a way to distinguish their output from each other:
+You can use extra arguments to distinguish different watchers from each other 
+in the log:
 
-    const fn = x => x > 0 ? E.v(x * 1.25) : E.v(x / 9);
+    const fn = n => n > 0 ? I.v(true, n * 1.25) : I.v(false, n / 9);
+    fn(5);   //=> V: [ true, 6.25 ]
+    fn(-81); //=> V: [ false, -9 ]
 
-Then you can pass any marker as a first argument, a string, for example:
+### Functions
 
-    const fn = x => x > 0 ? E.v("positive", x * 1.25) : E.v("negative", x / 9);
-    fn(5);   //=> V: [ 'positive', 6.25 ]
-    fn(-81); //=> V: [ 'negative', -9 ]
+`I.f()` (“f” stands for “function”) is designed to watch for function calls. 
+When a wrapped function is called, its arguments and a returned value are 
+logged. If a wrapped function throws an exception, that exception will be 
+logged and then rethrown again. A wrapped in the `I.f()` function can be used 
+in the same way as an unwrapped one: all arguments and a returned value will be 
+proxied.
 
-But usually it is more convenient to merely use digits:
-
-    const fn = x => x > 0 ? E.v(0, x * 1.25) : E.v(1, x / 9);
-    fn(5);   //=> V: [ 0, 6.25 ]
-    fn(-81); //=> V: [ 1, -9 ]
-
-
-Watching a Function
--------------------
-`E.f()` ("f" stands for "function") is designed to watch for a function. It is 
-used for printing arguments and a returned value each time a function is 
-called. If a function throws an exception, this exception will be printed and 
-then rethrown again. A wrapped in the `E.f()` function can be used in the same 
-way as an unwrapped one: all arguments and a returned value will be proxied.
-
-Suppose you have:
-
-    const transform = x => 2 * x;
-    const arr = [1, 2, 3];
-    const result = arr.map(transform);
-
-Now you can wrap the function in the `E.f()` call to obtain a new function with 
-the same behavior but it will additionally print information about it's calls.
-
-    const result = arr.map(E.f(transform));
+    [1, 2].map(I.f(n => 2 * n));
 
     //=> F: []
-    //=> F Params: [1, 0, [1,2,3]]
+    //=> F Params: [1, 0, [1,2]]
     //=> F Result: 2
 
     //=> F: []
-    //=> F Params: [2, 1, [1,2,3]]
+    //=> F Params: [2, 1, [1,2]]
     //=> F Result: 4
 
-    //=> F: []
-    //=> F Params: [3, 2, [1,2,3]]
-    //=> F Result: 6
+`I.f()` can also accept additional arguments for printing just like `I.v()` 
+does:
 
-`E.f()` can accept any additional values for printing that will be printed with 
-the information about a function call, just like `E.v()` do. But the last 
-argument must always be a function that you want to watch and get a return 
-value from.
+    I.f("foo", "bar", calculate)(1, 2, 3)
 
-    const myvar = true;
-    const result = arr.map(E.f(1, "mystr", myvar, transform));
+    // => F: ["foo", "bar"] <- extra arguments go here
+    // => F Params: [1, 2, 3]
+    // => F Result: 999
 
-    //=> F: [1, "mystr", true]
-    //=> F Params: [1, 0, [1,2,3]]
-    //=> F Result: 2
+### Methods
 
-    //=> F: [1, "mystr", true]
-    //=> F Params: [2, 1, [1,2,3]]
-    //=> F Result: 4
+`I.m()` (“m” stands for “method”) is similar to `I.f()`, but it won't corrupt 
+`this` inside of a method call. In order to use it, you need to split a method 
+call into an object, and a string that represents a path to the method.
 
-    //=> F: [1, "mystr", true]
-    //=> F Params: [3, 2, [1,2,3]]
-    //=> F Result: 6
+    A.B.C.method(5); // original call
 
+    I.m(A,".B.C.method")(5); // wrapped method
+    I.m(A.B,".C.method")(5); // ...the same
+    I.m(A.B.C,".method")(5); // ...one more way to do it
 
-Watching a Method
------------------
-`E.m()` ("m" stands for "method") is similar to `E.f()`, but it let's to pass 
-`this` inside, so it can be applied to a method that needs a correct `this`. 
-`E.f()` would cause an error in such case.
+The rest behavior does not differ from the `I.f()` watcher.
 
-If you have a method call:
+### Quiet Mode
 
-    o1.o2.o3.method(5)
+    `I.V()`, `I.F()`, `I.M()`
 
-Then you need to split this expression to an object and a string that 
-represents a path to the method inside that object. The following calls produce 
-the same result:
+Sometimes you are not interested in a wrapped value itself, but you need to 
+know, that it was calculated. For example, in React Native an attempt to log an 
+event object may hang the application. Or maybe you are interested only in 
+printing additional arguments. For these cases, there are alternative quiet 
+mode watchers that don't log wrapped value itself but log all additional 
+arguments.
 
-    E.m(o1,".o2.o3.method")(5);
-    E.m(o1.o2,".o3.method")(5);
-    E.m(o1.o2.o3,".method")(5);
+    const fn = I.F("Invoked!", n = > n + 1);
+    fn(2); //=> [ 'Invoked!' ]
 
-The rest behaviour is the same as for the `E.f()` function.
+### Breakpoint Mode
 
+`I.v_()`, `I.f_()`, `I.m_()`
 
-Quiet Mode
-----------
-For all the watching functions (`E.v()`, `E.f()`, `E.m()`) and their 
-conditional alternatives (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`) there are 
-modified versions with the name in an upper case (`E.V()`, `E.F()`, `E.M()`, 
-`E.mb.V()`, `E.mb.F()`, `E.mb.M()`). They do the same job except of printing 
-the last accepted argument. This means that their purpose is not to print the 
-wrapped value, but to print additional arguments. This is useful if you don't 
-care about the way a function is called or about its returned value. You just 
-need to know if it have been invoked or not.
+Instead of printing data to console these functions create a breakpoint using 
+`debugger` statement. It can help to look around and walk through the call 
+stack. An underscore in function names symbolizes a pause in program execution.
 
-Suppose you have:
+### Mute Mode
 
-    const fn = x = > x + 1;
-    fn();
+Imagine, you have a function covered with unit tests. And 1 of 30 tests fails. 
+For debugging reasons, it's important to know a value deep inside of that 
+function. But if you log that value each time it is evaluated for every unit 
+test, there would be hundreds of log entries. In this case, the mute mode comes 
+to the rescue.
 
-You had to replace it with:
+You can use a muted watcher, that is available for any watcher under the method 
+called `mute()` (e.g. `I.v.mute()`, `I.V.mute()`, `I.v_.mute()`, `I.f.mute()`, 
+...). Muted watcher doesn't produce any logs or breakpoints unless you 
+explicitly unmute it (in the failed unit test for instance).
 
-    const fn = x => {
-        console.log("Invoked!");
-        return x + 1;
-    };
-    fn(); //=> Invoked!
+    I.unmuteF(fn); // unmute everything during this function execution
+    I.unmuteRun(() => {...}); // runs passed function and unmutes everything while it is running
+    I.unmute(); // to unmute all the muted functions
+    I.mute(); // to mute everything again
 
-But now you can write:
-
-    const fn = E.F("Invoked!", x = > x + 1);
-    fn(); //=> [ 'Invoked!' ]
-
-Or even:
-
-    const fn = x = > x + 1;
-    E.F("Invoked!", fn)(); //=> [ 'Invoked!' ]
-
-
-Breakpoint Mode
----------------
-For all the watching functions (`E.v()`, `E.f()`, `E.m()`) and their 
-conditional alternatives (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`) there are 
-modified versions with an underscore appended (`E.v_()`, `E.f_()`, `E.m_()`, 
-`E.mb.v_()`, `E.mb.f_()`, `E.mb.m_()`). Instead of printing data to console 
-they create a breakpoint with the "debugger" statement. This can help to look 
-around and walk through the call stack. An underscore in the function names 
-symbolizes the break in a program execution.
-
-
-Conditional Watchers
---------------------
-Suppose you have a JavaScript module and unit tests for it. One of the 30 tests 
-fails. You need to know some value that is calculated many times somewhere deep 
-inside the module for debugging purposes. But if you print this value each time 
-it is evaluated for every test there would be hundreds of records. To avoid 
-this mess you should use conditional versions of utilities that resides in an 
-object `E.mb` ("mb" stands for "maybe"). By default, these conditional 
-utilities (`E.mb.v()`, `E.mb.f()`, `E.mb.m()`, `E.mb.V()`, `E.mb.F()`, 
-`E.mb.M()`, `E.mb.v_()`, `E.mb.f_()`, `E.mb.m_()`) do nothing. They need to be 
-"enabled" to print some data or to create a breakpoint.
-
-Suppose you have a module and a unit test for it:
+Example:
 
     // module.js
     function action(x) {
-        // ... big function with a complicated code
-        const y = x * 8;
-        return y ^ Math.PI;
+      // ... big and complicated function
+      const y = x * 8;
+      return y ^ Math.PI;
     }
 
     // module.spec.js
     describe("action()", () => {
-        // ... other tests for the function action()
-        it("should perform a complex calculation", () => {
-            const res = action(2);
-            expect(res).toBe(16);
-        });
+      // ... lots of unit tests
+      it("should perform a complex calculation", () => {
+        const res = action(2);
+        expect(res).toBe(16);
+      });
     });
 
-First you need to wrap a desired expression in a conditional function:
+First we need to wrap a desired expression in a muted watcher:
 
     // module.js
     function action(x) {
-        ...
-        return E.mb.v(y) ^ Math.PI;
+      ...
+      return I.v.mute(y) ^ Math.PI;
     }
 
-Then you need to "enable" the conditional watcher somewhere in the code. You 
-can do it manually with the `E.enabled` flag:
+Then we need to unmute a muted watcher at the desired moment (in the failed 
+unit test in this case):
 
-    E.enabled = true;
+    // module.spec.js
+
+    // unmute a function
+    const res = I.unmuteF(action)(2);
+
+    // or unmute an expression
+    const res = I.unmuteRun(() => action(2));
+
+    // or unmute anything in a low level imperative style
+    I.unmute();
     const res = action(2);
-    E.enabled = false;
-
-Since echolot is a functional library there are functions that perform the same 
-job:
-
-    E.deb();
-    const res = action(2);
-    E.off();
-
-There is a special sugar for enabling conditional watchers inside the function 
-call:
-
-    const res = E.debF(action)(2);
-
-And there is also a utility for enabling conditional watchers in an arbitrary 
-expression. Though this utility is probably going to be deprecated in the next 
-versions.
-
-    const res = E.debV(() => action(2));
-        // Enable debugging for the action(2) expression
+    I.mute();
 
 
-Shorthands
-----------
-You can use some functions above as methods of an any object so you don't have 
-to waste time on wrapping expressions in parenthesis. For example, instead of:
+Configuration
+-------------
 
-    this.error = E.f("myerr", dataUtil.ngError)(e.data);
+### Global Configuration
 
-You can edit just a single place in code:
+You can pass any number of global options as object properties:
 
-    this.error = dataUtil.ngError.E.f("myerr")(e.data);
+    I.config({
+      format: false,
+      print: (...xs) => xscript.response.write(xs.join(" ") + "\n")
+    });
 
-To make this available, echolot need to be initialized in a special way:
+### In-place configuration
 
-    window.E = echolot.inject("E"); // In browser
-    global.E = require("echolot").inject("E"); // In Node.js
+Every watcher function has a method `with()` for setting temporary local config 
+options only for that watcher.
 
-`inject()` adds methods to the `Object` prototype and returns an ordinary set 
-of functions that Echolot usually exports. It accepts a name that is placed in 
-the prototype. This name is safely added with the `enumerable: false` flag.
+    I.v.with({ depth: Infinity })(myobj);
 
-A list of implemented methods:
+### Options
 
-    E.v(name)  <=> name.E.v()
-    E.f(func)  <=> func.E.f()
-    E.V(name)  <=> name.E.V()
-    E.F(func)  <=> func.E.F()
-    E._v(name) <=> name.E._v()
-    E._f(func) <=> func.E._f()
+#### print
+    print :: (a, b, c, ...) => string
 
-    E.mb.v(name)  <=> name.E.mb.v()
-    E.mb.f(func)  <=> func.E.mb.f()
-    E.mb.V(name)  <=> name.E.mb.V()
-    E.mb.F(func)  <=> func.E.mb.F()
-    E.mb._v(name) <=> name.E.mb._v()
-    E.mb._f(func) <=> func.E.mb._f()
+A function that actually prints values to the log. Defaults to `console.log`.
 
-Be careful with `null` and `undefined`. It can't be converted into an object so 
-an attempt to call its methods will cause a TypeError.
+#### format
+    format :: boolean
 
-
-Options
--------
-`E.conf` is an object with options.
-
-### print
-    print :: (a, b, c, ...) -> String
-
-It is a function for printing data. Defaults to `console.log`.
-
-### format
-    format :: Boolean
-
-If `true` output will be specially formatted by nodejs with the "util" package. 
-Defaults to `true` if the node's module system is found.
+If `true` output values will be formatted with `util.inspect()` from Node.js. 
+Defaults to `true` if the node's module system is detected.
 
 * * *
 
-Options below take place only if `E.conf.format === true`
+Options below are used only if the `format` option is set to `true`.
 
-### enumerable
-    enumerable :: Boolean
+#### showHidden
+    showHidden :: boolean
 
-If `true`, object's enumerable symbols and properties will be printed. Defaults 
-to `false`.
+If true, object's non-enumerable symbols and properties are included in the 
+formatted result. Defaults to `false`.
 
-### depth
-    depth :: Number
+#### depth
+    depth :: number
 
-Specifies the depth of objects that you want to see in output. Pass `Infinity` 
-to print with the maximum depth. Defaults to `2`.
+Specifies depth for objects in a log. Use `Infinity` or `null` to print with 
+the maximum depth. Defaults to `2`.
 
-### color
-    color :: Boolean
+#### color
+    color :: boolean
 
-If `true` the output will be colored.
-It is set automaticaly if stdout is connected to a terminal.
+If `true`, the output will be colored. It is enabled if stdout is connected to 
+a terminal.
+
+
+License
+-------
+
+MIT

@@ -1,33 +1,45 @@
 {
-  "name": "echolotjs",
-  "description": "The library for debugging JavaScript expressions, useful for functional programming",
+  "name": "introversion",
+  "description": "Debugging JavaScript expressions, works great with functional code",
   "keywords": [
     "js",
-    "functional",
-    "debug"
+    "debug",
+    "functional"
   ],
   "license": "MIT",
-  "author": "Yevgeny Zharov <krantadan@mail.ru>",
-  "version": "0.2.1",
-  "main": "lib/echolot.js",
-  "homepage": "https://github.com/kahless/echolotjs",
+  "author": "Gene Zharov <gene.zharov@gmail.com>",
+  "version": "0.3.0",
+  "homepage": "https://github.com/kahless/introversion",
   "bugs": {
-    "url" : "https://github.com/kahless/echolotjs/issues",
-    "email": "krantadan@mail.ru"
+    "url": "https://github.com/kahless/introversion/issues",
+    "email": "gene.zharov@gmail.com"
   },
+  "main": "lib/index.js",
+  "jsnext:main": "es/index.js",
+  "module": "es/index.js",
+  "files": [ "lib", "src", "dist", "es" ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/kahless/echolotjs.git"
+    "url": "git://github.com/kahless/introversion.git"
   },
   "scripts": {
-    "test": "karma start",
-    "lint": "eslint lib"
+    "prettify": "prettier --write 'src/**/*.js'",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "yarn build:cjs && yarn build:umd && yarn build:es && yarn build:flow",
+    "build:es": "rm -r es && NODE_ENV=es babel -d es/ src/",
+    "build:cjs": "rm -r lib && NODE_ENV=commonjs babel -d lib/ src/",
+    "build:umd": "rm -r dist && mkdirp dist/ && NODE_ENV=umd babel -o dist/introversion.js src/",
+    "build:flow": "flow-copy-source -v -i '**/__tests__/**' src lib"
   },
   "devDependencies": {
-    "eslint": "^2.8.0",
-    "jasmine-core": "^2.4.1",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "^1.0.1",
-    "karma-jasmine": "^1.0.2"
+    "babel-cli": "6.26.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "6.26.2",
+    "babel-plugin-transform-es2015-modules-umd": "6.24.1",
+    "babel-plugin-transform-flow-strip-types": "6.22.0",
+    "flow-bin": "0.95.1",
+    "flow-copy-source": "2.0.3",
+    "jest": "24.5.0",
+    "prettier": "1.16.4"
   }
 }
