@@ -1,6 +1,7 @@
 // @flow
 
-import type { Conf } from "./types";
+import type { Conf, Timer } from "../types";
+import { extraArgsNotAllowed } from "../errors/compatibility";
 
 function printLines(conf: Conf, xs: mixed[]) {
   xs.forEach(x => conf.print(x));
@@ -63,6 +64,40 @@ export function logFn(
     if (!quiet) {
       conf.print("F Params:", args);
       error ? conf.print("F ERROR!:", result) : conf.print("F Result:", result);
+    }
+  }
+
+  conf.format ? logFormatted() : logTerse();
+}
+
+export function logTime(
+  conf: Conf,
+  timer: Timer,
+  args: mixed[],
+  id: string,
+  ellapsed: number
+): void {
+  function logFormatted() {
+    conf.print("# Time");
+    if (args.length) {
+      conf.print(fmt(conf, args));
+    }
+    if (timer === "console") {
+      console.timeEnd(id);
+    } else {
+      conf.print(`${ellapsed} ms`);
+    }
+    conf.print(); // New line for terminals
+  }
+
+  function logTerse() {
+    if (timer === "console") {
+      console.timeEnd(id);
+      if (args.length) {
+        throw extraArgsNotAllowed(id, args);
+      }
+    } else {
+      conf.print("Time:", args, `${ellapsed}ms`);
     }
   }
 

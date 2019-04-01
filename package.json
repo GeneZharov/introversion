@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "author": "Gene Zharov <gene.zharov@gmail.com>",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "homepage": "https://github.com/kahless/introversion",
   "bugs": {
     "url": "https://github.com/kahless/introversion/issues",
@@ -17,7 +17,12 @@
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
   "module": "es/index.js",
-  "files": [ "lib", "src", "dist", "es" ],
+  "files": [
+    "lib",
+    "src",
+    "dist",
+    "es"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/kahless/introversion.git"
@@ -41,5 +46,8 @@
     "flow-copy-source": "2.0.3",
     "jest": "24.5.0",
     "prettier": "1.16.4"
+  },
+  "dependencies": {
+    "lodash": "4.17.11"
   }
 }

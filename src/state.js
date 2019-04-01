@@ -12,14 +12,22 @@ const isTerm = process && process.stdout && (process.stdout: any).isTTY;
 
 export let globalConf: Conf = {
   print: (...xs) => console.log(...xs),
+  timer: "auto",
+
+  // util.inspect options
   format: isCommonJS,
   showHidden: false,
   depth: 2,
   color: isCommonJS ? isTerm : true,
-  times: Infinity
+
+  // in-place options
+  id: "",
+  guard: Infinity,
+  repeat: 1
 };
 
 export let state: State = {
-  times: new Map(),
-  muted: true // Whether conditional watchers are disabled
+  muted: true, // Whether muted watchers are disabled
+  guard: new Map(),
+  timers: new Map()
 };

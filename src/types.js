@@ -1,17 +1,32 @@
 // @flow
 
+export type Timer =
+  | "auto"
+  | "performance"
+  | "console"
+  | "date"
+  | (() => number);
+
 export type Conf = {
   print: (...args: mixed[]) => void,
+  timer: Timer,
+
+  // util.inspect options
   format: boolean,
   showHidden: boolean,
   depth: number,
   color: boolean,
-  times: number
+
+  // in-place options
+  id: string,
+  guard: number,
+  repeat: number | string
 };
 
 export type State = {
-  times: Map<mixed, number>,
-  muted: boolean
+  muted: boolean,
+  guard: Map<mixed, number>,
+  timers: Map<mixed, number>
 };
 
 export type Modes = {
@@ -19,14 +34,4 @@ export type Modes = {
   method: boolean,
   deb: boolean,
   mute: boolean
-};
-
-export type Task = {
-  conf: Conf,
-  log: boolean,
-  deb: boolean,
-  quiet: boolean,
-  extras: mixed[],
-  val: *,
-  self: mixed
 };
