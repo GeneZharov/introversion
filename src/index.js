@@ -1,16 +1,27 @@
 // @flow
 
-import type { Conf } from "./types";
-import { ModesArg, api } from "./util/api";
+import { init, last, map } from "ramda";
+
+import type { Conf } from "./types/conf";
+import { ConfArg, ModesArg, api, withApi } from "./util/app/api";
 import { globalConf } from "./state";
-import { validateConf } from "./util/validateConf";
+import { validateConf } from "./util/app/validateConf";
 import * as _mute from "./mute";
 import * as _time from "./time";
 import * as _watcher from "./watcher";
 
-export function config(conf: $Shape<Conf>): void {
+export type API = typeof tools;
+
+export function setDefaults(conf: $Shape<Conf>): void {
   validateConf(conf);
   Object.assign(globalConf, conf);
+}
+
+export function instance(...args: *[]): API {
+  const _args = init(args);
+  const conf = last(args);
+  validateConf(conf);
+  return map(f => api(f, ..._args, new ConfArg(conf)), tools);
 }
 
 export const v = api(_watcher.val);
@@ -36,8 +47,37 @@ export const mute = api(_mute.mute);
 export const unmuteF = api(_mute.unmuteF);
 export const unmuteRun = api(_mute.unmuteRun);
 
+const tools = {
+  setDefaults,
+  instance,
+
+  v,
+  f,
+  m,
+  V,
+  F,
+  M,
+  v_,
+  f_,
+  m_,
+
+  time,
+  timeEnd,
+  stopwatch,
+  lap,
+  timeF,
+  timeM,
+  timeRun,
+
+  unmute,
+  mute,
+  unmuteF,
+  unmuteRun
+};
+
 export default {
-  config,
+  setDefaults,
+  instance,
 
   v,
   f,

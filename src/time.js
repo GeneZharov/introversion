@@ -1,80 +1,57 @@
 // @flow
 
-import rangeStep from "lodash/fp/rangeStep";
-import toString from "lodash/fp/toString";
+import { range } from "ramda";
 
-import type { Conf, Timer } from "./types";
-import { invalidTimerReturn } from "./errors/conf-runtime";
-import { logTime } from "./util/logging";
-import { makeID, makeCallID } from "./util/id";
-import {
-  notCallableLastArg,
-  invalidTimeID,
-  repeatNotAllowed
-} from "./errors/compatibility";
-import { parseArgs, parseUserArgs } from "./util/api";
-import { parseSuffix } from "./util/suffix";
+import type { Modes } from "./types/modes";
+import type { Task } from "./types/_";
+import type { TimerOption } from "./types/conf";
+import type { _Conf } from "./types/_conf";
+import { detectPerformance } from "./util/detect/detectPerformance";
+import { getGuard, saveGuard } from "./util/app/guard";
+import { invalidTimerReturn, performanceNotAvail } from "./errors/conf-runtime";
+import { logTime } from "./util/app/logging";
+import { makeID, makeCallID } from "./util/app/id";
+import { notCallableLastArg } from "./errors/_";
+import { parseUserArgs, withApi } from "./util/app/api";
 import { state } from "./state";
 
 export const STOPWATCH_ID = makeID("stopwatch");
 
-const isPerfAvail =
-  typeof performance === "object" &&
-  performance !== null &&
-  typeof performance.now === "function";
-
-const isConsoleAvail = console && typeof console.log === "function";
-
-function normalizeOptions(
-  conf: Conf
-): {
-  id: mixed,
-  repeat: number,
-  timer: Timer
-} {
-  const timer =
-    conf.timer !== "auto"
-      ? conf.timer
-      : isPerfAvail
-      ? "performance"
-      : isConsoleAvail
-      ? "console"
-      : "date";
-  const id = timer === "console" ? toString(conf.id) : conf.id;
-  const repeat =
-    typeof conf.repeat === "string" ? parseSuffix(conf.repeat) : conf.repeat;
-  if (timer === "console" && repeat > 1) {
-    throw new repeatNotAllowed();
+function selectFuncName(method: boolean, task: Task): string {
+  if (task === "timeFn") {
+    return method ? "timeM" : "timeF";
+  } else {
+    return task;
   }
-  return { id, repeat, timer };
 }
 
-function genTask(
-  args: mixed[]
+function normalize(
+  args: mixed[],
+  conf: _Conf,
+  modes: $Shape<Modes>,
+  task: Task
 ): {
-  mute: boolean,
-  conf: Conf,
-  userArgs: mixed[],
-  _conf: {
-    id: mixed,
-    repeat: number,
-    timer: Timer
-  },
-  _userArgs: {
+  measure: boolean,
+  name: string,
+  _args: {
     extras: mixed[],
-    val: mixed,
+    val: mixed[],
     self: mixed
   }
 } {
-  const { modes, conf, userArgs } = parseArgs(args);
-  const _userArgs = parseUserArgs(modes, userArgs);
-  const _conf = normalizeOptions(conf);
-  const mute = modes.mute && state.muted;
-  return { mute, conf, userArgs, _conf, _userArgs };
+  const name = selectFuncName(modes.method, task);
+  const _args = parseUserArgs(modes, args);
+  const guard = getGuard(conf.id, conf.guard);
+  const measure = guard > 0 && !(modes.mute && state.muted);
+  saveGuard(conf.id, guard);
+  return { measure, name, _args };
 }
 
-function getTime(src: Timer): number {
+function getTime(src: TimerOption): number {
   if (src === "performance") {
+    if (!detectPerformance()) {
+      throw performanceNotAvail();
+    }
     return performance.now();
   } else if (src === "date") {
     return Date.now();
@@ -89,15 +66,15 @@ function getTime(src: Timer): number {
   }
 }
 
-function start(src: Timer, id: string): void {
+function start(src: TimerOption, id: mixed): void {
   if (src === "console") {
-    console.time(id);
+    console.time((id: any));
   } else {
     state.timers.set(id, getTime(src));
   }
 }
 
-function stop(src: Timer, id: string): number {
+function stop(src: TimerOption, id: mixed): number {
   if (src === "console") {
     return NaN;
   } else {
@@ -112,107 +89,105 @@ function stop(src: Timer, id: string): number {
   }
 }
 
-export function time(...args: mixed[]): void {
-  const {
-    mute,
-    _conf: { timer },
-    _userArgs: { val: id }
-  } = genTask(args);
-  if (!mute) {
-    if (typeof id === "string") {
-      start(timer, id);
-    } else {
-      throw invalidTimeID();
+export const time = withApi(
+  "time",
+  (args, conf, modes, task): void => {
+    const {
+      measure,
+      _args: {
+        val: [timerID]
+      }
+    } = normalize(args, conf, modes, task);
+    if (measure) {
+      start(conf.timer, timerID);
     }
   }
-}
+);
 
-export function timeEnd(...args: mixed[]): void {
-  const {
-    mute,
-    conf,
-    userArgs,
-    _conf: { timer },
-    _userArgs: { val: id }
-  } = genTask(args);
-  if (!mute) {
-    if (typeof id === "string") {
-      const ellapsed = stop(timer, id);
-      logTime(conf, timer, userArgs, id, ellapsed);
-    } else {
-      throw invalidTimeID();
+export const timeEnd = withApi(
+  "timeEnd",
+  (args, conf, modes, task): void => {
+    const {
+      measure,
+      name,
+      _args: {
+        val: [timerID]
+      }
+    } = normalize(args, conf, modes, task);
+    if (measure) {
+      const ellapsed = stop(conf.timer, timerID);
+      logTime(name, conf, 4, args, timerID, ellapsed);
     }
   }
-}
+);
 
-export function timeFn(...args: any[]) {
+export const timeFn = withApi("timeFn", (args, conf, modes, task) => {
   return (..._args: mixed[]): any => {
     const {
-      mute,
-      conf,
-      _conf: { timer, repeat },
-      _userArgs: { extras, val, self }
-    } = genTask(args);
-    if (typeof val !== "function") {
-      throw notCallableLastArg();
+      measure,
+      name,
+      _args: { extras, val, self }
+    } = normalize(args, conf, modes, task);
+    if (typeof val[0] !== "function") {
+      throw notCallableLastArg(task);
     } else {
-      if (mute) {
-        return (val: Function).apply(self, _args);
-      } else {
+      if (measure) {
         const id = conf.id || makeCallID();
-        start(timer, id);
-        const [result] = rangeStep(1, 0, repeat).map(_ =>
-          (val: Function).apply(self, _args)
+        start(conf.timer, id);
+        const [result] = range(0, conf.repeat).map(_ =>
+          (val[0]: Function).apply(self, _args)
         );
-        const ellapsed = stop(timer, id);
-        logTime(conf, timer, extras, id, ellapsed / repeat);
+        const ellapsed = stop(conf.timer, id);
+        logTime(name, conf, 3, extras, id, ellapsed);
         return result;
+      } else {
+        return (val[0]: Function).apply(self, _args);
       }
     }
   };
-}
+});
 
-export function timeRun<T>(...args: any[]): any {
-  const {
-    mute,
-    conf,
-    _conf: { timer, repeat },
-    _userArgs: { extras, val }
-  } = genTask(args);
-  if (typeof val !== "function") {
-    throw notCallableLastArg();
-  } else {
-    if (mute) {
-      return (val: Function)();
+export const timeRun = withApi(
+  "timeRun",
+  (args, conf, modes, task): any => {
+    const {
+      measure,
+      name,
+      _args: { extras, val }
+    } = normalize(args, conf, modes, task);
+    if (typeof val[0] !== "function") {
+      throw notCallableLastArg(task);
     } else {
-      const id = conf.id || makeCallID();
-      start(timer, id);
-      const [result] = rangeStep(1, 0, repeat).map(_ => (val: Function)());
-      const ellapsed = stop(timer, id);
-      logTime(conf, timer, extras, id, ellapsed / repeat);
-      return result;
+      if (measure) {
+        const id = conf.id || makeCallID();
+        start(conf.timer, id);
+        const [result] = range(0, conf.repeat).map(_ => (val[0]: Function)());
+        const ellapsed = stop(conf.timer, id);
+        logTime(name, conf, 4, extras, id, ellapsed);
+        return result;
+      } else {
+        return (val[0]: Function)();
+      }
     }
   }
-}
+);
 
-export function stopwatch(...args: mixed[]): void {
-  const {
-    mute,
-    _conf: { timer }
-  } = genTask(args);
-  if (!mute) start(timer, STOPWATCH_ID);
-}
-
-export function lap(...args: any[]): void {
-  const {
-    mute,
-    conf,
-    userArgs,
-    _conf: { timer }
-  } = genTask(args);
-  if (!mute) {
-    const ellapsed = stop(timer, STOPWATCH_ID);
-    logTime(conf, timer, userArgs, conf.id || STOPWATCH_ID, ellapsed);
-    start(timer, STOPWATCH_ID);
+export const stopwatch = withApi(
+  "stopwatch",
+  (args, conf, modes, task): void => {
+    const { measure } = normalize(args, conf, modes, task);
+    if (measure) start(conf.timer, STOPWATCH_ID);
   }
-}
+);
+
+export const lap = withApi(
+  "lap",
+  (args, conf, modes, task): void => {
+    const { measure, name } = normalize(args, conf, modes, task);
+    if (measure) {
+      const ellapsed = stop(conf.timer, STOPWATCH_ID);
+      logTime(name, conf, 4, args, STOPWATCH_ID, ellapsed);
+      start(conf.timer, STOPWATCH_ID);
+    }
+  }
+);

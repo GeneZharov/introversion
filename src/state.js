@@ -1,27 +1,28 @@
 // @flow
 
-import type { Conf, State } from "./types";
-
-const isCommonJS =
-  typeof module !== "undefined" &&
-  typeof module.exports === "object" &&
-  module.exports !== null;
-
-const isTerm = process && process.stdout && (process.stdout: any).isTTY;
-// process.stdout is undefined in React Native
+import type { Conf } from "./types/conf";
+import type { State } from "./types/state";
+import { detectReactNative } from "./util/detect/detectReactNative";
+import { detectTerminal } from "./util/detect/detectTerminal";
 
 export let globalConf: Conf = {
-  print: (...xs) => console.log(...xs),
   timer: "auto",
+  print: (...xs) => console.log(...xs),
+  clone: "auto",
+  dev: false,
 
-  // util.inspect options
-  format: isCommonJS,
-  showHidden: false,
-  depth: 2,
-  color: isCommonJS ? isTerm : true,
+  // stacktrace
+  stackTrace: true,
+  stackTraceAsync: !detectReactNative(),
+  stackTraceShift: detectReactNative() ? 1 : 0,
+
+  // formatting
+  format: "auto",
+  highlight: detectTerminal(),
+  inspectOptions: { colors: detectTerminal() },
 
   // in-place options
-  id: "",
+  id: undefined,
   guard: Infinity,
   repeat: 1
 };

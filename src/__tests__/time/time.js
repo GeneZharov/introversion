@@ -1,14 +1,21 @@
 // @flow
 
-import { extraArgsNotAllowed, invalidTimeID } from "../../errors/compatibility";
-import I from "../../index";
+import { range } from "ramda";
 
-const id = "id";
+import { extraArgsNotAllowed } from "../../errors/conf-compatibility";
+import Introversion from "../../index";
 
-const print = jest.fn(_ => {});
+const id = "ID";
+
+const print = jest.fn();
 const timer = jest.fn(_ => 0);
 
-I.config({ format: false, print, timer });
+const In = Introversion.instance({
+  format: false,
+  print,
+  timer,
+  stackTrace: false
+});
 
 afterEach(() => {
   print.mockClear();
@@ -18,45 +25,71 @@ afterEach(() => {
 describe("time() and timeEnd()", () => {
   describe("when muted", () => {
     test("should not log anything", () => {
-      I.time.mute(id);
-      I.timeEnd.mute(id);
+      In.time.mute(id);
+      In.timeEnd.mute(id);
       expect(timer.mock.calls.length).toEqual(0);
       expect(print).not.toBeCalled();
     });
   });
+
   describe("when unmuted", () => {
-    afterEach(() => {
+    test("should log time without args", () => {
+      In.time();
+      In.timeEnd();
       expect(timer.mock.calls.length).toEqual(2);
-      expect(print).toBeCalledWith("Time:", [id], "0ms");
+      expect(print).toBeCalledWith("timeEnd()", "0 ms");
     });
-    test("should log time", () => {
-      I.time(id);
-      I.timeEnd(id);
+    test("should log time with timerID", () => {
+      In.time(id);
+      In.timeEnd(id);
+      expect(timer.mock.calls.length).toEqual(2);
+      expect(print).toBeCalledWith("timeEnd()", [id], "0 ms");
     });
-    test("should log with I.unmuteRun()", () => {
+    test("should log with In.unmuteRun()", () => {
       const action = () => {
-        I.time.mute(id);
-        I.timeEnd.mute(id);
+        In.time.mute(id);
+        In.timeEnd.mute(id);
       };
-      I.unmuteRun(action);
+      In.unmuteRun(action);
+      expect(timer.mock.calls.length).toEqual(2);
+      expect(print).toBeCalledWith("timeEnd()", [id], "0 ms");
     });
-    test("should log with I.unmuteF()", () => {
+    test("should log with In.unmuteF()", () => {
       const action = () => {
-        I.time.mute(id);
-        I.timeEnd.mute(id);
+        In.time.mute(id);
+        In.timeEnd.mute(id);
       };
-      I.unmuteF(action)();
+      In.unmuteF(action)();
+      expect(timer.mock.calls.length).toEqual(2);
+      expect(print).toBeCalledWith("timeEnd()", [id], "0 ms");
     });
   });
+
+  test('should respect the "guard" option', () => {
+    const log1 = jest.fn();
+    const log2 = jest.fn();
+    const log3 = jest.fn();
+    range(0, 100).forEach(_ => {
+      In.time.with({ print: log1, guard: 3 })();
+      In.timeEnd.with({ print: log1, guard: 3 })();
+      In.time.with({ print: log2, guard: 1, id: 2 })();
+      In.timeEnd.with({ print: log2, guard: 1, id: 3 })();
+      In.time.with({ print: log3, guard: 6, id: 4 })();
+      In.timeEnd.with({ print: log3, guard: 6, id: 5 })();
+    });
+    expect(log1.mock.calls.length).toBe(3);
+    expect(log2.mock.calls.length).toBe(1);
+    expect(log3.mock.calls.length).toBe(6);
+  });
+
   describe("should throw", () => {
-    test("param is not a string", () => {
-      expect(() => I.time(1)).toThrow(invalidTimeID());
-      expect(() => I.timeEnd(1)).toThrow(invalidTimeID());
+    test("performance.now() is not available", () => {
+      // FIXME
     });
     test("extra args are used with console timer", () => {
-      I.time(id);
-      expect(() => I.timeEnd.with({ timer: "console" })(1, 2, 3, id)).toThrow(
-        extraArgsNotAllowed(id, [1, 2, 3, id])
+      In.time(id);
+      expect(() => In.timeEnd.with({ timer: "console" })(1, 2, 3, id)).toThrow(
+        extraArgsNotAllowed()
       );
     });
   });
