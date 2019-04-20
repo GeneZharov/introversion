@@ -7,15 +7,16 @@ import type { Task } from "./types/_";
 import type { TimerOption } from "./types/conf";
 import type { _Conf } from "./types/_conf";
 import { detectPerformance } from "./util/detect/detectPerformance";
+import { genTimerID } from "./util/app/id";
 import { getGuard, saveGuard } from "./util/app/guard";
 import { invalidTimerReturn, performanceNotAvail } from "./errors/conf-runtime";
 import { logTime } from "./util/app/logging";
-import { makeID, makeCallID } from "./util/app/id";
 import { notCallableLastArg } from "./errors/_";
 import { parseUserArgs, withApi } from "./util/app/api";
 import { state } from "./state";
 
-export const STOPWATCH_ID = makeID("stopwatch");
+const DEFAULT_ID = "default";
+const STOPWATCH_ID = "lap";
 
 function selectFuncName(method: boolean, task: Task): string {
   if (task === "timeFn") {
@@ -76,6 +77,7 @@ function start(src: TimerOption, id: mixed): void {
 
 function stop(src: TimerOption, id: mixed): number {
   if (src === "console") {
+    console.timeEnd((id: any));
     return NaN;
   } else {
     const start = state.timers.get(id);
@@ -95,7 +97,7 @@ export const time = withApi(
     const {
       measure,
       _args: {
-        val: [timerID]
+        val: [timerID = DEFAULT_ID]
       }
     } = normalize(args, conf, modes, task);
     if (measure) {
@@ -111,12 +113,13 @@ export const timeEnd = withApi(
       measure,
       name,
       _args: {
-        val: [timerID]
+        extras,
+        val: [timerID = DEFAULT_ID]
       }
     } = normalize(args, conf, modes, task);
     if (measure) {
       const ellapsed = stop(conf.timer, timerID);
-      logTime(name, conf, 4, args, timerID, ellapsed);
+      logTime(name, conf, 4, extras, timerID, ellapsed);
     }
   }
 );
@@ -132,13 +135,13 @@ export const timeFn = withApi("timeFn", (args, conf, modes, task) => {
       throw notCallableLastArg(task);
     } else {
       if (measure) {
-        const id = conf.id || makeCallID();
-        start(conf.timer, id);
+        const timerID = genTimerID(conf.id);
+        start(conf.timer, timerID);
         const [result] = range(0, conf.repeat).map(_ =>
           (val[0]: Function).apply(self, _args)
         );
-        const ellapsed = stop(conf.timer, id);
-        logTime(name, conf, 3, extras, id, ellapsed);
+        const ellapsed = stop(conf.timer, timerID);
+        logTime(name, conf, 3, extras, timerID, ellapsed);
         return result;
       } else {
         return (val[0]: Function).apply(self, _args);
@@ -159,11 +162,11 @@ export const timeRun = withApi(
       throw notCallableLastArg(task);
     } else {
       if (measure) {
-        const id = conf.id || makeCallID();
-        start(conf.timer, id);
+        const timerID = genTimerID(conf.id);
+        start(conf.timer, timerID);
         const [result] = range(0, conf.repeat).map(_ => (val[0]: Function)());
-        const ellapsed = stop(conf.timer, id);
-        logTime(name, conf, 4, extras, id, ellapsed);
+        const ellapsed = stop(conf.timer, timerID);
+        logTime(name, conf, 4, extras, timerID, ellapsed);
         return result;
       } else {
         return (val[0]: Function)();

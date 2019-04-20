@@ -11,6 +11,7 @@ import type { _Conf } from "../../types/_conf";
 import { extraArgsNotAllowed } from "../../errors/conf-runtime";
 import { formatStackFrame } from "../format/formatStackFrame";
 import { formatSuffix } from "../number/suffix";
+import { genString } from "../string/genString";
 
 const chalk = new Chalk.constructor();
 
@@ -92,7 +93,7 @@ export function logVal(
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.print(""); // New line for terminals
+    conf.print(""); // New line
   }
 
   getTrace(conf, trace => {
@@ -149,7 +150,7 @@ export function logFn(
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.print("");
+    conf.print(""); // New line
   }
 
   getTrace(conf, trace => {
@@ -167,6 +168,10 @@ export function logTime(
   timerID: mixed,
   ellapsed: number
 ): void {
+  if (conf.timer === "console" && args.length) {
+    throw extraArgsNotAllowed();
+  }
+
   const clone = _clone(conf);
 
   function formatTimer(timer: TimerOption): string {
@@ -181,46 +186,39 @@ export function logTime(
   }
 
   function log(trace, frameIdx, frame) {
-    if (conf.timer === "console") {
-      console.timeEnd((timerID: any));
-      if (args.length) {
-        throw extraArgsNotAllowed();
-      }
-    } else {
+    if (conf.timer !== "console") {
       conf.print(
         `${name}()`,
         ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
         ...(args.length ? [clone(args)] : []),
-        `${ellapsed / conf.repeat} ms`,
+        `${ellapsed / conf.repeat}ms`,
         ...(conf.repeat > 1
-          ? [`(${formatSuffix(conf.repeat)} repeats in ${ellapsed} ms)`]
+          ? [`(${formatSuffix(conf.repeat)} repeats in ${ellapsed}ms)`]
           : []),
         ...(typeof conf.timer !== "function"
           ? [`by ${formatTimer(conf.timer)}`]
           : [])
       );
-      if (conf.dev) {
-        logDev(clone(conf), trace, frameIdx);
-      }
+    }
+    if (conf.dev) {
+      logDev(clone(conf), trace, frameIdx);
     }
   }
 
   function logFmt(trace, frameIdx, frame) {
     chalk.enabled = conf.highlight;
-    conf.print(
-      chalk.bold(`${name}()`),
-      ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
-    );
-    if (args.length) {
-      conf.print(inspect(conf, args));
-    }
-    if (conf.timer === "console") {
-      console.timeEnd((timerID: any));
-    } else {
+    if (conf.timer !== "console") {
       conf.print(
-        `${ellapsed / conf.repeat} ms`,
+        chalk.bold(`${name}()`),
+        ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
+      );
+      if (args.length) {
+        conf.print(inspect(conf, args));
+      }
+      conf.print(
+        `${genString(timerID)}: ${ellapsed / conf.repeat}ms`,
         ...(conf.repeat > 1
-          ? [`(${formatSuffix(conf.repeat)} repeats in ${ellapsed} ms)`]
+          ? [`(${formatSuffix(conf.repeat)} repeats in ${ellapsed}ms)`]
           : []),
         ...(typeof conf.timer !== "function"
           ? [`by ${formatTimer(conf.timer)}`]
@@ -230,7 +228,7 @@ export function logTime(
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.print(""); // New line for terminals
+    conf.print(""); // New line
   }
 
   getTrace(conf, trace => {

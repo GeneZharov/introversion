@@ -22,7 +22,7 @@ test("invalidTimerReturn()", () => {
 
 test("performanceNotAvail()", () => {
   const now = performance.now;
-  Object.defineProperty(performance, "now", {
+  Object.defineProperty((performance: any), "now", {
     value: null,
     configurable: true
   });
@@ -30,7 +30,7 @@ test("performanceNotAvail()", () => {
   expect(() => {
     In.timeRun.with(conf)(fn);
   }).toThrow(performanceNotAvail());
-  Object.defineProperty(performance, "now", { value: now });
+  Object.defineProperty((performance: any), "now", { value: now });
 });
 
 test("extraArgsNotAllowed()", () => {

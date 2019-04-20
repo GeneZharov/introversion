@@ -1,11 +1,9 @@
 // @flow
 
-let idNumber = 0;
+import { genString } from "../string/genString";
 
-export function makeID(name: string): string {
-  return `timer-${name}`;
-}
+let idNumber: number = 0;
 
-export function makeCallID(): string {
-  return makeID(idNumber.toString());
+export function genTimerID(id: mixed): string {
+  return genString(id) + "-" + idNumber++;
 }
