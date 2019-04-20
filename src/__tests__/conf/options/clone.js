@@ -1,6 +1,6 @@
 // @flow
 
-import Introversion from "../../index";
+import Introversion from "../../../index";
 
 const print = jest.fn();
 

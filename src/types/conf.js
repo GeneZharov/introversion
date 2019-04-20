@@ -1,17 +1,15 @@
 // @flow
 
+export type StackTraceItem = "func" | "file" | "line" | "col";
+
+export type AutoBoolean = "auto" | boolean;
+
 export type TimerOption =
   | "auto"
   | "performance"
   | "console"
   | "date"
   | (() => number);
-
-export type CloneOption = "auto" | boolean;
-
-export type StackTraceItem = "func" | "file" | "line" | "col";
-
-export type FormatOption = "auto" | boolean;
 
 export type StackFrame = {
   functionName?: string,
@@ -24,16 +22,16 @@ export type StackFrame = {
 export type Conf = {
   timer: TimerOption,
   print: (...args: mixed[]) => void,
-  clone: CloneOption,
+  clone: AutoBoolean,
   dev: boolean,
 
   // stacktrace
   stackTrace: boolean | StackTraceItem[],
-  stackTraceAsync: boolean,
+  stackTraceAsync: AutoBoolean,
   stackTraceShift: number,
 
   // formatting
-  format: FormatOption,
+  format: AutoBoolean,
   highlight: boolean,
   inspectOptions: util$InspectOptions,
 

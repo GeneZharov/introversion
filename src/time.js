@@ -176,7 +176,9 @@ export const stopwatch = withApi(
   "stopwatch",
   (args, conf, modes, task): void => {
     const { measure } = normalize(args, conf, modes, task);
-    if (measure) start(conf.timer, STOPWATCH_ID);
+    if (measure) {
+      start(conf.timer, STOPWATCH_ID);
+    }
   }
 );
 

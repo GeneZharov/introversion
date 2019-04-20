@@ -12,8 +12,8 @@ import {
   invalidStackTraceShiftOpt,
   invalidTimerOpt,
   unknownOpt
-} from "../../errors/conf";
-import In from "../../index";
+} from "../../../errors/conf";
+import In from "../../../index";
 
 test("unknown option", () => {
   const opt = "asfd";

@@ -3,9 +3,8 @@
 import { toString } from "ramda";
 
 import type {
-  CloneOption,
+  AutoBoolean,
   Conf,
-  FormatOption,
   StackTraceItem,
   TimerOption
 } from "../../types/conf";
@@ -14,10 +13,14 @@ import type { _Conf, _TimerOption } from "../../types/_conf";
 import { detectConsole } from "../detect/detectConsole";
 import { detectDevTools } from "../detect/detectDevTools";
 import { detectPerformance } from "../detect/detectPerformance";
+import { detectReactNative } from "../detect/detectReactNative";
 import { detectTerminal } from "../detect/detectTerminal";
 import { invalidRepeatOpt } from "../../errors/conf";
 import { parseSuffix } from "../number/suffix";
-import { repeatNotAllowed } from "../../errors/conf-compatibility";
+import {
+  repeatNotAllowed,
+  stackTraceAsyncNotAllowed
+} from "../../errors/conf-runtime";
 
 function normalizeTimer(timer: TimerOption): _TimerOption {
   return timer !== "auto"
@@ -29,7 +32,7 @@ function normalizeTimer(timer: TimerOption): _TimerOption {
     : "date";
 }
 
-function normalizeClone(clone: CloneOption): boolean {
+function normalizeClone(clone: AutoBoolean): boolean {
   return clone === "auto" ? !detectTerminal() || detectDevTools() : clone;
 }
 
@@ -45,7 +48,6 @@ function normalizeId(timer: _TimerOption, task: Task, id: mixed): mixed {
 
 function normalizeRepeat(timer: _TimerOption, repeat: number | string): number {
   const _repeat = typeof repeat === "string" ? parseSuffix(repeat) : repeat;
-  // Check for runtime errors
   if (isNaN(_repeat) || _repeat === 0) {
     throw invalidRepeatOpt();
   }
@@ -65,7 +67,20 @@ function normalizeStackTrace(
     : stackTrace;
 }
 
-function normalizeFormat(format: FormatOption): boolean {
+function normalizeStackTraceAsync(
+  timer: _TimerOption,
+  stackTraceAsync: AutoBoolean
+): boolean {
+  if (timer === "console" && stackTraceAsync === true) {
+    throw stackTraceAsyncNotAllowed();
+  } else if (stackTraceAsync === "auto") {
+    return timer !== "console" && !detectReactNative();
+  } else {
+    return stackTraceAsync;
+  }
+}
+
+function normalizeFormat(format: AutoBoolean): boolean {
   return format === "auto" ? detectTerminal() && !detectDevTools() : format;
 }
 
@@ -75,6 +90,16 @@ export function normalizeConf(conf: Conf, task: Task): _Conf {
   const id = normalizeId(timer, task, conf.id);
   const repeat = normalizeRepeat(timer, conf.repeat);
   const stackTrace = normalizeStackTrace(conf.stackTrace);
+  const stackTraceAsync = normalizeStackTraceAsync(timer, conf.stackTraceAsync);
   const format = normalizeFormat(conf.format);
-  return ({ ...conf, timer, clone, stackTrace, format, id, repeat }: any);
+  return ({
+    ...conf,
+    timer,
+    clone,
+    stackTrace,
+    stackTraceAsync,
+    format,
+    id,
+    repeat
+  }: any);
 }

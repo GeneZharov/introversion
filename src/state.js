@@ -13,7 +13,7 @@ export let globalConf: Conf = {
 
   // stacktrace
   stackTrace: true,
-  stackTraceAsync: !detectReactNative(),
+  stackTraceAsync: "auto",
   stackTraceShift: detectReactNative() ? 1 : 0,
 
   // formatting

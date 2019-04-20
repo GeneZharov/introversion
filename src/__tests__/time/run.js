@@ -2,10 +2,6 @@
 
 import { range } from "ramda";
 
-import {
-  extraArgsNotAllowed,
-  repeatNotAllowed
-} from "../../errors/conf-compatibility";
 import Introversion from "../../index";
 
 const id = "id";
@@ -84,20 +80,5 @@ describe("timeRun()", () => {
     expect(log1.mock.calls.length).toBe(3);
     expect(log2.mock.calls.length).toBe(1);
     expect(log3.mock.calls.length).toBe(6);
-  });
-
-  describe("should throw", () => {
-    jest.spyOn(global.console, "time").mockImplementation(() => {});
-    jest.spyOn(global.console, "timeEnd").mockImplementation(() => {});
-    test("extra args are used with console timer", () => {
-      expect(() => {
-        In.timeRun.with({ id, timer: "console" })(1, 2, fn => ({ name }));
-      }).toThrow(extraArgsNotAllowed());
-    });
-    test('"repeat" option with console timer', () => {
-      expect(() => {
-        In.timeRun.with({ repeat: 2, timer: "console" })(() => fn({ name }));
-      }).toThrow(repeatNotAllowed());
-    });
   });
 });

@@ -2,13 +2,13 @@
 
 import util from "util";
 
-import { clone, fromPairs } from "ramda";
+import { T, clone, fromPairs } from "ramda";
 import Chalk from "chalk";
 import Stacktrace from "stacktrace-js";
 
 import type { StackFrame, TimerOption } from "../../types/conf";
 import type { _Conf } from "../../types/_conf";
-import { extraArgsNotAllowed } from "../../errors/conf-compatibility";
+import { extraArgsNotAllowed } from "../../errors/conf-runtime";
 import { formatStackFrame } from "../format/formatStackFrame";
 import { formatSuffix } from "../number/suffix";
 

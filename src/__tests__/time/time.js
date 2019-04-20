@@ -2,7 +2,7 @@
 
 import { range } from "ramda";
 
-import { extraArgsNotAllowed } from "../../errors/conf-compatibility";
+import { extraArgsNotAllowed } from "../../errors/conf-runtime";
 import Introversion from "../../index";
 
 const id = "ID";

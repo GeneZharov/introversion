@@ -1,6 +1,6 @@
 // @flow
 
-import In from "../../index";
+import In from "../../../index";
 
 const print = jest.fn();
 

@@ -2,7 +2,7 @@
 
 import { map } from "ramda";
 
-import In from "../../index";
+import In from "../../../index";
 
 const print = jest.fn();
 const print2 = jest.fn();

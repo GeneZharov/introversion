@@ -1,4 +1,6 @@
-import In from "../../index";
+// @flow
+
+import In from "../../../index";
 
 const print = jest.fn();
 const print2 = jest.fn();
@@ -11,9 +13,15 @@ afterEach(() => {
 });
 
 describe(".with()", () => {
-  test("should compete setDefaults() and instance()", () => {
-    In.setDefaults({ stackTraceAsync: false, print });
-    const _In = In.instance({ stackTraceAsync: false, print: print2 });
+  test("should beat setDefaults() and instance()", () => {
+    In.setDefaults({
+      stackTraceAsync: false,
+      print
+    });
+    const _In = In.instance({
+      stackTraceAsync: false,
+      print: print2
+    });
     _In.v.with({ print: print3 })();
     expect(print).not.toBeCalled();
     expect(print2).not.toBeCalled();

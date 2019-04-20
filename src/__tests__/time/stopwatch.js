@@ -2,8 +2,7 @@
 
 import { range } from "ramda";
 
-import { STOPWATCH_ID } from "../../time";
-import { extraArgsNotAllowed } from "../../errors/conf-compatibility";
+import { extraArgsNotAllowed } from "../../errors/conf-runtime";
 import Introversion from "../../index";
 
 const id = "id";

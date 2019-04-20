@@ -1,8 +1,8 @@
 // @flow
 
-import Introversion from "../../index";
+import Introversion from "../../../index";
 
-const FILE = "opt-stacktrace.js";
+const FILE = "stacktrace.js";
 
 const print = jest.fn();
 
