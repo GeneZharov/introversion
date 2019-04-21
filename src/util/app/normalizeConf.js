@@ -9,6 +9,7 @@ import type {
 import type { Task } from "../../types/_";
 import type { _Conf, _TimerOption } from "../../types/_conf";
 import { detectConsole } from "../detect/detectConsole";
+import { detectCorsAvail } from "../detect/detectCorsAvail";
 import { detectDevTools } from "../detect/detectDevTools";
 import { detectPerformance } from "../detect/detectPerformance";
 import { detectReactNative } from "../detect/detectReactNative";
@@ -71,7 +72,7 @@ function normalizeStackTraceAsync(
   if (timer === "console" && stackTraceAsync === true) {
     throw stackTraceAsyncNotAllowed();
   } else if (stackTraceAsync === "auto") {
-    return timer !== "console" && !detectReactNative();
+    return timer !== "console" && !detectReactNative() && detectCorsAvail();
   } else {
     return stackTraceAsync;
   }
