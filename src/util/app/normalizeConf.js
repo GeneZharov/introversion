@@ -14,7 +14,7 @@ import { detectDevTools } from "../detect/detectDevTools";
 import { detectPerformance } from "../detect/detectPerformance";
 import { detectReactNative } from "../detect/detectReactNative";
 import { detectTerminal } from "../detect/detectTerminal";
-import { genString } from "../string/genString";
+import { stringView } from "../string/stringView";
 import { invalidRepeatOpt } from "../../errors/conf";
 import { parseSuffix } from "../number/suffix";
 import {
@@ -39,7 +39,7 @@ function normalizeClone(clone: AutoBoolean): boolean {
 function normalizeId(timer: _TimerOption, task: Task, id: mixed): mixed {
   return typeof id !== "undefined"
     ? timer === "console"
-      ? genString(id)
+      ? stringView(id)
       : id
     : task;
 }

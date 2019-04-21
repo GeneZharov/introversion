@@ -11,7 +11,7 @@ import type { _Conf } from "../../types/_conf";
 import { extraArgsNotAllowed } from "../../errors/conf-runtime";
 import { formatStackFrame } from "../format/formatStackFrame";
 import { formatSuffix } from "../number/suffix";
-import { genString } from "../string/genString";
+import { stringView } from "../string/stringView";
 import { round } from "../number/round";
 
 const chalk = new Chalk.constructor();
@@ -166,7 +166,6 @@ export function logTime(
   conf: _Conf,
   depth: number,
   args: mixed[],
-  timerID: mixed,
   ellapsed: number
 ): void {
   if (conf.timer === "console" && args.length) {
@@ -193,9 +192,9 @@ export function logTime(
         `${name}()`,
         ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
         ...(args.length ? [_clone(args)] : []),
-        `${_round(ellapsed / conf.repeat)}ms`,
+        `${_round(ellapsed / conf.repeat)} ms`,
         ...(conf.repeat > 1
-          ? [`(${formatSuffix(conf.repeat)} repeats in ${_round(ellapsed)}ms)`]
+          ? [`(${formatSuffix(conf.repeat)} repeats in ${_round(ellapsed)} ms)`]
           : []),
         ...(typeof conf.timer !== "function"
           ? [`by ${formatTimer(conf.timer)}`]
@@ -218,9 +217,9 @@ export function logTime(
         conf.print(inspect(conf, args));
       }
       conf.print(
-        `${genString(timerID)}: ${_round(ellapsed / conf.repeat)}ms`,
+        `${_round(ellapsed / conf.repeat)} ms`,
         ...(conf.repeat > 1
-          ? [`(${formatSuffix(conf.repeat)} repeats in ${_round(ellapsed)}ms)`]
+          ? [`(${formatSuffix(conf.repeat)} repeats in ${_round(ellapsed)} ms)`]
           : []),
         ...(typeof conf.timer !== "function"
           ? [`by ${formatTimer(conf.timer)}`]

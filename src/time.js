@@ -119,7 +119,8 @@ export const timeEnd = withApi(
     } = normalize(args, conf, modes, task);
     if (measure) {
       const ellapsed = stop(conf.timer, timerID);
-      logTime(name, conf, 4, extras, timerID, ellapsed);
+      const _args = conf.timer === "console" ? extras : [...extras, timerID];
+      logTime(name, conf, 4, _args, ellapsed);
     }
   }
 );
@@ -141,7 +142,7 @@ export const timeFn = withApi("timeFn", (args, conf, modes, task) => {
           (val[0]: Function).apply(self, _args)
         );
         const ellapsed = stop(conf.timer, timerID);
-        logTime(name, conf, 3, extras, timerID, ellapsed);
+        logTime(name, conf, 3, extras, ellapsed);
         return result;
       } else {
         return (val[0]: Function).apply(self, _args);
@@ -166,7 +167,7 @@ export const timeRun = withApi(
         start(conf.timer, timerID);
         const [result] = range(0, conf.repeat).map(_ => (val[0]: Function)());
         const ellapsed = stop(conf.timer, timerID);
-        logTime(name, conf, 4, extras, timerID, ellapsed);
+        logTime(name, conf, 4, extras, ellapsed);
         return result;
       } else {
         return (val[0]: Function)();
@@ -191,7 +192,7 @@ export const lap = withApi(
     const { measure, name } = normalize(args, conf, modes, task);
     if (measure) {
       const ellapsed = stop(conf.timer, STOPWATCH_ID);
-      logTime(name, conf, 4, args, STOPWATCH_ID, ellapsed);
+      logTime(name, conf, 4, args, ellapsed);
       start(conf.timer, STOPWATCH_ID);
     }
   }

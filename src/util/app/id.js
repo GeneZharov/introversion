@@ -1,9 +1,9 @@
 // @flow
 
-import { genString } from "../string/genString";
+import { stringView } from "../string/stringView";
 
 let idNumber: number = 0;
 
 export function genTimerID(id: mixed): string {
-  return genString(id) + "-" + idNumber++;
+  return stringView(id) + "-" + idNumber++;
 }
