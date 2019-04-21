@@ -9,6 +9,7 @@ export let globalConf: Conf = {
   timer: "auto",
   print: (...xs) => console.log(...xs),
   clone: "auto",
+  precision: 0,
   dev: false,
 
   // stacktrace

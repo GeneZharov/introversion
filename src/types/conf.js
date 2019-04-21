@@ -23,6 +23,7 @@ export type Conf = {
   timer: TimerOption,
   print: (...args: mixed[]) => void,
   clone: AutoBoolean,
+  precision: number,
   dev: boolean,
 
   // stacktrace

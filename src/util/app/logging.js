@@ -12,10 +12,11 @@ import { extraArgsNotAllowed } from "../../errors/conf-runtime";
 import { formatStackFrame } from "../format/formatStackFrame";
 import { formatSuffix } from "../number/suffix";
 import { genString } from "../string/genString";
+import { round } from "../number/round";
 
 const chalk = new Chalk.constructor();
 
-const _clone = (conf: _Conf) => <T>(val: T): T =>
+const cloneTry = (conf: _Conf) => <T>(val: T): T =>
   conf.clone ? clone(val) : val;
 
 function inspect(conf: _Conf, x: mixed): string {
@@ -70,16 +71,16 @@ export function logVal(
   extras: mixed[],
   val: mixed[]
 ): void {
-  const clone = _clone(conf);
+  const _clone = cloneTry(conf);
 
   function log(trace, frameIdx, frame) {
     conf.print(
       `${name}()`,
       ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
-      [...clone(extras), ...(quiet ? [] : clone(val))]
+      [..._clone(extras), ...(quiet ? [] : _clone(val))]
     );
     if (conf.dev) {
-      logDev(clone(conf), trace, frameIdx);
+      logDev(_clone(conf), trace, frameIdx);
     }
   }
 
@@ -113,22 +114,22 @@ export function logFn(
   args: mixed[],
   result: mixed
 ): void {
-  const clone = _clone(conf);
+  const _clone = cloneTry(conf);
 
   function log(trace, frameIdx, frame) {
     conf.print(
       `${name}()`,
       ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
-      ...(extras.length ? [clone(extras)] : [])
+      ...(extras.length ? [_clone(extras)] : [])
     );
     if (!quiet) {
-      conf.print(meta("Params"), clone(args));
+      conf.print(meta("Params"), _clone(args));
       error
-        ? conf.print(meta("ERROR!"), clone(result))
-        : conf.print(meta("Result"), clone(result));
+        ? conf.print(meta("ERROR!"), _clone(result))
+        : conf.print(meta("Result"), _clone(result));
     }
     if (conf.dev) {
-      logDev(clone(conf), trace, frameIdx);
+      logDev(_clone(conf), trace, frameIdx);
     }
   }
 
@@ -172,7 +173,8 @@ export function logTime(
     throw extraArgsNotAllowed();
   }
 
-  const clone = _clone(conf);
+  const _clone = cloneTry(conf);
+  const _round = n => round(conf.precision, n);
 
   function formatTimer(timer: TimerOption): string {
     switch (timer) {
@@ -190,10 +192,10 @@ export function logTime(
       conf.print(
         `${name}()`,
         ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
-        ...(args.length ? [clone(args)] : []),
-        `${ellapsed / conf.repeat}ms`,
+        ...(args.length ? [_clone(args)] : []),
+        `${_round(ellapsed / conf.repeat)}ms`,
         ...(conf.repeat > 1
-          ? [`(${formatSuffix(conf.repeat)} repeats in ${ellapsed}ms)`]
+          ? [`(${formatSuffix(conf.repeat)} repeats in ${_round(ellapsed)}ms)`]
           : []),
         ...(typeof conf.timer !== "function"
           ? [`by ${formatTimer(conf.timer)}`]
@@ -201,7 +203,7 @@ export function logTime(
       );
     }
     if (conf.dev) {
-      logDev(clone(conf), trace, frameIdx);
+      logDev(_clone(conf), trace, frameIdx);
     }
   }
 
@@ -216,9 +218,9 @@ export function logTime(
         conf.print(inspect(conf, args));
       }
       conf.print(
-        `${genString(timerID)}: ${ellapsed / conf.repeat}ms`,
+        `${genString(timerID)}: ${_round(ellapsed / conf.repeat)}ms`,
         ...(conf.repeat > 1
-          ? [`(${formatSuffix(conf.repeat)} repeats in ${ellapsed}ms)`]
+          ? [`(${formatSuffix(conf.repeat)} repeats in ${_round(ellapsed)}ms)`]
           : []),
         ...(typeof conf.timer !== "function"
           ? [`by ${formatTimer(conf.timer)}`]

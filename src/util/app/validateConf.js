@@ -11,6 +11,7 @@ import {
   invalidGuardOpt,
   invalidHighlightOpt,
   invalidInspectOptionsOpt,
+  invalidPrecisionOpt,
   invalidPrintOpt,
   invalidRepeatOpt,
   invalidStackTraceAsyncOpt,
@@ -42,6 +43,12 @@ const validators = {
   clone(val) {
     if (val !== "auto" && typeof val !== "boolean") {
       throw invalidCloneOpt();
+    }
+  },
+
+  precision(val) {
+    if (typeof val !== "number" || isNaN(val) || val <= 0) {
+      throw invalidPrecisionOpt();
     }
   },
 

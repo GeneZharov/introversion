@@ -1,10 +1,13 @@
 // @flow
 
 import {
+  invalidCloneOpt,
+  invalidDevOpt,
   invalidFormatOpt,
   invalidGuardOpt,
   invalidHighlightOpt,
   invalidInspectOptionsOpt,
+  invalidPrecisionOpt,
   invalidPrintOpt,
   invalidRepeatOpt,
   invalidStackTraceAsyncOpt,
@@ -35,6 +38,27 @@ test('invalid "print" option', () => {
   expect(() => In.setDefaults(conf)).toThrow(invalidPrintOpt());
   expect(() => In.instance(conf)).toThrow(invalidPrintOpt());
   expect(() => In.v.with(conf)).toThrow(invalidPrintOpt());
+});
+
+test('invalid "clone" option', () => {
+  const conf = ({ clone: 0 }: any);
+  expect(() => In.setDefaults(conf)).toThrow(invalidCloneOpt());
+  expect(() => In.instance(conf)).toThrow(invalidCloneOpt());
+  expect(() => In.v.with(conf)).toThrow(invalidCloneOpt());
+});
+
+test('invalid "precision" option', () => {
+  const conf = ({ precision: -1 }: any);
+  expect(() => In.setDefaults(conf)).toThrow(invalidPrecisionOpt());
+  expect(() => In.instance(conf)).toThrow(invalidPrecisionOpt());
+  expect(() => In.v.with(conf)).toThrow(invalidPrecisionOpt());
+});
+
+test('invalid "dev" option', () => {
+  const conf = ({ dev: 0 }: any);
+  expect(() => In.setDefaults(conf)).toThrow(invalidDevOpt());
+  expect(() => In.instance(conf)).toThrow(invalidDevOpt());
+  expect(() => In.v.with(conf)).toThrow(invalidDevOpt());
 });
 
 test('invalid "stackTrace" option', () => {

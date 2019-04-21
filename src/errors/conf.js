@@ -12,6 +12,10 @@ export function invalidPrintOpt() {
   return new Error('"print" option must be a function');
 }
 
+export function invalidPrecisionOpt() {
+  return new Error('"precision" option must be a positive number');
+}
+
 export function invalidDevOpt() {
   return new Error('"dev" option must be boolean');
 }
