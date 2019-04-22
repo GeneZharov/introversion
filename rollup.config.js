@@ -3,6 +3,7 @@ import babel from "rollup-plugin-babel";
 import builtins from "rollup-plugin-node-builtins";
 import commonjs from "rollup-plugin-commonjs";
 import globals from "rollup-plugin-node-globals";
+import ignore from "rollup-plugin-ignore";
 import resolve from "rollup-plugin-node-resolve";
 
 import pkg from "./package.json";
@@ -73,6 +74,7 @@ export default [
       indent: false
     },
     plugins: [
+      ignore(["chalk", "util"]),
       babel(),
       resolve({ preferBuiltins: true }),
       commonjs(),
@@ -92,6 +94,7 @@ export default [
       indent: false
     },
     plugins: [
+      ignore(["chalk", "util"]),
       babel(),
       resolve({ preferBuiltins: true }),
       commonjs(),
