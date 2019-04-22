@@ -1,6 +1,6 @@
 // @flow
 
-import { range } from "ramda";
+import { isEmpty, range } from "ramda";
 
 import type { Modes } from "./types/modes";
 import type { Task } from "./types/_";
@@ -13,6 +13,7 @@ import { invalidTimerReturn, performanceNotAvail } from "./errors/conf-runtime";
 import { logTime } from "./util/app/logging";
 import { notCallableLastArg } from "./errors/_";
 import { parseUserArgs, withApi } from "./util/app/api";
+import { specifiedThis } from "./util/func/specifiedThis";
 import { state } from "./state";
 
 const DEFAULT_ID = "default";
@@ -37,7 +38,7 @@ function normalize(
   _args: {
     extras: mixed[],
     val: mixed[],
-    self: mixed
+    obj: mixed[]
   }
 } {
   const name = selectFuncName(modes.method, task);
@@ -119,34 +120,34 @@ export const timeEnd = withApi(
     } = normalize(args, conf, modes, task);
     if (measure) {
       const ellapsed = stop(conf.timer, timerID);
-      const _args = conf.timer === "console" ? extras : [...extras, timerID];
+      const _args = conf.timer === "console" ? extras : args;
       logTime(name, conf, 4, _args, ellapsed);
     }
   }
 );
 
 export const timeFn = withApi("timeFn", (args, conf, modes, task) => {
-  return (..._args: mixed[]): any => {
+  return function(..._args: mixed[]): any {
     const {
       measure,
       name,
-      _args: { extras, val, self }
+      _args: { extras, val, obj }
     } = normalize(args, conf, modes, task);
     if (typeof val[0] !== "function") {
       throw notCallableLastArg(task);
+    }
+    const self = specifiedThis(this) || isEmpty(obj) ? this : obj[0];
+    if (measure) {
+      const timerID = genTimerID(conf.id);
+      start(conf.timer, timerID);
+      const [result] = range(0, conf.repeat).map(_ =>
+        (val[0]: Function).apply(self, _args)
+      );
+      const ellapsed = stop(conf.timer, timerID);
+      logTime(name, conf, 3, extras, ellapsed);
+      return result;
     } else {
-      if (measure) {
-        const timerID = genTimerID(conf.id);
-        start(conf.timer, timerID);
-        const [result] = range(0, conf.repeat).map(_ =>
-          (val[0]: Function).apply(self, _args)
-        );
-        const ellapsed = stop(conf.timer, timerID);
-        logTime(name, conf, 3, extras, ellapsed);
-        return result;
-      } else {
-        return (val[0]: Function).apply(self, _args);
-      }
+      return (val[0]: Function).apply(self, _args);
     }
   };
 });

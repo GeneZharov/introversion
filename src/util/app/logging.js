@@ -2,7 +2,7 @@
 
 import util from "util";
 
-import { T, clone, fromPairs } from "ramda";
+import { clone, fromPairs } from "ramda";
 import Chalk from "chalk";
 import Stacktrace from "stacktrace-js";
 

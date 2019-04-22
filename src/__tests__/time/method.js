@@ -79,4 +79,8 @@ describe("timeM()", () => {
     expect(log2.mock.calls.length).toBe(1);
     expect(log3.mock.calls.length).toBe(6);
   });
+
+  test("should proxy this", () => {
+    expect(In.timeM(ns, ".a.b.c.fn").call({ prop: 0 }, 0)).toBe(0);
+  });
 });

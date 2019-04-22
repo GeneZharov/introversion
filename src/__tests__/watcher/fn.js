@@ -6,7 +6,7 @@ import { notCallableLastArg } from "../../errors/_";
 import Introversion from "../../index";
 
 const name = 9;
-const fn = x => x.name;
+const fn = o => o.name;
 
 const print = jest.fn();
 
@@ -122,5 +122,12 @@ describe("function's watch", () => {
       expect(() => In.f_(1, 2, 3)({ name })).toThrow(notCallableLastArg("fn"));
       expect(() => In.F(1, 2, 3)({ name })).toThrow(notCallableLastArg("fn"));
     });
+  });
+
+  test("should proxy this", () => {
+    function fn() {
+      return this.name;
+    }
+    expect(In.f(fn).call({ name })).toBe(name);
   });
 });

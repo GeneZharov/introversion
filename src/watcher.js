@@ -1,12 +1,15 @@
 // @flow
 
+import { isEmpty } from "ramda";
+
 import type { Modes } from "./types/modes";
-import type { Task, WatcherTask } from "./types/_";
+import type { Task } from "./types/_";
 import type { _Conf } from "./types/_conf";
 import { getGuard, saveGuard } from "./util/app/guard";
 import { logFn, logVal } from "./util/app/logging";
 import { notCallableLastArg } from "./errors/_";
 import { parseUserArgs, withApi } from "./util/app/api";
+import { specifiedThis } from "./util/func/specifiedThis";
 import { state } from "./state";
 
 function modifyFuncName(quiet: boolean, deb: boolean, func: string): string {
@@ -75,7 +78,7 @@ function normalize(
   _args: {
     extras: mixed[],
     val: *[],
-    self: mixed
+    obj: mixed[]
   }
 } {
   const { log, deb } = chooseBehavior(modes, conf);
@@ -97,16 +100,17 @@ export const val = withApi("val", (args, conf, modes, task) => {
 });
 
 export const fn = withApi("fn", (_args, conf, modes, task) => {
-  return (...args: mixed[]): any => {
+  return function(...args: mixed[]): any {
     const {
       log,
       deb,
       name,
-      _args: { extras, val, self }
+      _args: { extras, val, obj }
     } = normalize(_args, conf, modes, task);
     if (typeof val[0] !== "function") {
       throw notCallableLastArg(task);
     }
+    const self = specifiedThis(this) || isEmpty(obj) ? this : obj[0];
     try {
       if (deb) debugger;
       const result = (val[0]: Function).apply(self, args); // <-- Your function

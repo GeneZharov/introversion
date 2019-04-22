@@ -1,6 +1,6 @@
 // @flow
 
-import { T, last, path } from "ramda";
+import { last, path } from "ramda";
 
 import type { Conf } from "../../types/conf";
 import type { Modes } from "../../types/modes";
@@ -35,22 +35,22 @@ export function parseUserArgs(
 ): {
   extras: mixed[],
   val: mixed[],
-  self: mixed
+  obj: mixed[]
 } {
   if (modes.method) {
-    const obj = args[args.length - 2];
+    const root = args[args.length - 2];
     const method = args[args.length - 1].split(".").slice(1);
-    const self = method.slice(0, -1);
+    const obj = method.slice(0, -1);
     return {
       extras: args.slice(0, -2),
-      val: [path(method, obj)],
-      self: self.length ? path(self, obj) : obj
+      val: [path(method, root)],
+      obj: obj.length ? [path(obj, root)] : [root]
     };
   } else {
     return {
       extras: args.slice(0, -1),
       val: args.length ? [last(args)] : [],
-      self: this
+      obj: []
     };
   }
 }

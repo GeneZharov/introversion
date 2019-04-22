@@ -12,16 +12,19 @@ import * as _watcher from "./watcher";
 
 export type API = typeof tools;
 
-export function setDefaults(conf: $Shape<Conf>): void {
+export function setDefaults(conf: mixed): void {
   validateConf(conf);
-  Object.assign(globalConf, conf);
+  Object.assign(globalConf, ((conf: any): $Shape<Conf>));
 }
 
 export function instance(...args: *[]): API {
   const _args = init(args);
   const conf = last(args);
   validateConf(conf);
-  return map(f => api(f, ..._args, new ConfArg(conf)), tools);
+  return map(
+    f => api(f, ..._args, new ConfArg(((conf: any): $Shape<Conf>))),
+    tools
+  );
 }
 
 export const v = api(_watcher.val);

@@ -81,4 +81,11 @@ describe("timeF()", () => {
     expect(log2.mock.calls.length).toBe(1);
     expect(log3.mock.calls.length).toBe(6);
   });
+
+  test("should proxy this", () => {
+    function fn() {
+      return this.name;
+    }
+    expect(In.timeF(fn).call({ name })).toBe(name);
+  });
 });

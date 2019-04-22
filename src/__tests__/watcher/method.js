@@ -128,4 +128,8 @@ describe("methods's watch", () => {
       expect(() => In.M(ns, ".a.b.c")()).toThrow(notCallableLastArg("fn"));
     });
   });
+
+  test("should proxy this", () => {
+    expect(In.m(ns, ".a.b.c.fn").call({ prop: 0 }, 0)).toBe(0);
+  });
 });

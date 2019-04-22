@@ -17,12 +17,12 @@ beforeEach(() => print.mockClear());
 describe("correct stack frame", () => {
   test("should print with v()", () => {
     In.v.with({ stackTrace: ["func", "file"] })();
-    expect(print.mock.calls[0][1]).toBe(`at Object.test (${FILE})`);
+    expect(print.mock.calls[0][1]).toBe(`at Object.<anonymous> (${FILE})`);
   });
   test("should print with f()", () => {
     const fn = () => {};
     In.f.with({ stackTrace: ["func", "file"] })(fn)();
-    expect(print.mock.calls[0][1]).toBe(`at Object.test (${FILE})`);
+    expect(print.mock.calls[0][1]).toBe(`at Object.<anonymous> (${FILE})`);
   });
 });
 
@@ -31,7 +31,7 @@ describe("stackTrace option", () => {
     afterEach(() => {
       expect(print.mock.calls[0][1]).toEqual(
         expect.stringMatching(
-          new RegExp(`at Object\\.test \\(${FILE}:\\d+:\\d+\\)`)
+          new RegExp(`at Object\\.<anonymous> \\(${FILE}:\\d+:\\d+\\)`)
         )
       );
     });

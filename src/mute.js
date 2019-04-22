@@ -17,7 +17,7 @@ export const unmuteF = withApi("unmuteF", (args, conf, modes, task) => {
     throw expectedFuncArg(task);
   }
   const [fn] = args;
-  return (...args: mixed[]) => {
+  return function(...args: mixed[]) {
     state.muted = false;
     const res = fn.apply(this, args);
     state.muted = true;

@@ -10,6 +10,12 @@ describe("unmuteF()", () => {
     expect(() => In.unmuteF()).toThrow(expectedFuncArg("unmuteF"));
     expect(() => In.unmuteF(0)).toThrow(expectedFuncArg("unmuteF"));
   });
+  test("should proxy this", () => {
+    function fn() {
+      return this.name;
+    }
+    expect(In.unmuteF(fn).call({ name: 0 })).toBe(0);
+  });
 });
 
 describe("unmuteRun()", () => {

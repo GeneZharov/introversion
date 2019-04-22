@@ -111,7 +111,7 @@ const validators = {
   }
 };
 
-export function validateConf(conf: $Shape<Conf>): void {
+export function validateConf(conf: mixed): void {
   if (type(conf) !== "Object") {
     throw invalidConfType();
   }

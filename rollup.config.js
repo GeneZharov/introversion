@@ -1,7 +1,7 @@
 import { terser } from "rollup-plugin-terser";
+import babel from "rollup-plugin-babel";
 import builtins from "rollup-plugin-node-builtins";
 import commonjs from "rollup-plugin-commonjs";
-import flow from "rollup-plugin-flow";
 import globals from "rollup-plugin-node-globals";
 import resolve from "rollup-plugin-node-resolve";
 
@@ -20,7 +20,7 @@ export default [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
     ],
-    plugins: [flow({ pretty: true }), resolve()]
+    plugins: [babel(), resolve({ preferBuiltins: true })]
   },
 
   // ES
@@ -34,7 +34,7 @@ export default [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
     ],
-    plugins: [flow({ pretty: true })]
+    plugins: [babel()]
   },
 
   // ES for Browsers
@@ -49,8 +49,8 @@ export default [
       ...Object.keys(pkg.peerDependencies || {})
     ],
     plugins: [
-      flow({ pretty: true }),
-      resolve(),
+      babel(),
+      resolve({ preferBuiltins: true }),
       terser({
         compress: {
           pure_getters: true,
@@ -73,8 +73,8 @@ export default [
       indent: false
     },
     plugins: [
-      flow({ pretty: true }),
-      resolve(),
+      babel(),
+      resolve({ preferBuiltins: true }),
       commonjs(),
       globals(),
       builtins()
@@ -92,8 +92,8 @@ export default [
       indent: false
     },
     plugins: [
-      flow({ pretty: true }),
-      resolve(),
+      babel(),
+      resolve({ preferBuiltins: true }),
       commonjs(),
       globals(),
       builtins(),
