@@ -44,7 +44,7 @@ function logDev(conf: _Conf, trace: StackFrame[], frameIdx: number) {
     // Wrapped in an array to force a console to collapse the value
     fromPairs(
       trace.map((frame, idx) => {
-        const idxStr = idx === frameIdx ? `[${idx}]` : ` ${idx} `;
+        const idxStr = idx === frameIdx ? `${idx} <=` : idx;
         const frameStr = formatStackFrame(conf.stackTrace, frame);
         return [idxStr, frameStr];
       })
