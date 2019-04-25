@@ -1,6 +1,7 @@
 // @flow
 
-import { expectedFuncArg } from "./errors/_";
+import { _warning } from "./errors/util";
+import { errExpectedFuncArg } from "./errors/_";
 import { state } from "./state";
 import { withApi } from "./util/app/api";
 
@@ -14,7 +15,8 @@ export function unmute() {
 
 export const unmuteF = withApi("unmuteF", (args, conf, modes, task) => {
   if (!args.length || typeof args[0] !== "function") {
-    throw expectedFuncArg(task);
+    _warning(conf, errExpectedFuncArg(task));
+    return args[0];
   }
   const [fn] = args;
   return function(...args: mixed[]) {
@@ -27,7 +29,8 @@ export const unmuteF = withApi("unmuteF", (args, conf, modes, task) => {
 
 export const unmuteRun = withApi("unmuteRun", (args, conf, modes, task) => {
   if (!args.length || typeof args[0] !== "function") {
-    throw expectedFuncArg(task);
+    _warning(conf, errExpectedFuncArg(task));
+    return args[0];
   }
   const [action] = args;
   state.muted = false;

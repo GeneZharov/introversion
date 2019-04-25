@@ -4,7 +4,7 @@ import { memoizeWith, identity } from "ramda";
 
 function _detectPerformance(): boolean {
   return (
-    typeof performance === "object" &&
+    typeof performance !== "undefined" &&
     performance !== null &&
     typeof performance.now === "function"
   );

@@ -1,11 +1,12 @@
 // @flow
 
-import { init, last, map } from "ramda";
+import { init, last, map, type } from "ramda";
 
 import type { Conf } from "./types/conf";
-import { ConfArg, ModesArg, api, withApi } from "./util/app/api";
+import { ConfArg, ModesArg, api } from "./util/app/api";
+import { errInvalidConfType } from "./errors/_";
+import { error } from "./errors/util";
 import { globalConf } from "./state";
-import { validateConf } from "./util/app/validateConf";
 import * as _mute from "./mute";
 import * as _time from "./time";
 import * as _watcher from "./watcher";
@@ -13,14 +14,18 @@ import * as _watcher from "./watcher";
 export type API = typeof tools;
 
 export function setDefaults(conf: mixed): void {
-  validateConf(conf);
+  if (type(conf) !== "Object") {
+    error(errInvalidConfType("setDefault"));
+  }
   Object.assign(globalConf, ((conf: any): $Shape<Conf>));
 }
 
 export function instance(...args: *[]): API {
   const _args = init(args);
   const conf = last(args);
-  validateConf(conf);
+  if (type(conf) !== "Object") {
+    error(errInvalidConfType("instance"));
+  }
   return map(
     f => api(f, ..._args, new ConfArg(((conf: any): $Shape<Conf>))),
     tools

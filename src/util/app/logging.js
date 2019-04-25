@@ -8,10 +8,10 @@ import Stacktrace from "stacktrace-js";
 
 import type { StackFrame, TimerOption } from "../../types/conf";
 import type { _Conf } from "../../types/_conf";
-import { extraArgsNotAllowed } from "../../errors/conf-runtime";
+import { _warning } from "../../errors/util";
+import { errExtraArgsNotAllowed } from "../../errors/options-runtime";
 import { formatStackFrame } from "../format/formatStackFrame";
 import { formatSuffix } from "../number/suffix";
-import { stringView } from "../string/stringView";
 import { round } from "../number/round";
 
 const chalk = new Chalk.constructor();
@@ -39,8 +39,8 @@ const meta = s => `... ${s}:`;
 const metaFmt = s => chalk.italic(`--- ${s} ---`);
 
 function logDev(conf: _Conf, trace: StackFrame[], frameIdx: number) {
-  conf.print(meta("Dev Config"), conf);
-  conf.print(meta("Dev StackTrace"), [
+  conf.log(meta("Dev Config"), conf);
+  conf.log(meta("Dev StackTrace"), [
     // Wrapped in an array to force a console to collapse the value
     fromPairs(
       trace.map((frame, idx) => {
@@ -53,13 +53,13 @@ function logDev(conf: _Conf, trace: StackFrame[], frameIdx: number) {
 }
 
 function logDevFmt(conf: _Conf, trace: StackFrame[], frameIdx: number) {
-  conf.print(metaFmt("Dev: config"));
-  conf.print(inspect(conf, conf));
-  conf.print(metaFmt("Dev: stacktrace"));
+  conf.log(metaFmt("Dev: config"));
+  conf.log(inspect(conf, conf));
+  conf.log(metaFmt("Dev: stacktrace"));
   trace.forEach((frame, idx) => {
     const idxStr = idx === frameIdx ? `[${idx}]` : ` ${idx} `;
     const frameStr = formatStackFrame(conf.stackTrace, frame);
-    conf.print(`${idxStr} — ${frameStr}`);
+    conf.log(`${idxStr} — ${frameStr}`);
   });
 }
 
@@ -74,7 +74,7 @@ export function logVal(
   const _clone = cloneTry(conf);
 
   function log(trace, frameIdx, frame) {
-    conf.print(
+    conf.log(
       `${name}()`,
       ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
       [..._clone(extras), ...(quiet ? [] : _clone(val))]
@@ -86,15 +86,15 @@ export function logVal(
 
   function logFmt(trace, frameIdx, frame) {
     chalk.enabled = conf.highlight;
-    conf.print(
+    conf.log(
       chalk.bold(`${name}()`),
       ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
     );
-    conf.print(inspect(conf, [...extras, ...(quiet ? [] : val)]));
+    conf.log(inspect(conf, [...extras, ...(quiet ? [] : val)]));
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.print(""); // New line
+    conf.log(""); // New line
   }
 
   getTrace(conf, trace => {
@@ -117,16 +117,16 @@ export function logFn(
   const _clone = cloneTry(conf);
 
   function log(trace, frameIdx, frame) {
-    conf.print(
+    conf.log(
       `${name}()`,
       ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
       ...(extras.length ? [_clone(extras)] : [])
     );
     if (!quiet) {
-      conf.print(meta("Params"), _clone(args));
+      conf.log(meta("Params"), _clone(args));
       error
-        ? conf.print(meta("ERROR!"), _clone(result))
-        : conf.print(meta("Result"), _clone(result));
+        ? conf.log(meta("ERROR!"), _clone(result))
+        : conf.log(meta("Result"), _clone(result));
     }
     if (conf.dev) {
       logDev(_clone(conf), trace, frameIdx);
@@ -135,23 +135,23 @@ export function logFn(
 
   function logFmt(trace, frameIdx, frame) {
     chalk.enabled = conf.highlight;
-    conf.print(
+    conf.log(
       chalk.bold(`${name}()`),
       ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
     );
     if (extras.length) {
-      conf.print(inspect(conf, extras));
+      conf.log(inspect(conf, extras));
     }
     if (!quiet) {
-      conf.print(metaFmt("Params"));
-      conf.print(inspect(conf, args));
-      conf.print(error ? metaFmt("ERROR!") : metaFmt("Result"));
-      conf.print(inspect(conf, result));
+      conf.log(metaFmt("Params"));
+      conf.log(inspect(conf, args));
+      conf.log(error ? metaFmt("ERROR!") : metaFmt("Result"));
+      conf.log(inspect(conf, result));
     }
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.print(""); // New line
+    conf.log(""); // New line
   }
 
   getTrace(conf, trace => {
@@ -168,10 +168,6 @@ export function logTime(
   args: mixed[],
   ellapsed: number
 ): void {
-  if (conf.timer === "console" && args.length) {
-    throw extraArgsNotAllowed();
-  }
-
   const _clone = cloneTry(conf);
   const _round = n => round(conf.precision, n);
 
@@ -188,7 +184,7 @@ export function logTime(
 
   function log(trace, frameIdx, frame) {
     if (conf.timer !== "console") {
-      conf.print(
+      conf.log(
         `${name}()`,
         ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
         ...(args.length ? [_clone(args)] : []),
@@ -209,14 +205,14 @@ export function logTime(
   function logFmt(trace, frameIdx, frame) {
     chalk.enabled = conf.highlight;
     if (conf.timer !== "console") {
-      conf.print(
+      conf.log(
         chalk.bold(`${name}()`),
         ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
       );
       if (args.length) {
-        conf.print(inspect(conf, args));
+        conf.log(inspect(conf, args));
       }
-      conf.print(
+      conf.log(
         `${_round(ellapsed / conf.repeat)} ms`,
         ...(conf.repeat > 1
           ? [`(${formatSuffix(conf.repeat)} repeats in ${_round(ellapsed)} ms)`]
@@ -229,12 +225,15 @@ export function logTime(
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.print(""); // New line
+    conf.log(""); // New line
   }
 
   getTrace(conf, trace => {
     const frameIdx = depth + conf.stackTraceShift;
     const frame = trace[frameIdx];
     conf.format ? logFmt(trace, frameIdx, frame) : log(trace, frameIdx, frame);
+    if (conf.timer === "console" && args.length) {
+      _warning(conf, errExtraArgsNotAllowed());
+    }
   });
 }

@@ -2,11 +2,16 @@
 
 import { memoizeWith, identity } from "ramda";
 
-function _detectConsole(): boolean {
-  return console && typeof console.log === "function";
+function _detectConsoleTime(): boolean {
+  return (
+    typeof console !== "undefined" &&
+    console !== null &&
+    typeof console.time === "function" &&
+    typeof console.timeEnd === "function"
+  );
 }
 
-export const detectConsole: () => boolean = memoizeWith(
+export const detectConsoleTime: () => boolean = memoizeWith(
   identity,
-  _detectConsole
+  _detectConsoleTime
 );

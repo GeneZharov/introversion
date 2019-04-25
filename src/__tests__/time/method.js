@@ -14,18 +14,19 @@ const obj = {
 };
 const ns = { a: { b: { c: obj } } };
 
-const print = jest.fn();
+const log = jest.fn();
 const timer = jest.fn(_ => 0);
 
 const In = Introversion.instance({
   format: false,
-  print,
+  clone: false,
+  log,
   timer,
   stackTrace: false
 });
 
 afterEach(() => {
-  print.mockClear();
+  log.mockClear();
   timer.mockClear();
 });
 
@@ -35,7 +36,7 @@ describe("timeM()", () => {
       const result = In.timeM.mute(1, 2, ns, ".a.b.c.fn")(8);
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(0);
-      expect(print).not.toBeCalled();
+      expect(log).not.toBeCalled();
     });
   });
 
@@ -44,21 +45,21 @@ describe("timeM()", () => {
       const result = In.timeM(1, 2, ns, ".a.b.c.fn")(8);
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
-      expect(print).toBeCalledWith("timeM()", [1, 2], "0 ms");
+      expect(log).toBeCalledWith("timeM()", [1, 2], "0 ms");
     });
     test("should log with In.unmuteRun()", () => {
       const action = In.timeM.mute(1, 2, ns, ".a.b.c.fn");
       const result = In.unmuteRun(() => action(8));
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
-      expect(print).toBeCalledWith("timeM()", [1, 2], "0 ms");
+      expect(log).toBeCalledWith("timeM()", [1, 2], "0 ms");
     });
     test("should log with In.unmuteF()", () => {
       const action = In.timeM.mute(1, 2, ns, ".a.b.c.fn");
       const result = In.unmuteF(action)(8);
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
-      expect(print).toBeCalledWith("timeM()", [1, 2], "0 ms");
+      expect(log).toBeCalledWith("timeM()", [1, 2], "0 ms");
     });
   });
 
@@ -67,11 +68,11 @@ describe("timeM()", () => {
     const log2 = jest.fn();
     const log3 = jest.fn();
     range(0, 100).forEach(_ => {
-      In.timeM.with({ print: log1, guard: 3 })(ns, ".a.b.c.fn")({ name });
-      In.timeM.with({ print: log2, guard: 1, id: 2 })(ns, ".a.b.c.fn")({
+      In.timeM.with({ log: log1, guard: 3 })(ns, ".a.b.c.fn")({ name });
+      In.timeM.with({ log: log2, guard: 1, id: 2 })(ns, ".a.b.c.fn")({
         name
       });
-      In.timeM.with({ print: log3, guard: 6, id: 3 })(ns, ".a.b.c.fn")({
+      In.timeM.with({ log: log3, guard: 6, id: 3 })(ns, ".a.b.c.fn")({
         name
       });
     });

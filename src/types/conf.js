@@ -4,6 +4,8 @@ export type StackTraceItem = "func" | "file" | "line" | "col";
 
 export type AutoBoolean = "auto" | boolean;
 
+export type Print = (...xs: mixed[]) => void;
+
 export type TimerOption =
   | "auto"
   | "performance"
@@ -21,7 +23,8 @@ export type StackFrame = {
 
 export type Conf = {
   timer: TimerOption,
-  print: (...args: mixed[]) => void,
+  log: Print,
+  warn: Print,
   clone: AutoBoolean,
   precision: number,
   dev: boolean,

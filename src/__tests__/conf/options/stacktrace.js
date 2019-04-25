@@ -4,32 +4,33 @@ import Introversion from "../../../index";
 
 const FILE = "stacktrace.js";
 
-const print = jest.fn();
+const log = jest.fn();
 
 const In = Introversion.instance({
-  print,
+  log,
   format: false,
+  clone: false,
   stackTraceAsync: false
 });
 
-beforeEach(() => print.mockClear());
+beforeEach(() => log.mockClear());
 
 describe("correct stack frame", () => {
-  test("should print with v()", () => {
+  test("should log with v()", () => {
     In.v.with({ stackTrace: ["func", "file"] })();
-    expect(print.mock.calls[0][1]).toBe(`at Object.<anonymous> (${FILE})`);
+    expect(log.mock.calls[0][1]).toBe(`at Object.<anonymous> (${FILE})`);
   });
-  test("should print with f()", () => {
+  test("should log with f()", () => {
     const fn = () => {};
     In.f.with({ stackTrace: ["func", "file"] })(fn)();
-    expect(print.mock.calls[0][1]).toBe(`at Object.<anonymous> (${FILE})`);
+    expect(log.mock.calls[0][1]).toBe(`at Object.<anonymous> (${FILE})`);
   });
 });
 
 describe("stackTrace option", () => {
   describe("full stack trace data", () => {
     afterEach(() => {
-      expect(print.mock.calls[0][1]).toEqual(
+      expect(log.mock.calls[0][1]).toEqual(
         expect.stringMatching(
           new RegExp(`at Object\\.<anonymous> \\(${FILE}:\\d+:\\d+\\)`)
         )
@@ -45,7 +46,7 @@ describe("stackTrace option", () => {
 
   describe("no stack trace data", () => {
     afterEach(() => {
-      expect(print).toBeCalledWith("v()", []);
+      expect(log).toBeCalledWith("v()", []);
     });
     test("should not log with 'false'", () => {
       In.v.with({ stackTrace: false })();
@@ -62,6 +63,6 @@ describe("stackTraceShift option", () => {
       In.v.with({ stackTrace: ["func"], stackTraceShift: 1 })();
     }
     testFunc();
-    expect(print.mock.calls[0][1]).toBe("at Object.testFunc");
+    expect(log.mock.calls[0][1]).toBe("at Object.testFunc");
   });
 });

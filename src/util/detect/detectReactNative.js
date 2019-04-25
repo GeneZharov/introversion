@@ -4,7 +4,9 @@ import { memoizeWith, identity } from "ramda";
 
 function _detectReactNative(): boolean {
   return (
-    typeof navigator !== "undefined" && navigator.product === "ReactNative"
+    typeof navigator !== "undefined" &&
+    navigator !== null &&
+    navigator.product === "ReactNative"
   );
 }
 

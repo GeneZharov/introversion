@@ -78,10 +78,7 @@ export function api(fn: *, ...args: mixed[]): * {
   // function calls are concealed with "any" type.
   const _fn = fn.bind(this, ...args);
   const muteFn = () => (api: any)(_fn, new ModesArg({ mute: true }));
-  const withFn = (conf: $Shape<Conf>) => {
-    validateConf(conf);
-    return (api: any)(_fn, new ConfArg(conf));
-  };
+  const withFn = (conf: $Shape<Conf>) => (api: any)(_fn, new ConfArg(conf));
   _fn.with = withFn;
   Object.defineProperty(_fn, "mute", ({ get: muteFn }: Object));
   return _fn;
@@ -93,7 +90,7 @@ export function withApi<T>(
 ): (*) => T {
   return (...args) => {
     const { modes, conf, userArgs } = parseArgs(args);
-    const _conf = normalizeConf(conf, task);
+    const _conf = normalizeConf(validateConf(conf), task);
     return fn(userArgs, _conf, modes, task);
   };
 }

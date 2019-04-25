@@ -4,12 +4,12 @@ import { map } from "ramda";
 
 import In from "../../../index";
 
-const print = jest.fn();
-const print2 = jest.fn();
+const log = jest.fn();
+const log2 = jest.fn();
 
 afterEach(() => {
-  print.mockClear();
-  print2.mockClear();
+  log.mockClear();
+  log2.mockClear();
 });
 
 describe("instance()", () => {
@@ -26,21 +26,21 @@ describe("instance()", () => {
     expect(In.instance({})).toEqual(map(x => expect.any(Function), In));
   });
   test("should apply config", () => {
-    In.instance({ stackTraceAsync: false, print }).v(0);
-    expect(print).toBeCalled();
+    In.instance({ stackTraceAsync: false, log }).v(0);
+    expect(log).toBeCalled();
   });
   test("should chain and apply configs", () => {
     In.instance({ stackTraceAsync: false })
-      .instance({ print })
-      .instance({ print: print2 })
+      .instance({ log })
+      .instance({ log: log2 })
       .v(0);
-    expect(print).not.toBeCalled();
-    expect(print2).toBeCalled();
+    expect(log).not.toBeCalled();
+    expect(log2).toBeCalled();
   });
   test("should compete setDefaults()", () => {
-    In.setDefaults({ print, stackTraceAsync: false });
-    In.instance({ print: print2 }).v();
-    expect(print).not.toBeCalled();
-    expect(print2).toBeCalled();
+    In.setDefaults({ log, stackTraceAsync: false });
+    In.instance({ log: log2 }).v();
+    expect(log).not.toBeCalled();
+    expect(log2).toBeCalled();
   });
 });

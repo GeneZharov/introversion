@@ -10,6 +10,7 @@ export function detectCorsAvail(): boolean {
   ];
   return (
     typeof location !== "undefined" &&
+    location !== "null" &&
     validProto.indexOf(location.protocol) !== -1
   );
 }

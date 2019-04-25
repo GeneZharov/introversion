@@ -5,9 +5,10 @@ import { isEmpty } from "ramda";
 import type { Modes } from "./types/modes";
 import type { Task } from "./types/_";
 import type { _Conf } from "./types/_conf";
+import { _warning, error } from "./errors/util";
+import { errNotCallableLastArg } from "./errors/_";
 import { getGuard, saveGuard } from "./util/app/guard";
 import { logFn, logVal } from "./util/app/logging";
-import { notCallableLastArg } from "./errors/_";
 import { parseUserArgs, withApi } from "./util/app/api";
 import { specifiedThis } from "./util/func/specifiedThis";
 import { state } from "./state";
@@ -108,7 +109,8 @@ export const fn = withApi("fn", (_args, conf, modes, task) => {
       _args: { extras, val, obj }
     } = normalize(_args, conf, modes, task);
     if (typeof val[0] !== "function") {
-      throw notCallableLastArg(task);
+      _warning(conf, errNotCallableLastArg(task));
+      return val[0];
     }
     const self = specifiedThis(this) || isEmpty(obj) ? this : obj[0];
     try {

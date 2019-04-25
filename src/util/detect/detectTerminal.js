@@ -3,8 +3,13 @@
 import { memoizeWith, identity } from "ramda";
 
 function _detectTerminal(): boolean {
-  return process && process.stdout && (process.stdout: any).isTTY;
-  // process.stdout is undefined in React Native
+  return (
+    typeof process !== "undefined" &&
+    process !== null &&
+    typeof process.stdout !== "undefined" &&
+    process.stdout !== null &&
+    (process.stdout: any).isTTY === true
+  );
 }
 
 export const detectTerminal: () => boolean = memoizeWith(

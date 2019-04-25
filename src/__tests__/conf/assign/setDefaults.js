@@ -2,9 +2,9 @@
 
 import In from "../../../index";
 
-const print = jest.fn();
+const log = jest.fn();
 
-afterEach(() => print.mockClear());
+afterEach(() => log.mockClear());
 
 describe("setDefaults()", () => {
   test("should throw for not an object", () => {
@@ -17,8 +17,8 @@ describe("setDefaults()", () => {
     expect(() => (In.setDefaults: any)([])).toThrow();
   });
   test("should apply config", () => {
-    In.setDefaults({ print, stackTraceAsync: false });
+    In.setDefaults({ log, stackTraceAsync: false });
     In.v(0);
-    expect(print).toBeCalled();
+    expect(log).toBeCalled();
   });
 });

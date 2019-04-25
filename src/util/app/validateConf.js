@@ -1,126 +1,87 @@
 // @flow
 
-import { toPairs, type } from "ramda";
+import { always, memoizeWith } from "ramda";
 
 import type { Conf } from "../../types/conf";
+import { defaultConf } from "../../conf";
 import {
-  invalidCloneOpt,
-  invalidConfType,
-  invalidDevOpt,
-  invalidFormatOpt,
-  invalidGuardOpt,
-  invalidHighlightOpt,
-  invalidInspectOptionsOpt,
-  invalidPrecisionOpt,
-  invalidPrintOpt,
-  invalidRepeatOpt,
-  invalidStackTraceAsyncOpt,
-  invalidStackTraceOpt,
-  invalidStackTraceShiftOpt,
-  invalidTimerOpt,
-  unknownOpt
-} from "../../errors/conf";
+  errInvalidClone,
+  errInvalidDev,
+  errInvalidFormat,
+  errInvalidGuard,
+  errInvalidHighlight,
+  errInvalidInspectOptions,
+  errInvalidLog,
+  errInvalidPrecision,
+  errInvalidRepeat,
+  errInvalidStackTrace,
+  errInvalidStackTraceAsync,
+  errInvalidStackTraceShift,
+  errInvalidTimer,
+  errInvalidWarn,
+  errUnknownOpt
+} from "../../errors/options";
+import { error, warning } from "../../errors/util";
+import { once } from "../func/once";
+import {
+  validClone,
+  validDev,
+  validFormat,
+  validGuard,
+  validHighlight,
+  validInspectOptions,
+  validLog,
+  validPrecision,
+  validRepeat,
+  validStackTrace,
+  validStackTraceAsync,
+  validStackTraceShift,
+  validTimer,
+  validWarn
+} from "./validateOptions";
+
+const warnOnce = (msg: () => string[]) => once(conf => warning(conf, msg()));
 
 const validators = {
-  timer(val) {
-    if (
-      val !== "auto" &&
-      val !== "performance" &&
-      val !== "console" &&
-      val !== "date" &&
-      typeof val !== "function"
-    ) {
-      throw invalidTimerOpt();
-    }
-  },
-
-  print(val) {
-    if (typeof val !== "function") {
-      throw invalidPrintOpt();
-    }
-  },
-
-  clone(val) {
-    if (val !== "auto" && typeof val !== "boolean") {
-      throw invalidCloneOpt();
-    }
-  },
-
-  precision(val) {
-    if (typeof val !== "number" || isNaN(val) || val <= 0) {
-      throw invalidPrecisionOpt();
-    }
-  },
-
-  dev(val) {
-    if (typeof val !== "boolean") {
-      throw invalidDevOpt();
-    }
-  },
-
-  stackTrace(val) {
-    if (typeof val !== "boolean" && !Array.isArray(val)) {
-      throw invalidStackTraceOpt();
-    }
-  },
-
-  stackTraceAsync(val) {
-    if (typeof val !== "boolean") {
-      throw invalidStackTraceAsyncOpt();
-    }
-  },
-
-  stackTraceShift(val) {
-    if (typeof val !== "number") {
-      throw invalidStackTraceShiftOpt();
-    }
-  },
-
-  format(val) {
-    if (val !== "auto" && typeof val !== "boolean") {
-      throw invalidFormatOpt();
-    }
-  },
-
-  highlight(val) {
-    if (typeof val !== "boolean") {
-      throw invalidHighlightOpt();
-    }
-  },
-
-  inspectOptions(val) {
-    if (typeof val !== "object" || val === null) {
-      throw invalidInspectOptionsOpt();
-    }
-  },
-
-  id(val) {
-    return;
-  },
-
-  guard(val) {
-    if (typeof val !== "number") {
-      throw invalidGuardOpt();
-    }
-  },
-
-  repeat(val) {
-    if (typeof val !== "number" && typeof val !== "string") {
-      throw invalidRepeatOpt();
-    }
-  }
+  timer: [validTimer, warnOnce(errInvalidTimer)],
+  log: [validLog, warnOnce(errInvalidLog)],
+  warn: [validWarn, _ => error(errInvalidWarn())],
+  clone: [validClone, warnOnce(errInvalidClone)],
+  precision: [validPrecision, warnOnce(errInvalidPrecision)],
+  dev: [validDev, warnOnce(errInvalidDev)],
+  stackTrace: [validStackTrace, warnOnce(errInvalidStackTrace)],
+  stackTraceAsync: [validStackTraceAsync, warnOnce(errInvalidStackTraceAsync)],
+  stackTraceShift: [validStackTraceShift, warnOnce(errInvalidStackTraceShift)],
+  format: [validFormat, _ => error(errInvalidFormat())],
+  highlight: [validHighlight, warnOnce(errInvalidHighlight)],
+  inspectOptions: [validInspectOptions, warnOnce(errInvalidInspectOptions)],
+  id: [always, _ => {}],
+  guard: [validGuard, warnOnce(errInvalidGuard)],
+  repeat: [validRepeat, warnOnce(errInvalidRepeat)]
 };
 
-export function validateConf(conf: mixed): void {
-  if (type(conf) !== "Object") {
-    throw invalidConfType();
-  }
-  (toPairs: any)(conf).forEach(([name, val]) => {
-    const validator = validators[name];
-    if (!validator) {
-      throw unknownOpt(name);
+const warnUnknownOpt = memoizeWith(
+  (_, name) => name,
+  (conf, name) => warning(((conf: any): Conf), errUnknownOpt(name))
+);
+
+export function validateConf(conf: Object): Conf {
+  // Tried to avoid function calls in this function (including
+  // R.mapObjIndexed()) because it increases stack trace depth and hides user
+  // calls in that stack.
+  const _conf = {};
+  for (let name in conf) {
+    if (name in validators) {
+      const [valid, onInvalid] = validators[name];
+      if (valid(conf[name])) {
+        _conf[name] = conf[name];
+      } else {
+        onInvalid(conf);
+        _conf[name] = defaultConf[name];
+      }
     } else {
-      validator(val);
+      warnUnknownOpt(conf, name);
     }
-  });
+  }
+  return _conf;
 }

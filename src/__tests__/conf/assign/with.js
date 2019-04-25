@@ -2,29 +2,29 @@
 
 import In from "../../../index";
 
-const print = jest.fn();
-const print2 = jest.fn();
-const print3 = jest.fn();
+const log = jest.fn();
+const log2 = jest.fn();
+const log3 = jest.fn();
 
 afterEach(() => {
-  print.mockClear();
-  print2.mockClear();
-  print3.mockClear();
+  log.mockClear();
+  log2.mockClear();
+  log3.mockClear();
 });
 
 describe(".with()", () => {
   test("should beat setDefaults() and instance()", () => {
     In.setDefaults({
       stackTraceAsync: false,
-      print
+      log
     });
     const _In = In.instance({
       stackTraceAsync: false,
-      print: print2
+      log: log2
     });
-    _In.v.with({ print: print3 })();
-    expect(print).not.toBeCalled();
-    expect(print2).not.toBeCalled();
-    expect(print3).toBeCalled();
+    _In.v.with({ log: log3 })();
+    expect(log).not.toBeCalled();
+    expect(log2).not.toBeCalled();
+    expect(log3).toBeCalled();
   });
 });

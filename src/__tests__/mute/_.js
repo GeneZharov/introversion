@@ -1,14 +1,26 @@
 // @flow
 
-import { expectedFuncArg } from "../../errors/_";
+import { errExpectedFuncArg } from "../../errors/_";
 import Introversion from "../../index";
 
-const In = Introversion.instance({ format: false });
+const log = jest.fn();
+const warn = jest.fn();
+
+const In = Introversion.instance({
+  log,
+  warn,
+  format: false,
+  clone: false,
+  stackTrace: false
+});
 
 describe("unmuteF()", () => {
-  test("should throw for invalid argument", () => {
-    expect(() => In.unmuteF()).toThrow(expectedFuncArg("unmuteF"));
-    expect(() => In.unmuteF(0)).toThrow(expectedFuncArg("unmuteF"));
+  test("not callable argument", () => {
+    const [msg] = errExpectedFuncArg("unmuteF");
+    const result = In.unmuteF(null);
+    expect(result).toBe(null);
+    expect(log).not.toBeCalled();
+    expect(warn).toBeCalledWith(expect.stringContaining(msg));
   });
   test("should proxy this", () => {
     function fn() {
@@ -19,8 +31,11 @@ describe("unmuteF()", () => {
 });
 
 describe("unmuteRun()", () => {
-  test("should throw for invalid argument", () => {
-    expect(() => In.unmuteRun()).toThrow(expectedFuncArg("unmuteRun"));
-    expect(() => In.unmuteRun(0)).toThrow(expectedFuncArg("unmuteRun"));
+  test("not callable argument", () => {
+    const [msg] = errExpectedFuncArg("unmuteRun");
+    const result = In.unmuteRun(null);
+    expect(result).toBe(null);
+    expect(log).not.toBeCalled();
+    expect(warn).toBeCalledWith(expect.stringContaining(msg));
   });
 });
