@@ -61,8 +61,9 @@ describe('"clone" option', () => {
 
   describe("timeEnd()", () => {
     test("should create a deep clone when true", () => {
-      In.time();
-      In.timeEnd.with({ clone: true })(a, b);
+      const id = Symbol();
+      In.time(id);
+      In.timeEnd.with({ clone: true })(a, b, id);
       const [, [_a, _b]] = log.mock.calls[0];
       expect(_a).not.toBe(a);
       expect(_a).toEqual(a);
@@ -70,8 +71,9 @@ describe('"clone" option', () => {
       expect(_b).toEqual(b);
     });
     test("should prevent cloning when false", () => {
-      In.time();
-      In.timeEnd.with({ clone: false })(a, b);
+      const id = Symbol();
+      In.time(id);
+      In.timeEnd.with({ clone: false })(a, b, id);
       const [, [_a, _b]] = log.mock.calls[0];
       expect(_a).toBe(a);
       expect(_b).toBe(b);

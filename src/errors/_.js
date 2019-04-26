@@ -1,5 +1,7 @@
 // @flow
 
+import { toString } from "ramda";
+
 import type { Task } from "../types/_";
 
 export function errInvalidConfType(task: string): string[] {
@@ -12,4 +14,12 @@ export function errExpectedFuncArg(task: Task): string[] {
 
 export function errNotCallableLastArg(task: Task): string[] {
   return [`${task}() last argument is not a function`];
+}
+
+export function errTimerIdAlreadyExists(timerID: mixed): string[] {
+  return [`Timer id ${toString(timerID)} already exists`];
+}
+
+export function errTimerIdDoesNotExist(timerID: mixed): string[] {
+  return [`Timer id ${toString(timerID)} does not exist`];
 }

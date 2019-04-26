@@ -4,11 +4,14 @@ import { isEmpty, range } from "ramda";
 
 import type { Modes } from "./types/modes";
 import type { Task } from "./types/_";
-import type { TimerOption } from "./types/conf";
 import type { _Conf } from "./types/_conf";
 import { _warning } from "./errors/util";
 import { errInvalidTimerReturn } from "./errors/options-runtime";
-import { errNotCallableLastArg } from "./errors/_";
+import {
+  errNotCallableLastArg,
+  errTimerIdAlreadyExists,
+  errTimerIdDoesNotExist
+} from "./errors/_";
 import { genTimerID } from "./util/app/id";
 import { getGuard, saveGuard } from "./util/app/guard";
 import { logTime } from "./util/app/logging";
@@ -72,7 +75,11 @@ function start(conf: _Conf, id: mixed): void {
   if (timer === "console") {
     console.time((id: any));
   } else {
-    state.timers.set(id, getTime(conf));
+    if (state.timers.has(id)) {
+      _warning(conf, errTimerIdAlreadyExists(id));
+    } else {
+      state.timers.set(id, getTime(conf));
+    }
   }
 }
 
@@ -86,6 +93,7 @@ function stop(conf: _Conf, id: mixed): number {
     state.timers.delete(id);
     const stop = getTime(conf);
     if (start === undefined) {
+      _warning(conf, errTimerIdDoesNotExist(id));
       return NaN;
     } else {
       return stop - start;
@@ -183,6 +191,7 @@ export const stopwatch = withApi(
   (args, conf, modes, task): void => {
     const { measure } = normalize(args, conf, modes, task);
     if (measure) {
+      state.timers.delete(STOPWATCH_ID); // Reset previous stopwatch
       start(conf, STOPWATCH_ID);
     }
   }
