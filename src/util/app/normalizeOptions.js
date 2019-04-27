@@ -98,8 +98,10 @@ export function normalizeStackTraceAsync(
   if (timer === "console" && stackTraceAsync === true) {
     return [false, errStackTraceAsyncNotAllowed()];
   } else if (stackTraceAsync === "auto") {
-    const b = timer !== "console" && !detectReactNative() && detectCorsAvail();
-    return [b, null];
+    return [
+      timer !== "console" && !detectReactNative() && detectCorsAvail(),
+      null
+    ];
   } else {
     return [stackTraceAsync, null];
   }
@@ -109,9 +111,12 @@ export function normalizeFormat(format: AutoBoolean): WithErr<boolean> {
   if (format === true && isEmpty(chalk)) {
     return [false, errFormatNotAvail()];
   } else {
-    const b =
-      format === "auto" ? detectTerminal() && !detectDevTools() : format;
-    return [b, null];
+    return [
+      format === "auto"
+        ? (detectTerminal() || detectReactNative()) && !detectDevTools()
+        : format,
+      null
+    ];
   }
 }
 
@@ -121,10 +126,11 @@ export function normalizeFormatErrors(
   if (formatErrors === true && isEmpty(chalk)) {
     return [false, errFormatErrorsNotAvail()];
   } else {
-    const b =
+    return [
       formatErrors === "auto"
         ? detectTerminal() && !detectDevTools()
-        : formatErrors;
-    return [b, null];
+        : formatErrors,
+      null
+    ];
   }
 }
