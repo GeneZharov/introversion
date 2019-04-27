@@ -22,6 +22,10 @@ export function validClone(val: mixed): boolean {
   return val === "auto" || typeof val === "boolean";
 }
 
+export function validErrorHandling(val: mixed): boolean {
+  return val === "warn" || val === "throw";
+}
+
 export function validPrecision(val: mixed): boolean {
   return typeof val === "number" && !isNaN(val) && val >= 0;
 }

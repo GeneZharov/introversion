@@ -20,8 +20,8 @@ export function errInvalidClone(): string[] {
   return ['"clone" option must be boolean'];
 }
 
-export function errInvalidPrecision(): string[] {
-  return ['"precision" option must be number >=0'];
+export function errInvalidErrorHandling(): string[] {
+  return ['"errorHandling" option must be "warn" or "throw"'];
 }
 
 export function errInvalidDev(): string[] {
@@ -56,6 +56,10 @@ export function errInvalidHighlight(): string[] {
 
 export function errInvalidInspectOptions(): string[] {
   return ['"inspectOptions" option must be object'];
+}
+
+export function errInvalidPrecision(): string[] {
+  return ['"precision" option must be number >=0'];
 }
 
 // In-Place Options

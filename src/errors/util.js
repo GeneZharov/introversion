@@ -3,7 +3,7 @@
 import Stacktrace from "stacktrace-js";
 import chalk from "chalk";
 
-import type { AutoBoolean, Print } from "../types/conf";
+import type { AutoBoolean, ErrorHandlingOption, Print } from "../types/conf";
 import { errInvalidFormat, errInvalidWarn } from "./options";
 import { formatStackFrame } from "../util/format/formatStackFrame";
 import { normalizeFormat } from "../util/app/normalizeOptions";
@@ -31,9 +31,18 @@ export function formatWarnFmt(msg: string[], trace: string[]): string {
 }
 
 export function _warning(
-  { warn, format }: { warn: Print, format: boolean },
+  {
+    errorHandling,
+    warn,
+    format
+  }: {
+    errorHandling: ErrorHandlingOption,
+    warn: Print,
+    format: boolean
+  },
   msg: string[]
 ): void {
+  if (errorHandling === "throw") error(msg);
   const trace = Stacktrace.getSync()
     .map(f => formatStackFrame(["file", "func", "line", "col"], f))
     .slice(1);
@@ -41,9 +50,18 @@ export function _warning(
 }
 
 export function warning(
-  { warn, format }: { warn: Print, format: AutoBoolean },
+  {
+    errorHandling,
+    warn,
+    format
+  }: {
+    errorHandling: ErrorHandlingOption,
+    warn: Print,
+    format: AutoBoolean
+  },
   msg: string[]
 ): void {
+  if (errorHandling === "throw") error(msg);
   if (!validWarn(warn)) error(errInvalidWarn());
   if (!validFormat(format)) error(errInvalidFormat());
   const trace = Stacktrace.getSync()

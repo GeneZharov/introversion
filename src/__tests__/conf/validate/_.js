@@ -3,6 +3,7 @@
 import {
   errInvalidClone,
   errInvalidDev,
+  errInvalidErrorHandling,
   errInvalidFormat,
   errInvalidGuard,
   errInvalidHighlight,
@@ -71,6 +72,12 @@ test('invalid "clone" option', () => {
   In.v.with(conf)();
   const [msg] = errInvalidClone();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
+});
+
+test('invalid "errorHandling" option', () => {
+  const conf = ({ errorHandling: false }: any);
+  const [msg] = errInvalidErrorHandling();
+  expect(() => In.v.with(conf)()).toThrow(msg);
 });
 
 test('invalid "precision" option', () => {

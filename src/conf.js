@@ -12,7 +12,7 @@ export const defaultConf: Conf = {
   log: defaultLog,
   warn: defaultWarn,
   clone: "auto",
-  precision: 0,
+  errorHandling: "warn",
   dev: false,
 
   // stacktrace
@@ -24,6 +24,7 @@ export const defaultConf: Conf = {
   format: "auto",
   highlight: detectTerminal(),
   inspectOptions: { colors: detectTerminal() },
+  precision: 0,
 
   // in-place options
   id: undefined,

@@ -5,6 +5,7 @@ import { defaultConf } from "../../conf";
 import {
   errInvalidClone,
   errInvalidDev,
+  errInvalidErrorHandling,
   errInvalidFormat,
   errInvalidGuard,
   errInvalidHighlight,
@@ -23,6 +24,7 @@ import { error, warning } from "../../errors/util";
 import {
   validClone,
   validDev,
+  validErrorHandling,
   validFormat,
   validGuard,
   validHighlight,
@@ -45,7 +47,7 @@ const validators = {
   log: [validLog, onWarn(errInvalidLog)],
   warn: [validWarn, onErr(errInvalidWarn)],
   clone: [validClone, onWarn(errInvalidClone)],
-  precision: [validPrecision, onWarn(errInvalidPrecision)],
+  errorHandling: [validErrorHandling, onErr(errInvalidErrorHandling)],
   dev: [validDev, onWarn(errInvalidDev)],
   stackTrace: [validStackTrace, onWarn(errInvalidStackTrace)],
   stackTraceAsync: [validStackTraceAsync, onWarn(errInvalidStackTraceAsync)],
@@ -53,6 +55,7 @@ const validators = {
   format: [validFormat, onErr(errInvalidFormat)],
   highlight: [validHighlight, onWarn(errInvalidHighlight)],
   inspectOptions: [validInspectOptions, onWarn(errInvalidInspectOptions)],
+  precision: [validPrecision, onWarn(errInvalidPrecision)],
   id: [_ => true, _ => {}],
   guard: [validGuard, onWarn(errInvalidGuard)],
   repeat: [validRepeat, onWarn(errInvalidRepeat)]

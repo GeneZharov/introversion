@@ -13,6 +13,8 @@ export type TimerOption =
   | "date"
   | (() => number);
 
+export type ErrorHandlingOption = "warn" | "throw";
+
 export type StackFrame = {
   functionName?: string,
   fileName?: string,
@@ -26,7 +28,7 @@ export type Conf = {
   log: Print,
   warn: Print,
   clone: AutoBoolean,
-  precision: number,
+  errorHandling: ErrorHandlingOption,
   dev: boolean,
 
   // stacktrace
@@ -38,6 +40,7 @@ export type Conf = {
   format: AutoBoolean,
   highlight: boolean,
   inspectOptions: util$InspectOptions,
+  precision: number,
 
   // in-place options
   id: mixed,
