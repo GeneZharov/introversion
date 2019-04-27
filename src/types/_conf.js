@@ -12,5 +12,6 @@ export type _Conf = {
   stackTraceAsync: boolean[],
   clone: boolean,
   format: boolean,
+  formatErrors: boolean,
   repeat: number
 };

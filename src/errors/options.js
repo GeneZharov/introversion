@@ -17,7 +17,7 @@ export function errInvalidWarn(): string[] {
 }
 
 export function errInvalidClone(): string[] {
-  return ['"clone" option must be boolean'];
+  return ['"clone" option must be boolean or "auto"'];
 }
 
 export function errInvalidErrorHandling(): string[] {
@@ -36,7 +36,7 @@ export function errInvalidStackTrace(): string[] {
 }
 
 export function errInvalidStackTraceAsync(): string[] {
-  return ['"stackTraceAsync" option must be boolean'];
+  return ['"stackTraceAsync" option must be boolean or "auto"'];
 }
 
 export function errInvalidStackTraceShift(): string[] {
@@ -47,7 +47,11 @@ export function errInvalidStackTraceShift(): string[] {
 // ----------
 
 export function errInvalidFormat(): string[] {
-  return ['"format" option must be boolean'];
+  return ['"format" option must be boolean or "auto"'];
+}
+
+export function errInvalidFormatErrors(): string[] {
+  return ['"formatErrors" option must be boolean or "auto"'];
 }
 
 export function errInvalidHighlight(): string[] {

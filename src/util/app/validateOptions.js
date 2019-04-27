@@ -50,6 +50,10 @@ export function validFormat(val: mixed): boolean {
   return val === "auto" || typeof val === "boolean";
 }
 
+export function validFormatErrors(val: mixed): boolean {
+  return val === "auto" || typeof val === "boolean";
+}
+
 export function validHighlight(val: mixed): boolean {
   return typeof val === "boolean";
 }

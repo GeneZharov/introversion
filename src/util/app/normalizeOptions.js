@@ -19,6 +19,7 @@ import { detectReactNative } from "../detect/detectReactNative";
 import { detectTerminal } from "../detect/detectTerminal";
 import {
   errConsoleNotAvail,
+  errFormatErrorsNotAvail,
   errFormatNotAvail,
   errPerformanceNotAvail,
   errRepeatNotAllowed,
@@ -110,6 +111,20 @@ export function normalizeFormat(format: AutoBoolean): WithErr<boolean> {
   } else {
     const b =
       format === "auto" ? detectTerminal() && !detectDevTools() : format;
+    return [b, null];
+  }
+}
+
+export function normalizeFormatErrors(
+  formatErrors: AutoBoolean
+): WithErr<boolean> {
+  if (formatErrors === true && isEmpty(chalk)) {
+    return [false, errFormatErrorsNotAvail()];
+  } else {
+    const b =
+      formatErrors === "auto"
+        ? detectTerminal() && !detectDevTools()
+        : formatErrors;
     return [b, null];
   }
 }

@@ -16,6 +16,10 @@ export function errFormatNotAvail(): string[] {
   return ['format: true is not available in the "dist" build'];
 }
 
+export function errFormatErrorsNotAvail(): string[] {
+  return ['formatErrors: true is not available in the "dist" build'];
+}
+
 // Console Errors
 // --------------
 

@@ -22,6 +22,7 @@ export const defaultConf: Conf = {
 
   // formatting
   format: "auto",
+  formatErrors: "auto",
   highlight: detectTerminal(),
   inspectOptions: { colors: detectTerminal() },
   precision: 0,

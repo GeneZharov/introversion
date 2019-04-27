@@ -94,7 +94,7 @@ export function logVal(
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.log(""); // New line
+    conf.log(" "); // New line
   }
 
   getTrace(conf, trace => {
@@ -151,7 +151,7 @@ export function logFn(
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.log(""); // New line
+    conf.log(" "); // New line
   }
 
   getTrace(conf, trace => {
@@ -225,7 +225,7 @@ export function logTime(
     if (conf.dev) {
       logDevFmt(conf, trace, frameIdx);
     }
-    conf.log(""); // New line
+    conf.log(" "); // New line
   }
 
   getTrace(conf, trace => {

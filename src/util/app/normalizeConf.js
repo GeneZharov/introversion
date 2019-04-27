@@ -6,6 +6,7 @@ import type { _Conf } from "../../types/_conf";
 import {
   normalizeClone,
   normalizeFormat,
+  normalizeFormatErrors,
   normalizeId,
   normalizeRepeat,
   normalizeStackTrace,
@@ -21,12 +22,15 @@ export function normalizeConf(conf: Conf, task?: Task): _Conf {
   const [repeat, repeatE] = normalizeRepeat(conf.repeat, timer);
   const stackTrace = normalizeStackTrace(conf.stackTrace);
   const [format, formatE] = normalizeFormat(conf.format);
+  const [formatErrors, formatErrorsE] = normalizeFormatErrors(
+    conf.formatErrors
+  );
   const [stackTraceAsync, stackTraceAsyncE] = normalizeStackTraceAsync(
     conf.stackTraceAsync,
     timer
   );
 
-  [timerE, repeatE, stackTraceAsyncE, formatE].forEach(x => {
+  [timerE, repeatE, stackTraceAsyncE, formatE, formatErrorsE].forEach(x => {
     if (x !== null) warning(conf, x);
   });
 
@@ -37,6 +41,7 @@ export function normalizeConf(conf: Conf, task?: Task): _Conf {
     stackTrace,
     stackTraceAsync,
     format,
+    formatErrors,
     id,
     repeat
   }: any);

@@ -38,6 +38,7 @@ export type Conf = {
 
   // formatting
   format: AutoBoolean,
+  formatErrors: AutoBoolean,
   highlight: boolean,
   inspectOptions: util$InspectOptions,
   precision: number,

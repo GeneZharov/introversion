@@ -5,6 +5,7 @@ import {
   errInvalidDev,
   errInvalidErrorHandling,
   errInvalidFormat,
+  errInvalidFormatErrors,
   errInvalidGuard,
   errInvalidHighlight,
   errInvalidInspectOptions,
@@ -118,6 +119,12 @@ test('invalid "stackTraceAsync" option', () => {
 describe('invalid "format" option', () => {
   const conf = ({ format: 0 }: any);
   const [msg] = errInvalidFormat();
+  expect(() => In.v.with(conf)()).toThrow(msg);
+});
+
+describe('invalid "formatErrors" option', () => {
+  const conf = ({ formatErrors: 0 }: any);
+  const [msg] = errInvalidFormatErrors();
   expect(() => In.v.with(conf)()).toThrow(msg);
 });
 

@@ -4,10 +4,10 @@ import Stacktrace from "stacktrace-js";
 import chalk from "chalk";
 
 import type { AutoBoolean, ErrorHandlingOption, Print } from "../types/conf";
-import { errInvalidFormat, errInvalidWarn } from "./options";
+import { errInvalidFormatErrors, errInvalidWarn } from "./options";
 import { formatStackFrame } from "../util/format/formatStackFrame";
-import { normalizeFormat } from "../util/app/normalizeOptions";
-import { validFormat, validWarn } from "../util/app/validateOptions";
+import { normalizeFormatErrors } from "../util/app/normalizeOptions";
+import { validFormatErrors, validWarn } from "../util/app/validateOptions";
 
 const stripe = str => {
   const bar = chalk.yellow("▒");
@@ -34,11 +34,11 @@ export function _warning(
   {
     errorHandling,
     warn,
-    format
+    formatErrors
   }: {
     errorHandling: ErrorHandlingOption,
     warn: Print,
-    format: boolean
+    formatErrors: boolean
   },
   msg: string[]
 ): void {
@@ -46,29 +46,29 @@ export function _warning(
   const trace = Stacktrace.getSync()
     .map(f => formatStackFrame(["file", "func", "line", "col"], f))
     .slice(1);
-  format ? warn(formatWarnFmt(msg, trace)) : warn(formatWarn(msg));
+  formatErrors ? warn(formatWarnFmt(msg, trace)) : warn(formatWarn(msg));
 }
 
 export function warning(
   {
     errorHandling,
     warn,
-    format
+    formatErrors
   }: {
     errorHandling: ErrorHandlingOption,
     warn: Print,
-    format: AutoBoolean
+    formatErrors: AutoBoolean
   },
   msg: string[]
 ): void {
   if (errorHandling === "throw") error(msg);
   if (!validWarn(warn)) error(errInvalidWarn());
-  if (!validFormat(format)) error(errInvalidFormat());
+  if (!validFormatErrors(formatErrors)) error(errInvalidFormatErrors());
   const trace = Stacktrace.getSync()
     .map(f => formatStackFrame(["file", "func", "line", "col"], f))
     .slice(1);
-  const [_format] = normalizeFormat(format);
-  _format ? warn(formatWarnFmt(msg, trace)) : warn(formatWarn(msg));
+  const [_formatErrors] = normalizeFormatErrors(formatErrors);
+  _formatErrors ? warn(formatWarnFmt(msg, trace)) : warn(formatWarn(msg));
 }
 
 export function error(msg: string[]): void {
