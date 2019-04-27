@@ -29,37 +29,21 @@ const In = Introversion.instance({
   clone: false
 });
 
-afterEach(() => {
+beforeEach(() => {
   log.mockClear();
   warn.mockClear();
 });
 
-describe("unknown option", () => {
+test("unknown option", () => {
   const opt = s => `unknown-${s}`;
-  test("should be warned once", () => {
-    const conf = ({ [opt(0)]: false }: any);
-    In.v.with(conf)();
-    const [msg] = errUnknownOpt(opt(0));
-    expect(warn).toBeCalledWith(expect.stringContaining(msg));
-  });
-  test("should be warned only once", () => {
-    const conf = ({ [opt(1)]: false }: any);
-    In.v.with(conf)();
-    In.v.with(conf)();
-    In.v.with(conf)();
-    const [msg] = errUnknownOpt(opt(1));
-    expect(warn).toBeCalledWith(expect.stringContaining(msg));
-  });
-  test("should warn once for every unknown option", () => {
-    const conf2 = ({ [opt(2)]: false }: any);
-    const conf3 = ({ [opt(3)]: false }: any);
-    In.v.with(conf2)();
-    In.v.with(conf3)();
-    const [msg2] = errUnknownOpt(opt(2));
-    const [msg3] = errUnknownOpt(opt(3));
-    expect(warn.mock.calls[0][0]).toEqual(expect.stringContaining(msg2));
-    expect(warn.mock.calls[1][0]).toEqual(expect.stringContaining(msg3));
-  });
+  const conf2 = ({ [opt(2)]: false }: any);
+  const conf3 = ({ [opt(3)]: false }: any);
+  In.v.with(conf2)();
+  In.v.with(conf3)();
+  const [msg2] = errUnknownOpt(opt(2));
+  const [msg3] = errUnknownOpt(opt(3));
+  expect(warn.mock.calls[0][0]).toEqual(expect.stringContaining(msg2));
+  expect(warn.mock.calls[1][0]).toEqual(expect.stringContaining(msg3));
 });
 
 test('invalid "timer" option', () => {

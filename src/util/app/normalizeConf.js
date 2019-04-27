@@ -12,10 +12,7 @@ import {
   normalizeStackTraceAsync,
   normalizeTimer
 } from "./normalizeOptions";
-import { once } from "../func/once";
 import { warning } from "../../errors/util";
-
-const warnOnce = once((conf, msg) => warning(conf, msg));
 
 export function normalizeConf(conf: Conf, task?: Task): _Conf {
   const [timer, timerE] = normalizeTimer(conf.timer);
@@ -29,13 +26,9 @@ export function normalizeConf(conf: Conf, task?: Task): _Conf {
     timer
   );
 
-  [timerE, repeatE, stackTraceAsyncE].forEach(x => {
+  [timerE, repeatE, stackTraceAsyncE, formatE].forEach(x => {
     if (x !== null) warning(conf, x);
   });
-
-  if (formatE !== null) {
-    warnOnce(conf, formatE);
-  }
 
   return ({
     ...conf,
