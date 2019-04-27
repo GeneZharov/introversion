@@ -1,8 +1,6 @@
 // @flow
 
 import type { Conf, Print } from "./types/conf";
-import { detectReactNative } from "./util/detect/detectReactNative";
-import { detectTerminal } from "./util/detect/detectTerminal";
 
 export const nativeLog: Print = (...xs) => console.log(...xs);
 export const nativeWarn: Print = (...xs) => console.warn(...xs);
@@ -16,15 +14,15 @@ export const defaultConf: Conf = {
   dev: false,
 
   // stacktrace
-  stackTrace: detectReactNative() ? ["func"] : true,
+  stackTrace: "auto",
   stackTraceAsync: "auto",
-  stackTraceShift: detectReactNative() ? -1 : 0,
+  stackTraceShift: "auto",
 
   // formatting
   format: "auto",
   formatErrors: "auto",
-  highlight: detectTerminal(),
-  inspectOptions: { colors: detectTerminal() || detectReactNative() },
+  highlight: "auto",
+  inspectOptions: "auto",
   precision: 0,
 
   // in-place options

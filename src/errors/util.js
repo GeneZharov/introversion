@@ -3,7 +3,7 @@
 import Stacktrace from "stacktrace-js";
 import chalk from "chalk";
 
-import type { AutoBoolean, ErrorHandlingOption, Print } from "../types/conf";
+import type { Auto, Print } from "../types/conf";
 import { errInvalidFormatErrors, errInvalidWarn } from "./options";
 import { formatStackFrame } from "../util/format/formatStackFrame";
 import { normalizeFormatErrors } from "../util/app/normalizeOptions";
@@ -36,7 +36,7 @@ export function _warning(
     warn,
     formatErrors
   }: {
-    errorHandling: ErrorHandlingOption,
+    errorHandling: "warn" | "throw",
     warn: Print,
     formatErrors: boolean
   },
@@ -55,9 +55,9 @@ export function warning(
     warn,
     formatErrors
   }: {
-    errorHandling: ErrorHandlingOption,
+    errorHandling: "warn" | "throw",
     warn: Print,
-    formatErrors: AutoBoolean
+    formatErrors: Auto<boolean>
   },
   msg: string[]
 ): void {

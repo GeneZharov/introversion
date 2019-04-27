@@ -2,19 +2,6 @@
 
 export type StackTraceItem = "func" | "file" | "line" | "col";
 
-export type AutoBoolean = "auto" | boolean;
-
-export type Print = (...xs: mixed[]) => void;
-
-export type TimerOption =
-  | "auto"
-  | "performance"
-  | "console"
-  | "date"
-  | (() => number);
-
-export type ErrorHandlingOption = "warn" | "throw";
-
 export type StackFrame = {
   functionName?: string,
   fileName?: string,
@@ -23,24 +10,30 @@ export type StackFrame = {
   source?: string // ${functionName}@${fileName}:${lineNumber}${columnNumber}
 };
 
+export type Print = (...xs: mixed[]) => void;
+
+export type Auto<T> = "auto" | T;
+
+export type TimerOption = "performance" | "console" | "date" | (() => number);
+
 export type Conf = {
-  timer: TimerOption,
+  timer: Auto<TimerOption>,
   log: Print,
   warn: Print,
-  clone: AutoBoolean,
-  errorHandling: ErrorHandlingOption,
+  clone: Auto<boolean>,
+  errorHandling: "warn" | "throw",
   dev: boolean,
 
   // stacktrace
-  stackTrace: boolean | StackTraceItem[],
-  stackTraceAsync: AutoBoolean,
-  stackTraceShift: number,
+  stackTrace: Auto<boolean | StackTraceItem[]>,
+  stackTraceAsync: Auto<boolean>,
+  stackTraceShift: Auto<number>,
 
   // formatting
-  format: AutoBoolean,
-  formatErrors: AutoBoolean,
-  highlight: boolean,
-  inspectOptions: util$InspectOptions,
+  format: Auto<boolean>,
+  formatErrors: Auto<boolean>,
+  highlight: Auto<boolean>,
+  inspectOptions: Auto<util$InspectOptions>,
   precision: number,
 
   // in-place options

@@ -10,7 +10,7 @@ function _detectReactNative(): boolean {
   );
 }
 
-export const detectReactNative: () => mixed = memoizeWith(
+export const detectReactNative: () => boolean = memoizeWith(
   identity,
   _detectReactNative
 );

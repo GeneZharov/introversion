@@ -3,13 +3,8 @@
 import { isEmpty } from "ramda";
 import chalk from "chalk";
 
-import type {
-  AutoBoolean,
-  StackTraceItem,
-  TimerOption
-} from "../../types/conf";
+import type { Auto, StackTraceItem, TimerOption } from "../../types/conf";
 import type { Task } from "../../types/_";
-import type { _TimerOption } from "../../types/_conf";
 import { defaultConf } from "../../conf";
 import { detectConsoleTime } from "../detect/detectConsole";
 import { detectCorsAvail } from "../detect/detectCorsAvail";
@@ -31,7 +26,7 @@ import { stringView } from "../string/stringView";
 
 type WithErr<T> = [T, null | string[]];
 
-export function normalizeTimer(timer: TimerOption): WithErr<_TimerOption> {
+export function normalizeTimer(timer: Auto<TimerOption>): WithErr<TimerOption> {
   function getAuto() {
     return detectPerformance()
       ? "performance"
@@ -48,15 +43,11 @@ export function normalizeTimer(timer: TimerOption): WithErr<_TimerOption> {
   return [timer !== "auto" ? timer : getAuto(), null];
 }
 
-export function normalizeClone(clone: AutoBoolean): boolean {
+export function normalizeClone(clone: Auto<boolean>): boolean {
   return clone === "auto" ? !detectTerminal() || detectDevTools() : clone;
 }
 
-export function normalizeId(
-  id: mixed,
-  timer: _TimerOption,
-  task?: Task
-): mixed {
+export function normalizeId(id: mixed, timer: TimerOption, task?: Task): mixed {
   return typeof id !== "undefined"
     ? timer === "console"
       ? stringView(id)
@@ -66,7 +57,7 @@ export function normalizeId(
 
 export function normalizeRepeat(
   repeat: number | string,
-  timer: _TimerOption
+  timer: TimerOption
 ): WithErr<number> {
   function toNumber(x: number | string): number {
     return typeof x === "string" ? parseSuffix(x) : x;
@@ -82,18 +73,20 @@ export function normalizeRepeat(
 }
 
 export function normalizeStackTrace(
-  stackTrace: boolean | StackTraceItem[]
+  stackTrace: Auto<boolean | StackTraceItem[]>
 ): StackTraceItem[] {
-  return typeof stackTrace === "boolean"
-    ? stackTrace
-      ? ["func", "file", "line", "col"]
-      : []
-    : stackTrace;
+  if (stackTrace === "auto") {
+    return detectReactNative() ? ["func"] : ["func", "file", "line", "col"];
+  } else if (typeof stackTrace === "boolean") {
+    return stackTrace ? ["func", "file", "line", "col"] : [];
+  } else {
+    return stackTrace;
+  }
 }
 
 export function normalizeStackTraceAsync(
-  stackTraceAsync: AutoBoolean,
-  timer: _TimerOption
+  stackTraceAsync: Auto<boolean>,
+  timer: TimerOption
 ): WithErr<boolean> {
   if (timer === "console" && stackTraceAsync === true) {
     return [false, errStackTraceAsyncNotAllowed()];
@@ -107,7 +100,17 @@ export function normalizeStackTraceAsync(
   }
 }
 
-export function normalizeFormat(format: AutoBoolean): WithErr<boolean> {
+export function normalizeStackTraceShift(
+  stackTraceShift: Auto<number>
+): number {
+  return stackTraceShift === "auto"
+    ? detectReactNative()
+      ? -1
+      : 0
+    : stackTraceShift;
+}
+
+export function normalizeFormat(format: Auto<boolean>): WithErr<boolean> {
   if (format === true && isEmpty(chalk)) {
     return [false, errFormatNotAvail()];
   } else {
@@ -121,7 +124,7 @@ export function normalizeFormat(format: AutoBoolean): WithErr<boolean> {
 }
 
 export function normalizeFormatErrors(
-  formatErrors: AutoBoolean
+  formatErrors: Auto<boolean>
 ): WithErr<boolean> {
   if (formatErrors === true && isEmpty(chalk)) {
     return [false, errFormatErrorsNotAvail()];
@@ -133,4 +136,16 @@ export function normalizeFormatErrors(
       null
     ];
   }
+}
+
+export function normalizeHighlight(highlight: Auto<boolean>): boolean {
+  return highlight === "auto" ? detectTerminal() : highlight;
+}
+
+export function normalizeInspectOptions(
+  inspectOptions: Auto<util$InspectOptions>
+): util$InspectOptions {
+  return inspectOptions === "auto"
+    ? { colors: detectTerminal() || detectReactNative() }
+    : inspectOptions;
 }

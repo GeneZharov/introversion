@@ -1,17 +1,25 @@
 // @flow
 // Normalized Configuration
 
-import type { Conf, StackTraceItem } from "./conf";
-
-export type _TimerOption = "performance" | "console" | "date" | (() => number);
+import type { Conf, StackTraceItem, TimerOption } from "./conf";
 
 export type _Conf = {
   ...$Exact<Conf>,
-  timer: _TimerOption,
+
+  timer: TimerOption,
+  clone: boolean,
+
+  // stacktrace
   stackTrace: StackTraceItem[],
   stackTraceAsync: boolean[],
-  clone: boolean,
+  stackTraceShift: number,
+
+  // formatting
   format: boolean,
   formatErrors: boolean,
+  highlight: boolean,
+  inspectOptions: util$InspectOptions,
+
+  // in-place options
   repeat: number
 };

@@ -35,7 +35,7 @@ export function validDev(val: mixed): boolean {
 }
 
 export function validStackTrace(val: mixed): boolean {
-  return typeof val === "boolean" || Array.isArray(val);
+  return val === "auto" || typeof val === "boolean" || Array.isArray(val);
 }
 
 export function validStackTraceAsync(val: mixed): boolean {
@@ -43,7 +43,7 @@ export function validStackTraceAsync(val: mixed): boolean {
 }
 
 export function validStackTraceShift(val: mixed): boolean {
-  return typeof val === "number";
+  return val === "auto" || typeof val === "number";
 }
 
 export function validFormat(val: mixed): boolean {
@@ -55,11 +55,11 @@ export function validFormatErrors(val: mixed): boolean {
 }
 
 export function validHighlight(val: mixed): boolean {
-  return typeof val === "boolean";
+  return val === "auto" || typeof val === "boolean";
 }
 
 export function validInspectOptions(val: mixed): boolean {
-  return typeof val === "object" || val === null;
+  return val === "auto" || typeof val === "object" || val === null;
 }
 
 export function validGuard(val: mixed): boolean {
