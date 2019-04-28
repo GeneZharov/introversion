@@ -1,5 +1,6 @@
 // @flow
 
+import { defaultConf } from "../conf";
 import { v, f, setDefaults } from "../index";
 
 const name = 9;
@@ -7,12 +8,16 @@ const fn = x => x.name;
 
 const log = jest.fn();
 
-setDefaults({
-  log,
-  format: false,
-  clone: false,
-  stackTrace: false
+beforeAll(() => {
+  setDefaults({
+    log,
+    devTools: false,
+    format: false,
+    stackTrace: false
+  });
 });
+
+afterAll(() => setDefaults(defaultConf));
 
 afterEach(() => log.mockClear());
 

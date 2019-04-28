@@ -3,6 +3,7 @@
 import {
   errInvalidClone,
   errInvalidDev,
+  errInvalidDevTools,
   errInvalidErrorHandling,
   errInvalidFormat,
   errInvalidFormatErrors,
@@ -86,6 +87,12 @@ test('invalid "precision" option', () => {
   In.v.with(conf)();
   const [msg] = errInvalidPrecision();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
+});
+
+test('invalid "devTools" option', () => {
+  const conf = ({ devTools: 0 }: any);
+  const [msg] = errInvalidDevTools();
+  expect(() => In.v.with(conf)()).toThrow(msg);
 });
 
 test('invalid "dev" option', () => {

@@ -1,13 +1,14 @@
 // @flow
 // Normalized Configuration
 
-import type { Conf, StackTraceItem, TimerOption } from "./conf";
+import type { Auto, Conf, StackTraceItem, TimerOption } from "./conf";
 
 export type _Conf = {
-  ...$Exact<Conf>,
+  ...$Diff<$Exact<Conf>, { devTools: Auto<boolean> }>,
 
   timer: TimerOption,
   clone: boolean,
+  devTools: boolean,
 
   // stacktrace
   stackTrace: StackTraceItem[],

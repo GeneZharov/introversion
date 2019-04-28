@@ -18,7 +18,7 @@ function _detectDevTools(): boolean {
   console.log(
     "Introversion is detecting DevTools...",
     sample,
-    '\n(set "format" and "clone" options to skip it)\n'
+    '\n(set "devTools" option to skip it)\n'
   );
   return opened;
 }

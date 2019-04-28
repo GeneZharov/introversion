@@ -1,10 +1,13 @@
 // @flow
 
+import { dissoc, once } from "ramda";
+
 import type { Conf } from "../../types/conf";
 import type { Task } from "../../types/_";
 import type { _Conf } from "../../types/_conf";
 import {
   normalizeClone,
+  normalizeDevTools,
   normalizeFormat,
   normalizeFormatErrors,
   normalizeHighlight,
@@ -19,8 +22,10 @@ import {
 import { warning } from "../../errors/util";
 
 export function normalizeConf(conf: Conf, task?: Task): _Conf {
+  const getDevTools = once(() => normalizeDevTools(conf.devTools));
+
   const [timer, timerE] = normalizeTimer(conf.timer);
-  const clone = normalizeClone(conf.clone);
+  const clone = normalizeClone(conf.clone, getDevTools);
 
   // stacktrace
   const stackTrace = normalizeStackTrace(conf.stackTrace);
@@ -31,9 +36,10 @@ export function normalizeConf(conf: Conf, task?: Task): _Conf {
   const stackTraceShift = normalizeStackTraceShift(conf.stackTraceShift);
 
   // formatting
-  const [format, formatE] = normalizeFormat(conf.format);
+  const [format, formatE] = normalizeFormat(conf.format, getDevTools);
   const [formatErrors, formatErrorsE] = normalizeFormatErrors(
-    conf.formatErrors
+    conf.formatErrors,
+    getDevTools
   );
   const highlight = normalizeHighlight(conf.highlight);
   const inspectOptions = normalizeInspectOptions(conf.inspectOptions);
@@ -46,7 +52,7 @@ export function normalizeConf(conf: Conf, task?: Task): _Conf {
     if (x !== null) warning(conf, x);
   });
 
-  return ({
+  return (dissoc("devTools", {
     ...conf,
     timer,
     clone,
@@ -65,5 +71,5 @@ export function normalizeConf(conf: Conf, task?: Task): _Conf {
     // in-place options
     id,
     repeat
-  }: any);
+  }): any);
 }

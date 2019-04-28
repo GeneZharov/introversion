@@ -1,10 +1,13 @@
 // @flow
 
+import { defaultConf } from "../../../conf";
 import In from "../../../index";
 
 const log = jest.fn();
 const log2 = jest.fn();
 const log3 = jest.fn();
+
+afterAll(() => In.setDefaults(defaultConf));
 
 afterEach(() => {
   log.mockClear();

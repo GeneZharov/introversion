@@ -22,6 +22,7 @@ export type Conf = {
   warn: Print,
   clone: Auto<boolean>,
   errorHandling: "warn" | "throw",
+  devTools: Auto<boolean>,
   dev: boolean,
 
   // stacktrace

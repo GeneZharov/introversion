@@ -5,6 +5,7 @@ import { defaultConf } from "../../conf";
 import {
   errInvalidClone,
   errInvalidDev,
+  errInvalidDevTools,
   errInvalidErrorHandling,
   errInvalidFormat,
   errInvalidFormatErrors,
@@ -25,6 +26,7 @@ import { error, warning } from "../../errors/util";
 import {
   validClone,
   validDev,
+  validDevTools,
   validErrorHandling,
   validFormat,
   validFormatErrors,
@@ -50,6 +52,7 @@ const validators = {
   warn: [validWarn, onErr(errInvalidWarn)],
   clone: [validClone, onWarn(errInvalidClone)],
   errorHandling: [validErrorHandling, onErr(errInvalidErrorHandling)],
+  devTools: [validDevTools, onErr(errInvalidDevTools)],
   dev: [validDev, onWarn(errInvalidDev)],
   stackTrace: [validStackTrace, onWarn(errInvalidStackTrace)],
   stackTraceAsync: [validStackTraceAsync, onWarn(errInvalidStackTraceAsync)],

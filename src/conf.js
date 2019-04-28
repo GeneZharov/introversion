@@ -11,6 +11,7 @@ export const defaultConf: Conf = {
   warn: nativeWarn,
   clone: "auto",
   errorHandling: "warn",
+  devTools: "auto",
   dev: false,
 
   // stacktrace

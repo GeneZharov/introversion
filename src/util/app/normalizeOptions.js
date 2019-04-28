@@ -43,8 +43,15 @@ export function normalizeTimer(timer: Auto<TimerOption>): WithErr<TimerOption> {
   return [timer !== "auto" ? timer : getAuto(), null];
 }
 
-export function normalizeClone(clone: Auto<boolean>): boolean {
-  return clone === "auto" ? !detectTerminal() || detectDevTools() : clone;
+export function normalizeClone(
+  clone: Auto<boolean>,
+  getDevTools: () => boolean
+): boolean {
+  return clone === "auto" ? !detectTerminal() || getDevTools() : clone;
+}
+
+export function normalizeDevTools(devTools: Auto<boolean>): boolean {
+  return devTools === "auto" ? detectDevTools() : devTools;
 }
 
 export function normalizeId(id: mixed, timer: TimerOption, task?: Task): mixed {
@@ -110,13 +117,16 @@ export function normalizeStackTraceShift(
     : stackTraceShift;
 }
 
-export function normalizeFormat(format: Auto<boolean>): WithErr<boolean> {
+export function normalizeFormat(
+  format: Auto<boolean>,
+  getDevTools: () => boolean
+): WithErr<boolean> {
   if (format === true && isEmpty(chalk)) {
     return [false, errFormatNotAvail()];
   } else {
     return [
       format === "auto"
-        ? (detectTerminal() || detectReactNative()) && !detectDevTools()
+        ? (detectTerminal() || detectReactNative()) && !getDevTools()
         : format,
       null
     ];
@@ -124,14 +134,15 @@ export function normalizeFormat(format: Auto<boolean>): WithErr<boolean> {
 }
 
 export function normalizeFormatErrors(
-  formatErrors: Auto<boolean>
+  formatErrors: Auto<boolean>,
+  getDevTools: () => boolean
 ): WithErr<boolean> {
   if (formatErrors === true && isEmpty(chalk)) {
     return [false, errFormatErrorsNotAvail()];
   } else {
     return [
       formatErrors === "auto"
-        ? detectTerminal() && !detectDevTools()
+        ? detectTerminal() && !getDevTools()
         : formatErrors,
       null
     ];

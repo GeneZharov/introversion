@@ -4,10 +4,21 @@ import Stacktrace from "stacktrace-js";
 import chalk from "chalk";
 
 import type { Auto, Print } from "../types/conf";
-import { errInvalidFormatErrors, errInvalidWarn } from "./options";
+import {
+  errInvalidDevTools,
+  errInvalidFormatErrors,
+  errInvalidWarn
+} from "./options";
 import { formatStackFrame } from "../util/format/formatStackFrame";
-import { normalizeFormatErrors } from "../util/app/normalizeOptions";
-import { validFormatErrors, validWarn } from "../util/app/validateOptions";
+import {
+  normalizeDevTools,
+  normalizeFormatErrors
+} from "../util/app/normalizeOptions";
+import {
+  validDevTools,
+  validFormatErrors,
+  validWarn
+} from "../util/app/validateOptions";
 
 const stripe = str => {
   const bar = chalk.yellow("▒");
@@ -32,12 +43,12 @@ export function formatWarnFmt(msg: string[], trace: string[]): string {
 
 export function _warning(
   {
-    errorHandling,
     warn,
+    errorHandling,
     formatErrors
   }: {
-    errorHandling: "warn" | "throw",
     warn: Print,
+    errorHandling: "warn" | "throw",
     formatErrors: boolean
   },
   msg: string[]
@@ -51,12 +62,14 @@ export function _warning(
 
 export function warning(
   {
-    errorHandling,
     warn,
+    errorHandling,
+    devTools,
     formatErrors
   }: {
-    errorHandling: "warn" | "throw",
     warn: Print,
+    errorHandling: "warn" | "throw",
+    devTools: Auto<boolean>,
     formatErrors: Auto<boolean>
   },
   msg: string[]
@@ -64,10 +77,12 @@ export function warning(
   if (errorHandling === "throw") error(msg);
   if (!validWarn(warn)) error(errInvalidWarn());
   if (!validFormatErrors(formatErrors)) error(errInvalidFormatErrors());
+  if (!validDevTools(devTools)) error(errInvalidDevTools());
   const trace = Stacktrace.getSync()
     .map(f => formatStackFrame(["file", "func", "line", "col"], f))
     .slice(1);
-  const [_formatErrors] = normalizeFormatErrors(formatErrors);
+  const getDevTools = () => normalizeDevTools(devTools);
+  const [_formatErrors] = normalizeFormatErrors(formatErrors, getDevTools);
   _formatErrors ? warn(formatWarnFmt(msg, trace)) : warn(formatWarn(msg));
 }
 

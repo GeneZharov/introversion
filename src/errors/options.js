@@ -24,6 +24,10 @@ export function errInvalidErrorHandling(): string[] {
   return ['"errorHandling" option must be "warn" or "throw"'];
 }
 
+export function errInvalidDevTools(): string[] {
+  return ['"devTools" option must be boolean or "auto"'];
+}
+
 export function errInvalidDev(): string[] {
   return ['"dev" option must be boolean'];
 }

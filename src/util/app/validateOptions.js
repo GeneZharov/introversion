@@ -30,6 +30,10 @@ export function validPrecision(val: mixed): boolean {
   return typeof val === "number" && !isNaN(val) && val >= 0;
 }
 
+export function validDevTools(val: mixed): boolean {
+  return val === "auto" || typeof val === "boolean";
+}
+
 export function validDev(val: mixed): boolean {
   return typeof val === "boolean";
 }
