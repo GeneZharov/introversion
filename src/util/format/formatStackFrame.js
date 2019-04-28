@@ -21,7 +21,7 @@ export function formatStackFrame(
     columnNumber: col
   } = stackFrame;
 
-  function fmtFile(file?: string, line?: number, col?: number): string[] {
+  function fmtFile(file: any, line: any, col: any): string[] {
     const data = !isNil(file)
       ? [
           ...(!showFile ? [] : [formatFileName(file)]),

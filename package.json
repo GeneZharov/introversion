@@ -10,7 +10,7 @@
     "url": "https://github.com/kahless/introversion/issues",
     "email": "gene.zharov@gmail.com"
   },
-  "main": "lib/introversion.js",
+  "main": "lib/index.js",
   "jsnext:main": "es/introversion.js",
   "module": "es/introversion.js",
   "files": ["src", "es", "lib", "dist"],
@@ -22,6 +22,7 @@
     "prettify": "prettier --write 'src/**/*.js'",
     "test": "jest",
     "test:watch": "jest --watch",
+    "clean": "rimraf es lib dist",
     "build": "rollup -c",
     "build:watch": "rollup -c -w ",
     "build:flow": "flow-copy-source -v -i '**/__tests__/**' src lib"
@@ -34,6 +35,7 @@
     "flow-copy-source": "2.0.3",
     "jest": "24.5.0",
     "prettier": "1.16.4",
+    "rimraf": "2.6.3",
     "rollup": "1.10.0",
     "rollup-plugin-babel": "4.3.2",
     "rollup-plugin-commonjs": "9.3.4",
