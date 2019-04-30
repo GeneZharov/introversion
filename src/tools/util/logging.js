@@ -10,9 +10,9 @@ import type { StackFrame, TimerOption } from "../../types/conf";
 import type { _Conf } from "../../types/_conf";
 import { _warning } from "../../errors/util";
 import { errExtraArgsNotAllowed } from "../../errors/options-runtime";
-import { formatStackFrame } from "../format/formatStackFrame";
-import { formatSuffix } from "../number/suffix";
-import { round } from "../number/round";
+import { formatStackFrame } from "../../util/format/formatStackFrame";
+import { formatSuffix } from "../../util/number/suffix";
+import { round } from "../../util/number/round";
 
 const chalk = new Chalk.constructor();
 

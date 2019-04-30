@@ -1,23 +1,29 @@
 // @flow
 
-import { errExpectedFuncArg } from "../../errors/_";
-import Introversion from "../../index";
+import { defaultConf } from "../../defaultConf";
+import { errExpectedFuncArg } from "../../errors/misc";
+import { setDefaults, unmuteF, unmuteRun } from "../..";
 
 const log = jest.fn();
 const warn = jest.fn();
 
-const In = Introversion.instance({
-  log,
-  warn,
-  format: false,
-  clone: false,
-  stackTrace: false
+beforeAll(() => {
+  setDefaults({
+    log,
+    warn,
+    devTools: false,
+    format: false,
+    clone: false,
+    stackTrace: false
+  });
 });
+
+afterAll(() => setDefaults(defaultConf));
 
 describe("unmuteF()", () => {
   test("not callable argument", () => {
     const [msg] = errExpectedFuncArg("unmuteF");
-    const result = In.unmuteF(null);
+    const result = unmuteF(null);
     expect(result).toBe(null);
     expect(log).not.toBeCalled();
     expect(warn).toBeCalledWith(expect.stringContaining(msg));
@@ -26,14 +32,14 @@ describe("unmuteF()", () => {
     function fn() {
       return this.name;
     }
-    expect(In.unmuteF(fn).call({ name: 0 })).toBe(0);
+    expect(unmuteF(fn).call({ name: 0 })).toBe(0);
   });
 });
 
 describe("unmuteRun()", () => {
   test("not callable argument", () => {
     const [msg] = errExpectedFuncArg("unmuteRun");
-    const result = In.unmuteRun(null);
+    const result = unmuteRun(null);
     expect(result).toBe(null);
     expect(log).not.toBeCalled();
     expect(warn).toBeCalledWith(expect.stringContaining(msg));

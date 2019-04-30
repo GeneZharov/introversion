@@ -1,27 +1,29 @@
 // @flow
 
-import { defaultConf } from "../../../conf";
-import In from "../../../index";
+import { defaultConf } from "../../../defaultConf";
+import { logV, setDefaults } from "../../..";
 
 const log = jest.fn();
 
-afterAll(() => In.setDefaults(defaultConf));
+beforeAll(() => setDefaults({ devTools: false }));
+
+afterAll(() => setDefaults(defaultConf));
 
 afterEach(() => log.mockClear());
 
 describe("setDefaults()", () => {
   test("should throw for not an object", () => {
-    expect(() => (In.setDefaults: any)()).toThrow();
-    expect(() => (In.setDefaults: any)(undefined)).toThrow();
-    expect(() => (In.setDefaults: any)(null)).toThrow();
-    expect(() => (In.setDefaults: any)("")).toThrow();
-    expect(() => (In.setDefaults: any)(4)).toThrow();
-    expect(() => (In.setDefaults: any)(Symbol())).toThrow();
-    expect(() => (In.setDefaults: any)([])).toThrow();
+    expect(() => (setDefaults: any)()).toThrow();
+    expect(() => (setDefaults: any)(undefined)).toThrow();
+    expect(() => (setDefaults: any)(null)).toThrow();
+    expect(() => (setDefaults: any)("")).toThrow();
+    expect(() => (setDefaults: any)(4)).toThrow();
+    expect(() => (setDefaults: any)(Symbol())).toThrow();
+    expect(() => (setDefaults: any)([])).toThrow();
   });
   test("should apply config", () => {
-    In.setDefaults({ log, stackTraceAsync: false });
-    In.v(0);
+    setDefaults({ log, stackTraceAsync: false });
+    logV(0);
     expect(log).toBeCalled();
   });
 });

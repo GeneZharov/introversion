@@ -1,7 +1,7 @@
 // @flow
 
-import { defaultConf } from "../conf";
-import { v, f, setDefaults } from "../index";
+import { defaultConf } from "../defaultConf";
+import { f, setDefaults, v } from "..";
 
 const name = 9;
 const fn = x => x.name;

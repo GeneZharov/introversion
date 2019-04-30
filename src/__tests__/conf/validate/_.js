@@ -1,5 +1,6 @@
 // @flow
 
+import { defaultConf } from "../../../defaultConf";
 import {
   errInvalidClone,
   errInvalidDev,
@@ -20,17 +21,22 @@ import {
   errInvalidWarn,
   errUnknownOpt
 } from "../../../errors/options";
-import Introversion from "../../../index";
+import { logV, setDefaults } from "../../..";
 
 const log = jest.fn();
 const warn = jest.fn();
 
-const In = Introversion.instance({
-  log,
-  warn,
-  format: false,
-  clone: false
+beforeAll(() => {
+  setDefaults({
+    log,
+    warn,
+    devTools: false,
+    format: false,
+    clone: false
+  });
 });
+
+afterAll(() => setDefaults(defaultConf));
 
 beforeEach(() => {
   log.mockClear();
@@ -41,8 +47,8 @@ test("unknown option", () => {
   const opt = s => `unknown-${s}`;
   const conf2 = ({ [opt(2)]: false }: any);
   const conf3 = ({ [opt(3)]: false }: any);
-  In.v.with(conf2)();
-  In.v.with(conf3)();
+  logV.with(conf2)();
+  logV.with(conf3)();
   const [msg2] = errUnknownOpt(opt(2));
   const [msg3] = errUnknownOpt(opt(3));
   expect(warn.mock.calls[0][0]).toEqual(expect.stringContaining(msg2));
@@ -51,14 +57,14 @@ test("unknown option", () => {
 
 test('invalid "timer" option', () => {
   const conf = ({ timer: false }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidTimer();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
 test('invalid "log" option', () => {
   const conf = ({ log: false }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidLog();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
@@ -66,12 +72,12 @@ test('invalid "log" option', () => {
 test('invalid "warn" option', () => {
   const conf = ({ warn: false }: any);
   const [msg] = errInvalidWarn();
-  expect(() => In.v.with(conf)()).toThrow(msg);
+  expect(() => logV.with(conf)()).toThrow(msg);
 });
 
 test('invalid "clone" option', () => {
   const conf = ({ clone: 0 }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidClone();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
@@ -79,12 +85,12 @@ test('invalid "clone" option', () => {
 test('invalid "errorHandling" option', () => {
   const conf = ({ errorHandling: false }: any);
   const [msg] = errInvalidErrorHandling();
-  expect(() => In.v.with(conf)()).toThrow(msg);
+  expect(() => logV.with(conf)()).toThrow(msg);
 });
 
 test('invalid "precision" option', () => {
   const conf = ({ precision: -1 }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidPrecision();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
@@ -92,73 +98,73 @@ test('invalid "precision" option', () => {
 test('invalid "devTools" option', () => {
   const conf = ({ devTools: 0 }: any);
   const [msg] = errInvalidDevTools();
-  expect(() => In.v.with(conf)()).toThrow(msg);
+  expect(() => logV.with(conf)()).toThrow(msg);
 });
 
 test('invalid "dev" option', () => {
   const conf = ({ dev: 0 }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidDev();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
 test('invalid "stackTrace" option', () => {
   const conf = ({ stackTrace: 0 }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidStackTrace();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
 test('invalid "stackTraceShift" option', () => {
   const conf = ({ stackTraceShift: false }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidStackTraceShift();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
 test('invalid "stackTraceAsync" option', () => {
   const conf = ({ stackTraceAsync: 0 }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidStackTraceAsync();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
-describe('invalid "format" option', () => {
+test('invalid "format" option', () => {
   const conf = ({ format: 0 }: any);
   const [msg] = errInvalidFormat();
-  expect(() => In.v.with(conf)()).toThrow(msg);
+  expect(() => logV.with(conf)()).toThrow(msg);
 });
 
-describe('invalid "formatErrors" option', () => {
+test('invalid "formatErrors" option', () => {
   const conf = ({ formatErrors: 0 }: any);
   const [msg] = errInvalidFormatErrors();
-  expect(() => In.v.with(conf)()).toThrow(msg);
+  expect(() => logV.with(conf)()).toThrow(msg);
 });
 
-describe('invalid "highlight" option', () => {
+test('invalid "highlight" option', () => {
   const conf = ({ highlight: 0 }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidHighlight();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
-describe('invalid "inspectOptions" option', () => {
+test('invalid "inspectOptions" option', () => {
   const conf = ({ inspectOptions: false }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidInspectOptions();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
-describe('invalid "guard" option', () => {
+test('invalid "guard" option', () => {
   const conf = ({ guard: null }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidGuard();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });
 
-describe('invalid "repeat" option', () => {
+test('invalid "repeat" option', () => {
   const conf = ({ repeat: null }: any);
-  In.v.with(conf)();
+  logV.with(conf)();
   const [msg] = errInvalidRepeat();
   expect(warn).toBeCalledWith(expect.stringContaining(msg));
 });

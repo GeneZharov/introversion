@@ -1,0 +1,4 @@
+// It's impossible to cover "devTools" option with unit tests because
+// JavaScript code run by jest is not connected to the terminal. Also it is
+// impossible to emulate React Native because modifying the "navigator.product"
+// is prohibited.

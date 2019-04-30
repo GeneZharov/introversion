@@ -3,7 +3,6 @@
 import { dissoc, once } from "ramda";
 
 import type { Conf } from "../../types/conf";
-import type { Task } from "../../types/_";
 import type { _Conf } from "../../types/_conf";
 import {
   normalizeClone,
@@ -21,7 +20,7 @@ import {
 } from "./normalizeOptions";
 import { warning } from "../../errors/util";
 
-export function normalizeConf(conf: Conf, task?: Task): _Conf {
+export function normalizeConf(conf: Conf, task?: string): _Conf {
   const getDevTools = once(() => normalizeDevTools(conf.devTools));
 
   const [timer, timerE] = normalizeTimer(conf.timer);

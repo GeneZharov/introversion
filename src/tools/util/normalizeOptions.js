@@ -4,14 +4,13 @@ import { isEmpty } from "ramda";
 import chalk from "chalk";
 
 import type { Auto, StackTraceItem, TimerOption } from "../../types/conf";
-import type { Task } from "../../types/_";
-import { defaultConf } from "../../conf";
-import { detectConsoleTime } from "../detect/detectConsole";
-import { detectCorsAvail } from "../detect/detectCorsAvail";
-import { detectDevTools } from "../detect/detectDevTools";
-import { detectPerformance } from "../detect/detectPerformance";
-import { detectReactNative } from "../detect/detectReactNative";
-import { detectTerminal } from "../detect/detectTerminal";
+import { defaultConf } from "../../defaultConf";
+import { detectConsoleTime } from "../../util/detect/detectConsole";
+import { detectCorsAvail } from "../../util/detect/detectCorsAvail";
+import { detectDevTools } from "../../util/detect/detectDevTools";
+import { detectPerformance } from "../../util/detect/detectPerformance";
+import { detectReactNative } from "../../util/detect/detectReactNative";
+import { detectTerminal } from "../../util/detect/detectTerminal";
 import {
   errConsoleNotAvail,
   errFormatErrorsNotAvail,
@@ -21,8 +20,8 @@ import {
   errStackTraceAsyncNotAllowed
 } from "../../errors/options-runtime";
 import { errInvalidRepeat } from "../../errors/options";
-import { parseSuffix } from "../number/suffix";
-import { stringView } from "../string/stringView";
+import { parseSuffix } from "../../util/number/suffix";
+import { stringView } from "../../util/string/stringView";
 
 type WithErr<T> = [T, null | string[]];
 
@@ -54,7 +53,11 @@ export function normalizeDevTools(devTools: Auto<boolean>): boolean {
   return devTools === "auto" ? detectDevTools() : devTools;
 }
 
-export function normalizeId(id: mixed, timer: TimerOption, task?: Task): mixed {
+export function normalizeId(
+  id: mixed,
+  timer: TimerOption,
+  task?: string
+): mixed {
   return typeof id !== "undefined"
     ? timer === "console"
       ? stringView(id)

@@ -4,7 +4,6 @@ import { last, path } from "ramda";
 
 import type { Conf } from "../../types/conf";
 import type { Modes } from "../../types/modes";
-import type { Task } from "../../types/_";
 import type { _Conf } from "../../types/_conf";
 import { globalConf } from "../../state";
 import { normalizeConf } from "./normalizeConf";
@@ -18,7 +17,7 @@ export function parseArgs(
   userArgs: *[]
 } {
   const modes = args
-    .filter(x => x instanceof ModesArg)
+    .filter(x => x instanceof ModeArg)
     .reduce((acc, o) => Object.assign({}, acc, o.modes), {});
   const conf = args
     .filter(x => x instanceof ConfArg)
@@ -57,7 +56,7 @@ export function parseUserArgs(
 
 export class Arg {}
 
-export class ModesArg extends Arg {
+export class ModeArg extends Arg {
   modes: $Shape<Modes>;
   constructor(modes: $Shape<Modes>) {
     super();
@@ -77,20 +76,17 @@ export function api(fn: *, ...args: mixed[]): * {
   // This function cause "Recursion limit exceeded" in flow-type, so recursion
   // function calls are concealed with "any" type.
   const _fn = fn.bind(this, ...args);
-  const muteFn = () => (api: any)(_fn, new ModesArg({ mute: true }));
+  const muteFn = () => (api: any)(_fn, new ModeArg({ mute: true }));
   const withFn = (conf: $Shape<Conf>) => (api: any)(_fn, new ConfArg(conf));
   _fn.with = withFn;
   Object.defineProperty(_fn, "mute", ({ get: muteFn }: Object));
   return _fn;
 }
 
-export function withApi<T>(
-  task: Task,
-  fn: (*[], _Conf, $Shape<Modes>, Task) => T
-): (*) => T {
+export function withApi<T>(fn: (*[], _Conf, $Shape<Modes>) => T): (*) => T {
   return (...args) => {
     const { modes, conf, userArgs } = parseArgs(args);
-    const _conf = normalizeConf(validateConf(conf), task);
-    return fn(userArgs, _conf, modes, task);
+    const _conf = normalizeConf(validateConf(conf), modes.task);
+    return fn(userArgs, _conf, modes);
   };
 }

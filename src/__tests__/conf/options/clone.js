@@ -1,26 +1,32 @@
 // @flow
 
-import Introversion from "../../../index";
-
-const log = jest.fn();
-
-const In = Introversion.instance({
-  log,
-  format: false,
-  stackTrace: false
-});
+import { defaultConf } from "../../../defaultConf";
+import In, { setDefaults, time, timeEnd, logF, logV } from "../../..";
 
 const a = { a: true };
 const b = { b: true };
 const c = { c: true };
 const fn = () => c;
 
+const log = jest.fn();
+
+beforeAll(() => {
+  setDefaults({
+    log,
+    devTools: false,
+    format: false,
+    stackTrace: false
+  });
+});
+
+afterAll(() => setDefaults(defaultConf));
+
 beforeEach(() => log.mockClear());
 
 describe('"clone" option', () => {
-  describe("v()", () => {
+  describe("logV()", () => {
     test("should create a deep clone when true", () => {
-      In.v.with({ clone: true })(a, b);
+      logV.with({ clone: true })(a, b);
       const [, [_a, _b]] = log.mock.calls[0];
       expect(_a).not.toBe(a);
       expect(_a).toEqual(a);
@@ -28,16 +34,16 @@ describe('"clone" option', () => {
       expect(_b).toEqual(b);
     });
     test("should prevent cloning when false", () => {
-      In.v.with({ clone: false })(a, b);
+      logV.with({ clone: false })(a, b);
       const [, [_a, _b]] = log.mock.calls[0];
       expect(_a).toBe(a);
       expect(_b).toBe(b);
     });
   });
 
-  describe("f()", () => {
+  describe("logF()", () => {
     test("should create a deep clone when true", () => {
-      In.f.with({ clone: true })(a, fn)(b);
+      logF.with({ clone: true })(a, fn)(b);
       const [, [_a]] = log.mock.calls[0];
       const [, [_b]] = log.mock.calls[1];
       const [, _c] = log.mock.calls[2];
@@ -49,7 +55,7 @@ describe('"clone" option', () => {
       expect(_c).toEqual(c);
     });
     test("should prevent cloning when false", () => {
-      In.f.with({ clone: false })(a, fn)(b);
+      logF.with({ clone: false })(a, fn)(b);
       const [, [_a]] = log.mock.calls[0];
       const [, [_b]] = log.mock.calls[1];
       const [, _c] = log.mock.calls[2];
@@ -62,8 +68,8 @@ describe('"clone" option', () => {
   describe("timeEnd()", () => {
     test("should create a deep clone when true", () => {
       const id = Symbol();
-      In.time(id);
-      In.timeEnd.with({ clone: true })(a, b, id);
+      time(id);
+      timeEnd.with({ clone: true })(a, b, id);
       const [, [_a, _b]] = log.mock.calls[0];
       expect(_a).not.toBe(a);
       expect(_a).toEqual(a);
@@ -72,8 +78,8 @@ describe('"clone" option', () => {
     });
     test("should prevent cloning when false", () => {
       const id = Symbol();
-      In.time(id);
-      In.timeEnd.with({ clone: false })(a, b, id);
+      time(id);
+      timeEnd.with({ clone: false })(a, b, id);
       const [, [_a, _b]] = log.mock.calls[0];
       expect(_a).toBe(a);
       expect(_b).toBe(b);

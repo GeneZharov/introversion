@@ -1,7 +1,7 @@
 // @flow
 
 import type { Conf } from "../../types/conf";
-import { defaultConf } from "../../conf";
+import { defaultConf } from "../../defaultConf";
 import {
   errInvalidClone,
   errInvalidDev,

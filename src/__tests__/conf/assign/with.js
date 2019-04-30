@@ -1,13 +1,15 @@
 // @flow
 
-import { defaultConf } from "../../../conf";
-import In from "../../../index";
+import { defaultConf } from "../../../defaultConf";
+import { instance, setDefaults } from "../../..";
 
 const log = jest.fn();
 const log2 = jest.fn();
 const log3 = jest.fn();
 
-afterAll(() => In.setDefaults(defaultConf));
+beforeAll(() => setDefaults({ devTools: false }));
+
+afterAll(() => setDefaults(defaultConf));
 
 afterEach(() => {
   log.mockClear();
@@ -17,15 +19,15 @@ afterEach(() => {
 
 describe(".with()", () => {
   test("should beat setDefaults() and instance()", () => {
-    In.setDefaults({
+    setDefaults({
       stackTraceAsync: false,
       log
     });
-    const _In = In.instance({
+    const In = instance({
       stackTraceAsync: false,
       log: log2
     });
-    _In.v.with({ log: log3 })();
+    In.v.with({ log: log3 })();
     expect(log).not.toBeCalled();
     expect(log2).not.toBeCalled();
     expect(log3).toBeCalled();

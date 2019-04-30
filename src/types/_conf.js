@@ -1,4 +1,5 @@
 // @flow
+
 // Normalized Configuration
 
 import type { Auto, Conf, StackTraceItem, TimerOption } from "./conf";

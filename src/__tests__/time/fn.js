@@ -2,7 +2,8 @@
 
 import { range } from "ramda";
 
-import Introversion from "../../index";
+import { defaultConf } from "../../defaultConf";
+import { setDefaults, timeF, unmuteF, unmuteRun } from "../..";
 
 const id = "id";
 const name = 9;
@@ -11,13 +12,18 @@ const fn = jest.fn(x => x.name);
 const log = jest.fn();
 const timer = jest.fn(_ => 0);
 
-const In = Introversion.instance({
-  format: false,
-  clone: false,
-  log,
-  timer,
-  stackTrace: false
+beforeAll(() => {
+  setDefaults({
+    devTools: false,
+    format: false,
+    clone: false,
+    log,
+    timer,
+    stackTrace: false
+  });
 });
+
+afterAll(() => setDefaults(defaultConf));
 
 afterEach(() => {
   fn.mockClear();
@@ -28,7 +34,7 @@ afterEach(() => {
 describe("timeF()", () => {
   describe("when muted", () => {
     test("should not log anything", () => {
-      const result = In.timeF.mute(1, 2, fn)({ name });
+      const result = timeF.mute(1, 2, fn)({ name });
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(0);
       expect(log).not.toBeCalled();
@@ -37,21 +43,21 @@ describe("timeF()", () => {
 
   describe("when unmuted", () => {
     test("should log time", () => {
-      const result = In.timeF(1, 2, fn)({ name });
+      const result = timeF(1, 2, fn)({ name });
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
       expect(log).toBeCalledWith("timeF()", [1, 2], "0 ms");
     });
-    test("should log with In.unmuteRun()", () => {
-      const action = In.timeF.mute(1, 2, fn);
-      const result = In.unmuteRun(() => action({ name }));
+    test("should log with unmuteRun()", () => {
+      const action = timeF.mute(1, 2, fn);
+      const result = unmuteRun(() => action({ name }));
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
       expect(log).toBeCalledWith("timeF()", [1, 2], "0 ms");
     });
-    test("should log with In.unmuteF()", () => {
-      const action = In.timeF.mute(1, 2, fn);
-      const result = In.unmuteF(action)({ name });
+    test("should log with unmuteF()", () => {
+      const action = timeF.mute(1, 2, fn);
+      const result = unmuteF(action)({ name });
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
       expect(log).toBeCalledWith("timeF()", [1, 2], "0 ms");
@@ -60,11 +66,11 @@ describe("timeF()", () => {
 
   describe("should repeat measurements", () => {
     test("should log time", () => {
-      In.timeF.with({ repeat: 5 })(fn)({ name });
+      timeF.with({ repeat: 5 })(fn)({ name });
       expect(fn.mock.calls.length).toEqual(5);
     });
     test("should log time", () => {
-      In.timeF.with({ repeat: "1k" })(fn)({ name });
+      timeF.with({ repeat: "1k" })(fn)({ name });
       expect(fn.mock.calls.length).toEqual(1000);
     });
   });
@@ -74,9 +80,9 @@ describe("timeF()", () => {
     const log2 = jest.fn();
     const log3 = jest.fn();
     range(0, 100).forEach(_ => {
-      In.timeF.with({ log: log1, guard: 3 })(fn)({ name });
-      In.timeF.with({ log: log2, guard: 1, id: 2 })(fn)({ name });
-      In.timeF.with({ log: log3, guard: 6, id: 3 })(fn)({ name });
+      timeF.with({ log: log1, guard: 3 })(fn)({ name });
+      timeF.with({ log: log2, guard: 1, id: 2 })(fn)({ name });
+      timeF.with({ log: log3, guard: 6, id: 3 })(fn)({ name });
     });
     expect(log1.mock.calls.length).toBe(3);
     expect(log2.mock.calls.length).toBe(1);
@@ -87,6 +93,6 @@ describe("timeF()", () => {
     function fn() {
       return this.name;
     }
-    expect(In.timeF(fn).call({ name })).toBe(name);
+    expect(timeF(fn).call({ name })).toBe(name);
   });
 });

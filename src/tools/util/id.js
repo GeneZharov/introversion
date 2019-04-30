@@ -1,6 +1,6 @@
 // @flow
 
-import { stringView } from "../string/stringView";
+import { stringView } from "../../util/string/stringView";
 
 let idNumber: number = 0;
 

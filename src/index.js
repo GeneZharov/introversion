@@ -3,24 +3,27 @@
 import { init, last, map, type } from "ramda";
 
 import type { Conf } from "./types/conf";
-import { ConfArg, ModesArg, api } from "./util/app/api";
-import { errInvalidConfType } from "./errors/_";
+import { ConfArg, ModeArg, api } from "./tools/util/api";
+import type { Modes } from "./types/modes";
+import { errInvalidConfType } from "./errors/misc";
 import { error } from "./errors/util";
 import { globalConf } from "./state";
-import * as _mute from "./mute";
-import * as _time from "./time";
-import * as _watcher from "./watcher";
+import * as _mute from "./tools/mute";
+import * as _time from "./tools/time";
+import * as _watch from "./tools/watcher";
+
+const tool = (fn, modeGist: $Shape<Modes>) => api(fn, new ModeArg(modeGist));
 
 export type API = typeof tools;
 
-export function setDefaults(conf: mixed): void {
+function setDefaults(conf: mixed): void {
   if (type(conf) !== "Object") {
     error(errInvalidConfType("setDefault"));
   }
   Object.assign(globalConf, ((conf: any): $Shape<Conf>));
 }
 
-export function instance(...args: *[]): API {
+function instance(...args: *[]): API {
   const _args = init(args);
   const conf = last(args);
   if (type(conf) !== "Object") {
@@ -32,43 +35,59 @@ export function instance(...args: *[]): API {
   );
 }
 
-export const v = api(_watcher.val);
-export const f = api(_watcher.fn);
-export const m = api(_watcher.fn, new ModesArg({ method: true }));
-export const V = api(_watcher.val, new ModesArg({ quiet: true }));
-export const F = api(_watcher.fn, new ModesArg({ quiet: true }));
-export const M = api(_watcher.fn, new ModesArg({ quiet: true, method: true }));
-export const v_ = api(_watcher.val, new ModesArg({ deb: true }));
-export const f_ = api(_watcher.fn, new ModesArg({ deb: true }));
-export const m_ = api(_watcher.fn, new ModesArg({ deb: true, method: true }));
+const logV = tool(_watch.val, { task: "logV" });
+const logF = tool(_watch.fn, { task: "logF" });
+const logM = tool(_watch.fn, { task: "logM", method: true });
 
-export const time = api(_time.time);
-export const timeEnd = api(_time.timeEnd);
-export const stopwatch = api(_time.stopwatch);
-export const lap = api(_time.lap);
-export const timeF = api(_time.timeFn);
-export const timeM = api(_time.timeFn, new ModesArg({ method: true }));
-export const timeRun = api(_time.timeRun);
+const logV_ = tool(_watch.val, { task: "logV_", quiet: true });
+const logF_ = tool(_watch.fn, { task: "logF_", quiet: true });
+const logM_ = tool(_watch.fn, { task: "logM_", quiet: true, method: true });
 
-export const unmute = api(_mute.unmute);
-export const mute = api(_mute.mute);
-export const unmuteF = api(_mute.unmuteF);
-export const unmuteRun = api(_mute.unmuteRun);
+const debV = tool(_watch.val, { task: "debV", deb: true });
+const debF = tool(_watch.fn, { task: "debF", deb: true });
+const debM = tool(_watch.fn, { task: "debM", deb: true, method: true });
+
+const v = tool(logV, { task: "v" });
+const f = tool(logF, { task: "f" });
+const m = tool(logM, { task: "m" });
+
+const v_ = tool(logV_, { task: "v_" });
+const f_ = tool(logF_, { task: "f_" });
+const m_ = tool(logM_, { task: "m_" });
+
+const time = tool(_time.time, { task: "time" });
+const timeEnd = tool(_time.timeEnd, { task: "timeEnd" });
+
+const stopwatch = tool(_time.stopwatch, { task: "stopwatch" });
+const lap = tool(_time.lap, { task: "lap" });
+
+const timeF = tool(_time.timeFn, { task: "timeF" });
+const timeM = tool(_time.timeFn, { task: "timeM", method: true });
+const timeRun = tool(_time.timeRun, { task: "timeRun" });
+
+const unmute = tool(_mute.unmute, { task: "unmute" });
+const mute = tool(_mute.mute, { task: "mute" });
+const unmuteF = tool(_mute.unmuteF, { task: "unmuteF" });
+const unmuteRun = tool(_mute.unmuteRun, { task: "unmuteRun" });
 
 const tools = {
   setDefaults,
   instance,
-
+  logV,
+  logF,
+  logM,
+  logV_,
+  logF_,
+  logM_,
+  debV,
+  debF,
+  debM,
   v,
   f,
   m,
-  V,
-  F,
-  M,
   v_,
   f_,
   m_,
-
   time,
   timeEnd,
   stopwatch,
@@ -76,7 +95,37 @@ const tools = {
   timeF,
   timeM,
   timeRun,
+  unmute,
+  mute,
+  unmuteF,
+  unmuteRun
+};
 
+export {
+  setDefaults,
+  instance,
+  logV,
+  logF,
+  logM,
+  logV_,
+  logF_,
+  logM_,
+  debV,
+  debF,
+  debM,
+  v,
+  f,
+  m,
+  v_,
+  f_,
+  m_,
+  time,
+  timeEnd,
+  stopwatch,
+  lap,
+  timeF,
+  timeM,
+  timeRun,
   unmute,
   mute,
   unmuteF,
@@ -86,17 +135,21 @@ const tools = {
 export default {
   setDefaults,
   instance,
-
+  logV,
+  logF,
+  logM,
+  logV_,
+  logF_,
+  logM_,
+  debV,
+  debF,
+  debM,
   v,
   f,
   m,
-  V,
-  F,
-  M,
   v_,
   f_,
   m_,
-
   time,
   timeEnd,
   stopwatch,
@@ -104,7 +157,6 @@ export default {
   timeF,
   timeM,
   timeRun,
-
   unmute,
   mute,
   unmuteF,

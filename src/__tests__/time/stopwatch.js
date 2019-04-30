@@ -2,8 +2,9 @@
 
 import { range } from "ramda";
 
+import { defaultConf } from "../../defaultConf";
 import { errExtraArgsNotAllowed } from "../../errors/options-runtime";
-import Introversion from "../../index";
+import { lap, setDefaults, stopwatch, unmuteF, unmuteRun } from "../..";
 
 const id = "id";
 
@@ -11,14 +12,19 @@ const log = jest.fn();
 const warn = jest.fn();
 const timer = jest.fn(_ => 0);
 
-const In = Introversion.instance({
-  format: false,
-  clone: false,
-  log,
-  warn,
-  timer,
-  stackTrace: false
+beforeAll(() => {
+  setDefaults({
+    log,
+    warn,
+    devTools: false,
+    format: false,
+    clone: false,
+    timer,
+    stackTrace: false
+  });
 });
+
+afterAll(() => setDefaults(defaultConf));
 
 afterEach(() => {
   log.mockClear();
@@ -29,10 +35,10 @@ afterEach(() => {
 describe("stopwatch() and lap()", () => {
   describe("when muted", () => {
     test("should not log anything", () => {
-      In.stopwatch.mute();
-      In.lap.mute();
-      In.lap.mute();
-      In.lap.mute();
+      stopwatch.mute();
+      lap.mute();
+      lap.mute();
+      lap.mute();
       expect(timer.mock.calls.length).toEqual(0);
       expect(log).not.toBeCalled();
     });
@@ -40,32 +46,32 @@ describe("stopwatch() and lap()", () => {
 
   describe("when unmuted", () => {
     test("should log time", () => {
-      In.stopwatch();
-      In.lap();
-      In.lap();
-      In.lap();
+      stopwatch();
+      lap();
+      lap();
+      lap();
       expect(timer.mock.calls.length).toEqual(7);
       expect(log).toBeCalledWith("lap()", "0 ms");
     });
-    test("should log with In.unmuteRun()", () => {
+    test("should log with unmuteRun()", () => {
       const action = () => {
-        In.stopwatch.mute();
-        In.lap.mute();
-        In.lap.mute();
-        In.lap.mute();
+        stopwatch.mute();
+        lap.mute();
+        lap.mute();
+        lap.mute();
       };
-      In.unmuteRun(action);
+      unmuteRun(action);
       expect(timer.mock.calls.length).toEqual(7);
       expect(log).toBeCalledWith("lap()", "0 ms");
     });
-    test("should log with In.unmuteF()", () => {
+    test("should log with unmuteF()", () => {
       const action = () => {
-        In.stopwatch.mute();
-        In.lap.mute();
-        In.lap.mute();
-        In.lap.mute();
+        stopwatch.mute();
+        lap.mute();
+        lap.mute();
+        lap.mute();
       };
-      In.unmuteF(action)();
+      unmuteF(action)();
       expect(timer.mock.calls.length).toEqual(7);
       expect(log).toBeCalledWith("lap()", "0 ms");
     });
@@ -75,11 +81,11 @@ describe("stopwatch() and lap()", () => {
     const log1 = jest.fn();
     const log2 = jest.fn();
     const log3 = jest.fn();
-    In.stopwatch();
+    stopwatch();
     range(0, 100).forEach(_ => {
-      In.lap.with({ log: log1, guard: 3 })();
-      In.lap.with({ log: log2, guard: 1, id: 2 })();
-      In.lap.with({ log: log3, guard: 6, id: 3 })();
+      lap.with({ log: log1, guard: 3 })();
+      lap.with({ log: log2, guard: 1, id: 2 })();
+      lap.with({ log: log3, guard: 6, id: 3 })();
     });
     expect(log1.mock.calls.length).toBe(3);
     expect(log2.mock.calls.length).toBe(1);
@@ -89,8 +95,8 @@ describe("stopwatch() and lap()", () => {
   describe("should print a warning", () => {
     test("extra args are used with console timer", () => {
       const [msg] = errExtraArgsNotAllowed();
-      In.stopwatch();
-      In.lap.with({ timer: "console" })(1, 2, 3);
+      stopwatch();
+      lap.with({ timer: "console" })(1, 2, 3);
       expect(log).not.toBeCalled();
       expect(warn).toBeCalledWith(expect.stringContaining(msg));
     });

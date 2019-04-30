@@ -2,7 +2,7 @@
 
 import type { Conf } from "./types/conf";
 import type { State } from "./types/state";
-import { defaultConf } from "./conf";
+import { defaultConf } from "./defaultConf";
 
 export let globalConf: Conf = Object.assign({}, defaultConf);
 

@@ -2,54 +2,42 @@
 
 import { isEmpty, range } from "ramda";
 
-import type { Modes } from "./types/modes";
-import type { Task } from "./types/_";
-import type { _Conf } from "./types/_conf";
-import { _warning } from "./errors/util";
-import { errInvalidTimerReturn } from "./errors/options-runtime";
+import type { Modes } from "../types/modes";
+import type { _Conf } from "../types/_conf";
+import { _warning } from "../errors/util";
+import { errInvalidTimerReturn } from "../errors/options-runtime";
 import {
   errNotCallableLastArg,
   errTimerIdAlreadyExists,
   errTimerIdDoesNotExist
-} from "./errors/_";
-import { genTimerID } from "./util/app/id";
-import { getGuard, saveGuard } from "./util/app/guard";
-import { logTime } from "./util/app/logging";
-import { parseUserArgs, withApi } from "./util/app/api";
-import { specifiedThis } from "./util/func/specifiedThis";
-import { state } from "./state";
+} from "../errors/misc";
+import { genTimerID } from "./util/id";
+import { getGuard, saveGuard } from "./util/guard";
+import { logTime } from "./util/logging";
+import { parseUserArgs, withApi } from "./util/api";
+import { specifiedThis } from "../util/func/specifiedThis";
+import { state } from "../state";
 
 const DEFAULT_ID = "default";
 const STOPWATCH_ID = "lap";
 
-function selectFuncName(method: boolean, task: Task): string {
-  if (task === "timeFn") {
-    return method ? "timeM" : "timeF";
-  } else {
-    return task;
-  }
-}
-
 function normalize(
   args: mixed[],
   conf: _Conf,
-  modes: $Shape<Modes>,
-  task: Task
+  modes: $Shape<Modes>
 ): {
   measure: boolean,
-  name: string,
   _args: {
     extras: mixed[],
     val: mixed[],
     obj: mixed[]
   }
 } {
-  const name = selectFuncName(modes.method, task);
   const _args = parseUserArgs(modes, args);
   const guard = getGuard(conf.id, conf.guard);
   const measure = guard > 0 && !(modes.mute && state.muted);
   saveGuard(conf.id, guard);
-  return { measure, name, _args };
+  return { measure, _args };
 }
 
 function getTime(conf: _Conf): number {
@@ -102,14 +90,13 @@ function stop(conf: _Conf, id: mixed): number {
 }
 
 export const time = withApi(
-  "time",
-  (args, conf, modes, task): void => {
+  (args, conf, modes): void => {
     const {
       measure,
       _args: {
         val: [timerID = DEFAULT_ID]
       }
-    } = normalize(args, conf, modes, task);
+    } = normalize(args, conf, modes);
     if (measure) {
       start(conf, timerID);
     }
@@ -117,31 +104,30 @@ export const time = withApi(
 );
 
 export const timeEnd = withApi(
-  "timeEnd",
-  (args, conf, modes, task): void => {
+  (args, conf, modes): void => {
+    const { task } = modes;
     const {
       measure,
-      name,
       _args: {
         extras,
         val: [timerID = DEFAULT_ID]
       }
-    } = normalize(args, conf, modes, task);
+    } = normalize(args, conf, modes);
     if (measure) {
       const ellapsed = stop(conf, timerID);
       const _args = conf.timer === "console" ? extras : args;
-      logTime(name, conf, 4, _args, ellapsed);
+      logTime(task, conf, 4, _args, ellapsed);
     }
   }
 );
 
-export const timeFn = withApi("timeFn", (args, conf, modes, task) => {
+export const timeFn = withApi((args, conf, modes) => {
   return function(..._args: mixed[]): any {
+    const { task } = modes;
     const {
       measure,
-      name,
       _args: { extras, val, obj }
-    } = normalize(args, conf, modes, task);
+    } = normalize(args, conf, modes);
     if (typeof val[0] !== "function") {
       _warning(conf, errNotCallableLastArg(task));
     }
@@ -153,7 +139,7 @@ export const timeFn = withApi("timeFn", (args, conf, modes, task) => {
         (val[0]: Function).apply(self, _args)
       );
       const ellapsed = stop(conf, timerID);
-      logTime(name, conf, 3, extras, ellapsed);
+      logTime(task, conf, 3, extras, ellapsed);
       return result;
     } else {
       return (val[0]: Function).apply(self, _args);
@@ -162,13 +148,12 @@ export const timeFn = withApi("timeFn", (args, conf, modes, task) => {
 });
 
 export const timeRun = withApi(
-  "timeRun",
-  (args, conf, modes, task): any => {
+  (args, conf, modes): any => {
+    const { task } = modes;
     const {
       measure,
-      name,
       _args: { extras, val }
-    } = normalize(args, conf, modes, task);
+    } = normalize(args, conf, modes);
     if (typeof val[0] !== "function") {
       _warning(conf, errNotCallableLastArg(task));
     } else {
@@ -177,7 +162,7 @@ export const timeRun = withApi(
         start(conf, timerID);
         const [result] = range(0, conf.repeat).map(_ => (val[0]: Function)());
         const ellapsed = stop(conf, timerID);
-        logTime(name, conf, 4, extras, ellapsed);
+        logTime(task, conf, 4, extras, ellapsed);
         return result;
       } else {
         return (val[0]: Function)();
@@ -187,9 +172,8 @@ export const timeRun = withApi(
 );
 
 export const stopwatch = withApi(
-  "stopwatch",
-  (args, conf, modes, task): void => {
-    const { measure } = normalize(args, conf, modes, task);
+  (args, conf, modes): void => {
+    const { measure } = normalize(args, conf, modes);
     if (measure) {
       state.timers.delete(STOPWATCH_ID); // Reset previous stopwatch
       start(conf, STOPWATCH_ID);
@@ -198,12 +182,12 @@ export const stopwatch = withApi(
 );
 
 export const lap = withApi(
-  "lap",
-  (args, conf, modes, task): void => {
-    const { measure, name } = normalize(args, conf, modes, task);
+  (args, conf, modes): void => {
+    const { task } = modes;
+    const { measure } = normalize(args, conf, modes);
     if (measure) {
       const ellapsed = stop(conf, STOPWATCH_ID);
-      logTime(name, conf, 4, args, ellapsed);
+      logTime(task, conf, 4, args, ellapsed);
       start(conf, STOPWATCH_ID);
     }
   }

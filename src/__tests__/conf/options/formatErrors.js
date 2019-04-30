@@ -1,18 +1,23 @@
 // @flow
 
+import { defaultConf } from "../../../defaultConf";
 import { errUnknownOpt } from "../../../errors/options";
-import Introversion from "../../../index";
+import { logV, setDefaults } from "../../..";
 
 const log = jest.fn();
 const warn = jest.fn();
 
-const In = Introversion.instance({
-  log,
-  warn,
-  format: false,
-  stackTrace: false,
-  clone: false
+beforeAll(() => {
+  setDefaults({
+    log,
+    warn,
+    format: false,
+    stackTrace: false,
+    clone: false
+  });
 });
+
+afterAll(() => setDefaults(defaultConf));
 
 beforeEach(() => {
   log.mockClear();
@@ -23,11 +28,11 @@ describe('"formatErrors" option', () => {
   const conf = { kkk: 0 };
   const [msg] = errUnknownOpt("kkk");
   test("should enable warning formatting", () => {
-    In.v.with(conf).with({ formatErrors: true })(0);
+    logV.with(conf).with({ formatErrors: true })(0);
     expect(warn).toBeCalledWith(expect.stringContaining("\u001b[33m▒"));
   });
   test("should disable warning formatting", () => {
-    In.v.with(conf).with({ formatErrors: false })(0);
+    logV.with(conf).with({ formatErrors: false })(0);
     expect(warn).toBeCalledWith(expect.not.stringContaining("\u001b[33m▒"));
   });
 });
