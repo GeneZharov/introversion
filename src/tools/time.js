@@ -13,7 +13,7 @@ import {
 } from "../errors/misc";
 import { genTimerID } from "./util/id";
 import { getGuard, saveGuard } from "./util/guard";
-import { logTime } from "./util/logging";
+import { logTime } from "./util/logging/time";
 import { parseUserArgs, withApi } from "./util/api";
 import { specifiedThis } from "../util/func/specifiedThis";
 import { state } from "../state";

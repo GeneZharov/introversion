@@ -25,17 +25,17 @@ export type Conf = {
   devTools: Auto<boolean>,
   dev: boolean,
 
-  // stacktrace
-  stackTrace: Auto<boolean | StackTraceItem[]>,
-  stackTraceAsync: Auto<boolean>,
-  stackTraceShift: Auto<number>,
-
   // formatting
   format: Auto<boolean>,
   formatErrors: Auto<boolean>,
   highlight: Auto<boolean>,
   inspectOptions: Auto<util$InspectOptions>,
   precision: number,
+
+  // stacktrace
+  stackTrace: Auto<boolean | StackTraceItem[]>,
+  stackTraceAsync: Auto<boolean>,
+  stackTraceShift: Auto<number>,
 
   // in-place options
   id: mixed,

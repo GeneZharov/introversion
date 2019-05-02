@@ -14,17 +14,17 @@ export const defaultConf: Conf = {
   devTools: "auto",
   dev: false,
 
-  // stacktrace
-  stackTrace: "auto",
-  stackTraceAsync: "auto",
-  stackTraceShift: "auto",
-
   // formatting
   format: "auto",
   formatErrors: "auto",
   highlight: "auto",
   inspectOptions: "auto",
-  precision: 0,
+  precision: 2,
+
+  // stacktrace
+  stackTrace: "auto",
+  stackTraceAsync: "auto",
+  stackTraceShift: "auto",
 
   // in-place options
   id: undefined,

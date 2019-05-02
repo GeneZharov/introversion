@@ -6,8 +6,8 @@ import type { Conf } from "../../types/conf";
 import type { Modes } from "../../types/modes";
 import type { _Conf } from "../../types/_conf";
 import { globalConf } from "../../state";
-import { normalizeConf } from "./normalizeConf";
-import { validateConf } from "./validateConf";
+import { normalizeConf } from "./normalize/conf";
+import { validateConf } from "./validate/conf";
 
 export function parseArgs(
   args: *[]

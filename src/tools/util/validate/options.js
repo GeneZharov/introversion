@@ -38,18 +38,6 @@ export function validDev(val: mixed): boolean {
   return typeof val === "boolean";
 }
 
-export function validStackTrace(val: mixed): boolean {
-  return val === "auto" || typeof val === "boolean" || Array.isArray(val);
-}
-
-export function validStackTraceAsync(val: mixed): boolean {
-  return val === "auto" || typeof val === "boolean";
-}
-
-export function validStackTraceShift(val: mixed): boolean {
-  return val === "auto" || typeof val === "number";
-}
-
 export function validFormat(val: mixed): boolean {
   return val === "auto" || typeof val === "boolean";
 }
@@ -64,6 +52,18 @@ export function validHighlight(val: mixed): boolean {
 
 export function validInspectOptions(val: mixed): boolean {
   return val === "auto" || typeof val === "object" || val === null;
+}
+
+export function validStackTrace(val: mixed): boolean {
+  return val === "auto" || typeof val === "boolean" || Array.isArray(val);
+}
+
+export function validStackTraceAsync(val: mixed): boolean {
+  return val === "auto" || typeof val === "boolean";
+}
+
+export function validStackTraceShift(val: mixed): boolean {
+  return val === "auto" || typeof val === "number";
 }
 
 export function validGuard(val: mixed): boolean {

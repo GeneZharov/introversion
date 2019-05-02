@@ -1,0 +1,42 @@
+type Conf = Object;
+
+type Tool = {
+  (...xs: any[]): any,
+  with: Conf => Tool,
+  mute: Tool
+};
+
+type Api = {
+  setDefaults: Conf => void,
+  instance: Conf => Api,
+  logV: Tool,
+  logF: Tool,
+  logM: Tool,
+  logV_: Tool,
+  logF_: Tool,
+  logM_: Tool,
+  debV: Tool,
+  debF: Tool,
+  debM: Tool,
+  v: Tool,
+  f: Tool,
+  m: Tool,
+  v_: Tool,
+  f_: Tool,
+  m_: Tool,
+  time: Tool,
+  timeEnd: Tool,
+  stopwatch: Tool,
+  lap: Tool,
+  timeF: Tool,
+  timeM: Tool,
+  timeRun: Tool,
+  unmute: Tool,
+  mute: Tool,
+  unmuteF: Tool,
+  unmuteRun: Tool
+};
+
+declare module "introversion" {
+  declare module.exports: Api;
+}

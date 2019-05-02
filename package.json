@@ -4,13 +4,13 @@
   "keywords": ["js", "debug", "functional"],
   "license": "MIT",
   "author": "Gene Zharov <gene.zharov@gmail.com>",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "homepage": "https://github.com/kahless/introversion",
   "bugs": {
     "url": "https://github.com/kahless/introversion/issues",
     "email": "gene.zharov@gmail.com"
   },
-  "main": "lib/index.js",
+  "main": "lib/introversion.js",
   "jsnext:main": "es/introversion.js",
   "module": "es/introversion.js",
   "files": ["src", "es", "lib", "dist"],
@@ -25,14 +25,13 @@
     "clean": "rimraf es lib dist",
     "build": "rollup -c",
     "build:watch": "rollup -c -w ",
-    "build:flow": "flow-copy-source -v -i '**/__tests__/**' src lib"
+    "build:types": "cp introversion.js.flow lib"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",
     "@babel/preset-env": "7.4.3",
     "@babel/preset-flow": "7.0.0",
     "flow-bin": "0.97.0",
-    "flow-copy-source": "2.0.3",
     "jest": "24.5.0",
     "prettier": "1.16.4",
     "rimraf": "2.6.3",

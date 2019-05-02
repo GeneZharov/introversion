@@ -13,12 +13,12 @@ import { formatStackFrame } from "../util/format/formatStackFrame";
 import {
   normalizeDevTools,
   normalizeFormatErrors
-} from "../tools/util/normalizeOptions";
+} from "../tools/util/normalize/options";
 import {
   validDevTools,
   validFormatErrors,
   validWarn
-} from "../tools/util/validateOptions";
+} from "../tools/util/validate/options";
 
 const stripe = str => {
   const bar = chalk.yellow("▒");

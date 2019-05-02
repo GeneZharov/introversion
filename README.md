@@ -4,17 +4,52 @@ Introversion.js
 Tool for debugging JavaScript expressions. Works great with functional code.
 
 
+Table of Contents
+-----------------
+* [Motivation](#motivation)
+* [Installation](#installation)
+* [Watchers](#watchers)
+    * [`logV()`](#logV)
+    * [`logF()`](#logF)
+    * [`logM()`](#logM)
+* [Timers](#timers)
+    * [`time()`, `timeEnd()`](#time-timeEnd)
+    * [`stopwatch()`](#stopwatch)
+    * [`timeF()`](#timeF)
+    * [`timeM()`](#timeM)
+    * [`timeRun()`](#timeRun)
+* [Modes](#modes)
+    * [Quiet mode (`logV_()`, `v_()`...)](#quiet-mode)
+    * [Breakpoint mode (`debV()`, ...)](#breakpoint-mode)
+    * [Guards](#guards)
+    * [Mute mode (`.mute`)](#mute-mode)
+* [Configuration](#configuration)
+    * [Default configuration (`setDefaults()`)](#default-configuration)
+    * [Instance configuration (`instance()`)](#instance-configuration)
+    * [In-place configuration (`.with()`)](#in-place-configuration)
+* [Options](#options)
+    * [General options](#general-options)
+    * [Formatting options](#formatting-options)
+    * [Stack trace options](#stack-trace-options)
+    * [In-place options](#in-place-options)
+* [Advanced installation](#advanced-installation)
+    * [Default import](#default-import)
+    * [Setup in global variable](#setup-in-global-variable)
+    * [Zero-conf for Node.js](#zero-conf-for-nodejs)
+* [License](#license)
+
+
 Motivation
 ----------
 
-Suppose you have an arrow function, and you need to check a value inside of 
-this function:
+Suppose you have an arrow function, and you need to know a value inside of this 
+function:
 
 ```js
-const fn = n => n + 1; // what's in "n"?
+const fn = n => n + 1; // what's in “n”?
 ```
 
-In order to use `console.log()` we'll have to rewrite this function into 
+In order to use `console.log()` you'll have to rewrite this function into 
 multiple statements:
 
 ```js
@@ -28,34 +63,57 @@ Introversion allows you to simply wrap the desired value without rewriting
 anything:
 
 ```js
-const fn = n => I.v(n) + 1; // log value
+const fn = n => logV(n) + 1; // log value
 // ...or
-const fn = I.f(n => n + 1); // log every function call (parameters and return value)
+const fn = logF(n => n + 1); // log every function call (arguments and return value)
 ```
 
 
-Table of Contents
------------------
-* [Installation](#installation)
-* [Watchers](#watchers)
-    * [`v()`](#v)
-    * [`f()`](#f)
-    * [`m()`](#m)
-* [Timers](#timers)
-    * [`time()`, `timeEnd()`](#time-timeEnd)
-    * [`stopwatch()`](#stopwatch)
-    * [`timeF()`](#timeF)
-    * [`timeM()`](#timeM)
-    * [`timeRun()`](#timeRun)
-* [Modes](#modes)
-    * [Quiet mode](#quiet-mode)
-    * [Breakpoint mode](#breakpoint-mode)
-    * [Guards](#guards)
-    * [Mute mode](#mute-mode)
-* [Global configuration](#global-configuration)
-* [In-place configuration](#in-place-configuration)
-* [Options](#options)
-* [License](#license)
+### React component
+A real-world example for a functional React component that makes you hate 
+`console.log()`.
+
+```js
+...
+renderSuggestion={item => (
+  <MenuItem
+    text={logV(item).name}
+    onClick={_ => this.toggle(item.id)}
+  />
+)}
+```
+
+
+### Performance
+
+Imagine you need to check if a function call is fast enough to decide whether 
+you need to cache it somewhere. With Introversion you can do it by simply 
+wrapping the desired expression in `timeRun(() => <expr>)` right in JSX:
+
+```js
+// before
+<Select options={states.map(transform) /* is map() too slow? */} />
+
+// after
+<Select options={timeRun(() => states.map(transform)) /* prints 2.73ms */} />
+```
+
+
+### Functional programming
+
+Since Introversion is functional, it tries not to interfer in program's logic, 
+but to seamlessly proxy input and output values, so it makes it easy to debug 
+functional code. For example, to research a function composition for issues.
+
+```js
+import { groupBy, omitBy, mapValues } from "lodash/fp";
+
+const build = pipe([
+  groupBy(o => o.key),
+  logF(omitBy(x => x.length > 1)), // print what goes on the 2nd step and what comes out
+  mapValues(([o]) => o.uuid)
+]);
+```
 
 
 Installation
@@ -65,43 +123,27 @@ Installation
 npm install introversion --save-dev
 ```
 
-Often, it is convenient to setup Introversion in global scope. In order to do 
-this include the following script in your main file:
-
-```js
-// src/globals.js
-
-import I from "introversion";
-
-I.config({...}); // if necessary
-window.I = I; // for browser
-global.I = I; // for node
-```
-
-If you are using Introversion in [Jest](https://jestjs.io) unit tests:
-
-```json
-// package.json
-
-"jest": {
-  "setupFiles": ["<rootDir>/src/globals.js"]
-}
-```
+Advanced installation cases are described below ([default 
+import](#default-import), [setup in global 
+variable](#setup-in-global-variable), [zero-conf for 
+Node.js](#zero-conf-for-nodejs))
 
 
 Watchers
 --------
 
-### `v()`
+### logV()
 
-`I.v()` (“v” stands for “value”) merely prints an array of its arguments. The 
+*Alias:* `v()` (helpful with default import: `In.v()`)
+
+`logV()` (“v” stands for “value”) merely prints an array of its arguments. The 
 main difference between `console.log()` is that the last argument is returned. 
-Therefore it is safe to wrap almost any expression in `I.v()` without breaking 
-your code down.
+Therefore it is safe to wrap any expression in `logV()` without breaking your 
+code down.
 
 ```js
-const random = n => Math.floor(I.v(Math.random()) * n) + 10;
-random(1); //=> V: [ 0.504418952113608 ]
+const random = n => Math.floor(logV(Math.random()) * n) + 10;
+random(1); //=> logV() [ 0.5909956243063763 ]
 ```
 
 You can print any other values alongside with the wrapped expression. Just pass 
@@ -109,66 +151,70 @@ them as arguments. Only the last argument is returned, so extra arguments won't
 affect your code:
 
 ```js
-const random = n => Math.floor(I.v(num, this, "mystr", Math.random()) * n) 10;
-random(1); //=> V: [ 1, {}, 'mystr', 0.8474771121023132 ]
+const random = n => Math.floor(logV(num, this, "mystr", Math.random()) * n) 10;
+random(1); //=> logV [ 1, {}, 'mystr', 0.8474771121023132 ]
 ```
 
 You can use extra arguments to distinguish different watchers from each other 
 in the log:
 
 ```js
-const fn = n => n > 0 ? I.v(true, n * 1.25) : I.v(false, n / 9);
-fn(5);   //=> V: [ true, 6.25 ]
-fn(-81); //=> V: [ false, -9 ]
+const fn = n => n > 0 ? logV(true, n * 1.25) : logV(false, n / 9);
+fn(5);   //=> logV [ true, 6.25 ]
+fn(-81); //=> logV [ false, -9 ]
 ```
 
-### `f()`
+### logF()
 
-`I.f()` (“f” stands for “function”) is designed to watch for function calls. 
+*Alias:* `f()` (helpful with default import: `In.f()`)
+
+`logF()` (“f” stands for “function”) is designed to watch for function calls. 
 When a wrapped function is called, its arguments and a returned value are 
 logged. If a wrapped function throws an exception, that exception will be 
-logged and then rethrown again. A wrapped in the `I.f()` function can be used 
-in the same way as an unwrapped one: all arguments and a returned value will be 
-proxied.
+logged and then rethrown again. A wrapped in the `logF()` function can be used 
+in the same way as an unwrapped one: all arguments, `this` and a returned value 
+will be proxied.
 
 ```js
-[1, 2].map(I.f(n => 2 * n));
+[1, 2].map(logF(n => 2 * n));
 
-//=> F: []
-//=> F Params: [1, 0, [1,2]]
-//=> F Result: 2
+//=> logF()
+//=> ... Params: [ 1, 0, [ 1, 2 ] ]
+//=> ... Result: 2
 
-//=> F: []
-//=> F Params: [2, 1, [1,2]]
-//=> F Result: 4
+//=> logF()
+//=> ... Params: [ 2, 1, [ 1, 2 ] ]
+//=> ... Result: 4
 ```
 
-`I.f()` can also accept additional arguments for printing just like `I.v()` 
+`logF()` can also accept additional arguments for printing just like `logV()` 
 does:
 
 ```js
-I.f("foo", "bar", calculate)(1, 2, 3)
+logF("foo", "bar", calculate)(1, 2, 3)
 
-// => F: ["foo", "bar"] <- extra arguments go here
-// => F Params: [1, 2, 3]
-// => F Result: 999
+// => logF() [ "foo", "bar" ] <- extra arguments go here
+// => ... Params: [ 1, 2, 3 ]
+// => ... Result: 999
 ```
 
-### `m()`
+### logM()
 
-`I.m()` (“m” stands for “method”) is similar to `I.f()`, but it won't corrupt 
-`this` inside of a method call. In order to use it, you need to split a method 
-call into an object, and a string that represents a path to the method.
+*Alias:* `m()` (helpful with default import: `In.m()`)
+
+`logM()` (“m” stands for “method”) is similar to `logF()`, but it will call 
+your method with correct `this` value. In order to use it, you need to split a 
+method call into an object, and a string that represents a path to the method.
 
 ```js
 A.B.C.method(5); // original call
 
-I.m(A,".B.C.method")(5); // wrapped method
-I.m(A.B,".C.method")(5); // ...the same
-I.m(A.B.C,".method")(5); // ...one more way to do it
+logM(A,".B.C.method")(5); // wrapped method
+logM(A.B,".C.method")(5); // ...the same
+logM(A.B.C,".method")(5); // ...one more way to do it
 ```
 
-The rest behavior does not differ from the `I.f()` watcher.
+The rest behavior does not differ from the `logF()` watcher.
 
 
 Timers
@@ -183,20 +229,24 @@ of time available:
 3. `Date.now()`
 
 ```js
-I.time(); // start the timer
+time(); // start the timer
 calculateEverything();
-I.timeEnd(); //=> Time: [] 203ms
+timeEnd(); // stop the timer
+
+//=> timeEnd() 203 ms
 ```
 
-Just like console time methods, these functions accept an optional name for a 
+Just like console timing methods, these functions accept an optional name for a 
 new timer. `timeEnd()` may also accept additional arguments for printing 
 alongside with the ellapsed time (not available with `format: false` and 
 console methods as a time source).
 
 ```js
-I.time("label"); // start timer named "label"
+time("label"); // start the timer named "label"
 calculateEverything();
-I.timeEnd("foo", "bar", "label"); //=> Time: [ "foo", "bar", "label" ] 203ms
+timeEnd("foo", "bar", "label"); // stop the timer named "label"
+
+//=> timeEnd() [ 'foo', 'bar', 'label' ] 203 ms
 ```
 
 ### stopwatch()
@@ -210,39 +260,39 @@ When you have a sequence of actions, it is inconvenient to wrap every action in
 </a>
 
 ```js
-I.stopwatch();
+stopwatch();
 
 createTables();
-I.lap("created"); //=> Time: [ "created" ] 15ms
+lap("created"); //=> lap() [ 'created' ] 15 ms
 
 const rows = queryRows();
-I.lap("foobar", rows, "queried"); //=> Time: [ "foobar", [], "queried" ] 107ms
+lap("foobar", rows, "queried"); //=> lap() [ 'foobar', [], 'queried' ] 107 ms
 
 populateState(rows);
-I.lap("populated"); //=> Time: [ "populated" ] 768ms
+lap("populated"); //=> lap() [ 'populated' ] 768 ms
 ```
 
 ### timeF()
 You can wrap any function with `timeF()`. The result will be a function with 
 the same behavior as a wrapped one, but additionally it will print its 
-execution time.
+execution time of its synchronous code.
 
 ```js
-array.map(I.timeF(iterator));
+array.map(timeF(iterator));
 
-//=> Time: [] 4 ms
-//=> Time: [] 9 ms
-//=> Time: [] 1 ms
+//=> timeF() 4 ms
+//=> timeF() 9 ms
+//=> timeF() 1 ms
 ```
 
 Optionally you can pass any arguments for printing:
 
 ```js
-array.map(I.timeF("foo", "bar", iterator));
+array.map(timeF("foo", "bar", iterator));
 
-//=> Time: [ 'foo', 'bar' ] 4 ms
-//=> Time: [ 'foo', 'bar' ] 9 ms
-//=> Time: [ 'foo', 'bar' ] 1 ms
+//=> timeF() [ 'foo', 'bar' ] 4 ms
+//=> timeF() [ 'foo', 'bar' ] 9 ms
+//=> timeF() [ 'foo', 'bar' ] 1 ms
 ```
 
 ### timeM()
@@ -253,21 +303,21 @@ Like `timeF()` but for methods.
 array.map(n => this.iterator(n));
 
 // wrapped method call
-array.map(n => I.timeM(this,".iterator")(n));
+array.map(n => timeM(this,".iterator")(n));
 
-//=> Time: [] 4 ms
-//=> Time: [] 9 ms
-//=> Time: [] 1 ms
+//=> timeM() 4 ms
+//=> timeM() 9 ms
+//=> timeM() 1 ms
 ```
 
 Optionally you can pass any arguments for printing:
 
 ```js
-array.map(n => I.timeM("foo", "bar", this,".iterator")(n));
+array.map(n => timeM("foo", "bar", this,".iterator")(n));
 
-//=> Time: [ 'foo', 'bar' ] 4 ms
-//=> Time: [ 'foo', 'bar' ] 9 ms
-//=> Time: [ 'foo', 'bar' ] 1 ms
+//=> timeM() [ 'foo', 'bar' ] 4 ms
+//=> timeM() [ 'foo', 'bar' ] 9 ms
+//=> timeM() [ 'foo', 'bar' ] 1 ms
 ```
 
 ### timeRun()
@@ -281,17 +331,17 @@ that will print the ellapsed time.
 data = [calculate(src), readState()];
 
 // wrapped expression
-data = I.timeRun(() => [calculate(src), readState()]);
+data = timeRun(() => [calculate(src), readState()]);
 
-//=> Time: [] 349 ms
+//=> timeRun() 349 ms
 ```
 
 Optionally you can pass any arguments for printing:
 
 ```js
-data = I.timeRun("data", src, () => [calculate(src), readState()]);
+data = timeRun("data", src, () => [calculate(src), readState()]);
 
-//=> Time: [ 'data', "DATABASE" ] 349 ms
+//=> timeRun() [ 'data', "DATABASE" ] 349 ms
 ```
 
 
@@ -300,9 +350,9 @@ Modes
 
 ### Quiet Mode
 
-* `I.V()`
-* `I.F()`
-* `I.M()`
+* `logV_()`, *alias:* `v_()`
+* `logF_()`, *alias:* `f_()`
+* `logM_()`, *alias:* `m_()`
 
 Sometimes you are not interested in a wrapped value itself, but you need to 
 know, that it was calculated. For example, in React Native an attempt to log an 
@@ -312,21 +362,44 @@ mode watchers that don't log wrapped value itself but log all additional
 arguments.
 
 ```js
-const fn = I.F("Invoked!", n = > n + 1);
-fn(2); //=> [ 'Invoked!' ]
+const fn = logF_("Invoked!", n => n + 1);
+fn(2); //=> logF_() [ 'Invoked!' ]
 ```
 
 ### Breakpoint Mode
 
-* `I.v_()`
-* `I.f_()`
-* `I.m_()`
+* `debV()`
+* `debF()`
+* `debM()`
 
 Instead of printing data these functions create a breakpoint using `debugger` 
 statement. It can help to look around and walk through the call stack. An 
 underscore in function names symbolizes a pause in program execution.
 
 ### Guards
+Sometimes a watcher can produce too many outputs if it is called for too many 
+times. You may want to suppress excess outputs. Perhaps you need only the first 
+one or the first ten outputs. In this case the in-place “guard” option may 
+help. It specifies the number of times a watcher will be active. After this 
+amount runs out, it will merely proxy values without any side effects. More 
+about the [in-place configuration](#in-place-configuration) is described below.
+
+```js
+for (let i = 0; i < 1000; i++) {
+  logV.with({ guard: 1 })(i); // prints only once
+}
+```
+
+Guards need some way to distinguish one call from another to keep track of the 
+amount of executed calls. So if you have more than one guard, you need to 
+explicitly identify a call with the “id” option:
+
+```js
+for (let i = 0; i < 1000; i++) {
+  logV.with({ id: 1, guard: 1 })(i); // prints only once
+  logV.with({ id: 2, guard: 10 })(arr[i]); // prints for the first 10 times
+}
+```
 
 ### Mute Mode
 
@@ -337,15 +410,15 @@ test, there would be hundreds of log entries. In this case, the mute mode comes
 to the rescue.
 
 You can use a muted watcher, that is available for any watcher under the method 
-called `mute()` (e.g. `I.v.mute()`, `I.V.mute()`, `I.v_.mute()`, `I.f.mute()`, 
-...). Muted watcher doesn't produce any logs or breakpoints unless you 
-explicitly unmute it (in the failed unit test for instance).
+called `mute()` (e.g. `logV.mute()`, `logV_.mute()`, `debV.mute()`, 
+`logF.mute()`, ...). Muted watcher doesn't produce any logs or breakpoints 
+unless you explicitly unmute it (in the failed unit test for instance).
 
-* `I.unmuteF(fn)` — unmute everything during this function execution
-* `I.unmuteRun(() => {...})` — runs passed function and unmutes everything 
-  while it is running
-* `I.unmute()` — to unmute all the muted functions
-* `I.mute()` — to mute everything again
+* `unmuteF(fn)` — unmute everything during this function execution
+* `unmuteRun(() => <expr>)` — runs passed function and unmutes everything while 
+  it is running
+* `unmute()` — to unmute all the muted functions
+* `mute()` — to mute everything again
 
 Example:
 
@@ -373,7 +446,7 @@ First we need to wrap a desired expression in a muted watcher:
 // module.js
 function action(x) {
   ...
-  return I.v.mute(y) ^ Math.PI;
+  return logV.mute(y) ^ Math.PI;
 }
 ```
 
@@ -384,52 +457,94 @@ unit test in this case):
 // module.spec.js
 
 // unmute a function
-const res = I.unmuteF(action)(2);
+const res = unmuteF(action)(2);
 
 // or unmute an expression
-const res = I.unmuteRun(() => action(2));
+const res = unmuteRun(() => action(2));
 
 // or unmute anything in a low level imperative style
-I.unmute();
+unmute();
 const res = action(2);
-I.mute();
+mute();
 ```
 
 
-Global Configuration
---------------------
+Configuration
+-------------
 
-You can pass any number of global options as object properties:
+### Default Configuration
+
+You can pass any number of default options as object properties:
 
 ```js
-I.config({
+setDefaults({
   format: false,
-  print: (...xs) => xscript.response.write(xs.join(" ") + "\n")
+  log: (...xs) => Reactotron.log(xs),
+  warn: (...xs) => Reactotron.warn(xs)
 });
 ```
 
-In-place configuration
-----------------------
+### Instance configuration
 
-Every watcher function has a method `with()` for setting temporary local config 
-options only for that watcher.
+You can have many instances of Introversions with different configurations:
 
 ```js
-I.v.with({ depth: Infinity })(myobj);
+const InR = instance({
+  format: false,
+  log: (...xs) => Reactotron.log(xs),
+  warn: (...xs) => Reactotron.warn(xs)
+});
+
+const InX = instance({
+  format: false,
+  log: (...xs) => xscript.response.write(xs.join(" ") + "\n"),
+  warn (...xs) => xscript.response.write(xs.join(" ") + "\n")
+})
+```
+
+### In-place configuration
+
+Most functions have method `with()` for setting temporary local configuration 
+options only for this call.
+
+```js
+logV.with({ depth: Infinity })(myobj);
 ```
 
 Options
 -------
 
-* **print**
+### General Options
 
-    `(a, b, c, ...) => string`
+* **log**
 
-    A function that actually prints values to the log.
+    A function that accepts any number of any arguments and prints them to the 
+    log.
 
     *Default:* `(...xs) => console.log(...xs)`
 
+    *Examples:*
+
+    ```js
+    (...xs) => Reactotron.log(xs)
+    (...xs) => xscript.response.write(xs.join(" ") + "\n")
+    ```
+
+* **warn**
+
+    A function that accepts any number of any arguments and prints them as 
+    warnings to the log.
+
+    *Default:* `(...xs) => console.warn(...xs)`
+
+    *Example:*
+
+    ```js
+    (...xs) => Reactotron.warn(xs)
+    ```
+
 * **timer**
+
     * `"auto"` — use the most accurate source of time available
     * `"performance"` — use `performance.now()`
     * `"console"` — use `console.time`/`timeEnd()`
@@ -443,33 +558,183 @@ Options
 
     *Default:* `"auto"`
 
+* **clone**
+
+    * `"auto"` — clone all the values before printing if DevTools are detected
+    * `true` / `false` — whether to deeply clone all values for printing
+
+    *Default:* `"auto"`
+
+* **errorHandling**
+
+    * `"warn"` — output errors as warnings and try to fallback on default behavior
+    * `"throw"` — always throw an exception on error
+
+    *Default:* `"warn"`
+
+* **devTools**
+
+    For some options it is important if DevTools are connected to the program. 
+    Introversion tries to detect DevTools with a test output to the log. To 
+    skip it, you can explicitly specify presense of DevTools with this option. 
+    Or you can explicitly specify all the options that depends on DevTools 
+    (currently these are “clone”, “format”, “formatErrors”).
+
+    * `"auto"` — detect DevTools with a test output to the log
+    * `true` / `false` — whether DevTools are connected
+
+    *Default:* `"auto"`
+
+* **dev**
+
+    If `true` Introversion utilities will additionally print a configuration 
+    object they are using and a stack trace including the detected user code 
+    position in it that is useful for configuring “stackTraceShift” option.
+
+    *Default:* `false`
+
 ### Formatting Options
 
 * **format**
 
-    If `true` output values will be formatted with `util.inspect()`.
+    * `"auto"` — detect the environment
+    * `true` — optimized for browsers and sophisticated tools like DevTools
+    * `false` — optimized for text output, e.g. to a terminal by Node.js
 
-    *Default:* `true`, if the CommonJS module system is detected
+    When “format” is enabled:
 
-* **showHidden**
+    * stringifies printed objects in a pretty way
+    * Only single `log()` call is made with a single formatted string as an 
+      argument
+    * empty line after each output
 
-    If `true`, object's non-enumerable symbols and properties are included in 
-    the formatted result.
+    Not formatted output:
 
-    *Default:* `false`
+    ```
+    logF() at myfunc (index.js:10:23)
+    ... Params: [ 1, 0, [ 1, 2, 3 ] ]
+    ... Result: 1
+    ```
 
-* **depth**
+    Formatted output:
 
-    A number that specifies depth for objects in a log. Use `Infinity` or 
-    `null` to print with the maximum depth.
+    ```
+    logF() at myfunc (index.js:10:23)
+    --- Params ---
+    [ 1, 0, [ 1, 2, 3 ] ]
+    --- Result ---
+    1
+    ```
+
+    *Default:* `"auto"`
+
+* **formatErrors**
+
+    Similar to the “format” option, but for errors and warnings.
+
+    * `"auto"` — detect the environment
+    * `true` — optimized for browsers and sophisticated tools like DevTools
+    * `false` — optimized for text output, e.g. to a terminal by Node.js
+
+    Not formatted output:
+
+    ```
+    Introversion Warning
+
+    Unknown option stakcTrace
+    ```
+
+    Formatted output:
+
+    ```
+    ▒  Introversion
+    ▒
+    ▒  Unknown option stakcTrace
+    ▒
+    ▒  at validateConf (introversion.js:780:7)
+    ▒  at (introversion.js:898:31)
+    ▒  at Object.<anonymous> (index.js:35:4)
+    ▒  at Module._compile (loader.js:723:30)
+    ▒  at Object.Module._extensions..js (loader.js:734:10)
+    ▒  at Module.load (loader.js:620:32)
+    ▒  at tryModuleLoad (loader.js:560:12)
+    ```
+
+    *Default:* `"auto"`
+
+* **highlight**
+
+    If `true`, Introversion will try to highlight the output for terminals.
+
+    *Default:* `"auto"`
+
+* **inspectOptions**
+
+    Options that will be proxied to the node's `util.inspect()`
+
+    *Default:* `"auto"`
+
+* **precision**
+
+    Number of digits after the point for the time measured by 
+    [timers](#timers).
 
     *Default:* `2`
 
-* **color**
+### Stack Trace Options
 
-    If `true`, the output will be colored.
+* **stacktrace**
 
-    *Default:* `true`, if stdout is connected to a terminal
+    In order to distinguish one output from another Introversion logs function 
+    name, file name, line and column numbers of a line where the user called an 
+    Introversion function. What exactly will be printed is configured with this 
+    option using an array of keywords.
+
+    * `"auto"` — depends on the environment
+    * `Array<"func" | "file" | "line" | "col">`
+    * `true` — print everything, shorthand for `["func", "file", "line", "col"]`
+    * `false` — print nothing, shorthand for `[]`
+
+    *Default:* `"auto"`
+
+* **stackTraceAsync**
+
+    * `"auto"` — try to log asynchronously if available.
+    * `true` — print to the log asyncronously. It allows to use source maps and 
+      guess anonymous functions but will trigger network requests for source 
+      maps.
+    * `false` — synchronous behavior, won't use source maps or guess anonymous 
+      functions.
+
+    *Default:* `"auto"`
+
+* **stackTraceShift**
+
+    Introversion knows at what depth in the stack trace the user function call 
+    should be located. But on some platforms Introversion module can be wrapped 
+    with something. For instance React Native increases stack trace depth by 1. 
+    Therefore Introversion may mistake with the location of the user function 
+    call. This option helps to correct this mistake.
+
+    ```js
+    logV.with({ dev: true })
+    // ...
+    // --- Dev: stacktrace ---
+    //  0  — at getTrace (introversion.js:989:21)
+    //  1  — at logVal (introversion.js:1048:3)
+    //  2  — at (introversion.js:1414:12)
+    //  3  — at (introversion.js:869:12)
+    // [4] — at Object.<anonymous> (2.js:5:25)
+    //  5  — at Module._compile (loader.js:723:30)
+    //  6  — at Object.Module._extensions..js (loader.js:734:10)
+    //  7  — at Module.load (loader.js:620:32)
+    ```
+
+    You can see that Introversion suppose that user call was in the 4th 
+    position, but actually it was in the 5th. So you can set `stackTraceShift: 
+    1` to fix it.
+
+    *Default:* `"auto"`
 
 ### In-Place Options
 
@@ -490,30 +755,158 @@ Options
     value/function/method without any additional behavior like printing or 
     debugging.
 
+    See [guards](#guards) for a complete description.
+
     *Default:* `Infinity`
 
     ```js
-    const fn = I.f.with({ id: 0, guard: 1 })(n => n % 2); // prints only once
+    const fn = logF.with({ id: 0, guard: 1 })(n => n % 2); // prints only once
     [1, 2, 3, 4, 5].map(fn);
 
-    //=> F: []
-    //=> F Params: [ 1, 0, [ 1, 2, 3, 4, 5 ] ]
-    //=> F Result: 1
+    //=> logF()
+    //=> ... Params: [ 1, 0, [ 1, 2, 3, 4, 5 ] ]
+    //=> ... Result: 1
     ```
 
 * **repeat**
 
-    The number of times a measure will be repeated to make it more precise. 
-    Especially useful if you use `Date.now()` as a time source, because its 
-    precision is rounded.
+    The number of times to repeat the measure in order to increase preciseness. 
+    Especially useful with `Date.now()` as a time source, because its precision 
+    is rounded.
+
+    The value can be either a number or a string with a special suffix (`"K"`, 
+    `"M"`, `"G"`) for big numbers. For example:
+
+    * `"5K"` stands for 5,000
+    * `"1.5M"` stands for 1,500,000
+    * `"10G"` stands for 10,000,000,000
 
     *Default:* 1
 
     ```js
-    I.timeRun.with({ repeat: "5k" })(mergeDatabases);
+    timeRun.with({ repeat: 5000 })(mergeDatabases);
+    // ...or
+    timeRun.with({ repeat: "5K" })(mergeDatabases);
 
-    //=> Time: [] 0.113ms
+    //=> timeRun() 0.113 ms
     ```
+
+
+Advanced installation
+---------------------
+
+### Default import
+
+Introversion has a default export:
+
+```js
+import In from "introversion";
+
+In.v("foobar");
+```
+
+In this case short aliases`v()`, `f()`, `m()` and their quiet alternatives 
+`v_()`, `f_()`, `m_()` are especially helpful.
+
+#### ImportJS
+
+If you use [ImportJS](https://github.com/Galooshi/import-js) and want it to 
+automatically add Introversion's as a default import, like in the example 
+above, then set the desired alias in the configuration file.
+
+```js
+// .importjs.js
+
+module.exports = {
+  aliases: { In: "introversion" }
+};
+```
+
+### Setup in global variable
+
+Sometimes, it is convenient to setup Introversion in global scope. In order to 
+do this you can import the following script in your main file:
+
+```js
+// src/globals.js
+
+import In from "introversion";
+
+In.setDefaults({...}); // if necessary
+window.In = In; // for browser
+global.In = In; // for node
+```
+
+#### Jest
+
+If you are using Introversion in [Jest](https://jestjs.io) unit tests:
+
+```json
+// package.json
+
+"jest": {
+  "setupFiles": ["<rootDir>/src/globals.js"]
+}
+```
+
+#### Flow
+
+If you are using Introversion with [Flow](https://flow.org/), then you'll have 
+to specify type of the global variable with a libdef file:
+
+```js
+// flow-typed/introversion.js
+
+declare var In: any;
+```
+
+If you want to specify the shape of the API, then you can copypaste it from the 
+[libdef 
+script](https://github.com/GeneZharov/introversion/blob/master/introversion.js.flow).
+
+### Zero-conf for Node.js
+
+Introversion can work with Node.js without need to initialize and write 
+imports. To make API available in scripts you need to run `node` with `-r 
+introversion/init` option, that will write API into the global variable `In`.
+
+```sh
+node -r introversion/init myfile.js
+```
+
+```js
+// myfile.js
+In.v("working without initialization!");
+```
+
+Introversion initialized this way can be configured with environment variables:
+
+* `INTROVERSION_NAME` — the name for the global variable (`In` by default)
+* `INTROVERSION_CONF` — js object with the configuration
+* `INTROVERSION_CONF_FILE` — path to the CommonJS module that exports the 
+  configuration object
+
+Examples:
+
+```sh
+INTROVERSION_NAME='I' node -r introversion/init myfile.js
+INTROVERSION_CONF='{ stackTrace: false }' node -r introversion/init myfile.js
+INTROVERSION_CONF_FILE=~/.introversion-conf.js node -r introversion/init myfile.js
+```
+
+You can go further and create an alias for node with initialized Introversion 
+for debugging small scripts that you don't want to over bloat with extra code. 
+You can put these commands in `~/.bashrc`, `~/.zshrc`, etc. Introversion should 
+be installed globally in this case.
+
+```sh
+npm install -g introversion
+
+alias nodein='node -r introversion/init'
+alias babel-nodein='babel-node -r introversion/init'
+alias ts-nodein='ts-node -r introversion/init'
+...
+```
 
 
 License

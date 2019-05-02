@@ -2,8 +2,8 @@
 
 import { dissoc, once } from "ramda";
 
-import type { Conf } from "../../types/conf";
-import type { _Conf } from "../../types/_conf";
+import type { Conf } from "../../../types/conf";
+import type { _Conf } from "../../../types/_conf";
 import {
   normalizeClone,
   normalizeDevTools,
@@ -17,22 +17,14 @@ import {
   normalizeStackTraceAsync,
   normalizeStackTraceShift,
   normalizeTimer
-} from "./normalizeOptions";
-import { warning } from "../../errors/util";
+} from "./options";
+import { warning } from "../../../errors/util";
 
 export function normalizeConf(conf: Conf, task?: string): _Conf {
   const getDevTools = once(() => normalizeDevTools(conf.devTools));
 
   const [timer, timerE] = normalizeTimer(conf.timer);
   const clone = normalizeClone(conf.clone, getDevTools);
-
-  // stacktrace
-  const stackTrace = normalizeStackTrace(conf.stackTrace);
-  const [stackTraceAsync, stackTraceAsyncE] = normalizeStackTraceAsync(
-    conf.stackTraceAsync,
-    timer
-  );
-  const stackTraceShift = normalizeStackTraceShift(conf.stackTraceShift);
 
   // formatting
   const [format, formatE] = normalizeFormat(conf.format, getDevTools);
@@ -42,6 +34,14 @@ export function normalizeConf(conf: Conf, task?: string): _Conf {
   );
   const highlight = normalizeHighlight(conf.highlight);
   const inspectOptions = normalizeInspectOptions(conf.inspectOptions);
+
+  // stacktrace
+  const stackTrace = normalizeStackTrace(conf.stackTrace);
+  const [stackTraceAsync, stackTraceAsyncE] = normalizeStackTraceAsync(
+    conf.stackTraceAsync,
+    timer
+  );
+  const stackTraceShift = normalizeStackTraceShift(conf.stackTraceShift);
 
   // in-place options
   const id = normalizeId(conf.id, timer, task);

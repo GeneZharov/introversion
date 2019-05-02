@@ -12,9 +12,8 @@ export default [
   // CommonJS
   {
     input: "src/index.js",
-    preserveModules: true,
     output: {
-      dir: "lib",
+      file: "lib/introversion.js",
       format: "cjs",
       exports: "named"
     },
