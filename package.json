@@ -1,11 +1,7 @@
 {
   "name": "introversion",
   "description": "Debugging JavaScript expressions, works great with functional code",
-  "keywords": [
-    "js",
-    "debug",
-    "functional"
-  ],
+  "keywords": ["js", "debug", "functional"],
   "license": "MIT",
   "author": "Gene Zharov <gene.zharov@gmail.com>",
   "version": "0.5.0",
@@ -17,12 +13,7 @@
   "main": "lib/introversion.js",
   "jsnext:main": "es/introversion.js",
   "module": "es/introversion.js",
-  "files": [
-    "src",
-    "es",
-    "lib",
-    "dist"
-  ],
+  "files": ["src", "es", "lib", "dist"],
   "repository": {
     "type": "git",
     "url": "git://github.com/kahless/introversion.git"
@@ -36,7 +27,7 @@
     "clean": "rimraf es lib dist",
     "build": "rollup -c",
     "build:watch": "rollup -c -w ",
-    "build:types": "cp introversion.js.flow lib"
+    "build:types": "cp introversion.d.ts introversion.js.flow lib"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",

@@ -1,7 +1,20 @@
 Introversion.js
 ===============
 
-Tool for debugging JavaScript expressions. Works great with functional code.
+
+Swiss army knife for debugging JavaScript expressions and performance 
+measurements. A wrapper around `console.log()`, `performance.now()`, 
+`debugger`, etc. with significant benefits:
+
+* works great with functional code (built with [React](https://reactjs.org/), 
+  [Redux](https://redux.js.org/), [Ramda](https://ramdajs.com/), 
+  [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide), etc.)
+* pretty and ![colorful](assets/colorful.jpeg) output
+* easy to use:
+    * automatically chooses the best time source available (`performance.now()` 
+      or `console.time()` or `Date.now()`)
+    * logged objects are deeply cloned to prevent confusing results in DevTools
+    * many tools for various scenarios
 
 
 Table of Contents
@@ -40,8 +53,7 @@ Table of Contents
 Motivation
 ----------
 
-Suppose you have an arrow function, and you need to know a value inside of this 
-function:
+Suppose you have an arrow function, and you need to know some value inside:
 
 ```js
 const fn = n => n + 1; // what's in “n”?
@@ -99,12 +111,12 @@ wrapping the desired expression in `timeRun(() => <expr>)` right in JSX:
 
 ### Functional programming
 
-Since Introversion is functional, it tries not to interfer in program's logic, 
+Since Introversion is functional, it tries not to interfere in program's logic, 
 but to seamlessly proxy input and output values, so it makes it easy to debug 
 functional code. For example, to research a function composition for issues.
 
 ```js
-import { groupBy, omitBy, mapValues } from "lodash/fp";
+import { pipe, groupBy, omitBy, mapValues } from "lodash/fp";
 
 const build = pipe([
   groupBy(o => o.key),
@@ -230,7 +242,7 @@ timeEnd("foo", "bar", "label"); // stop the timer named "label"
 
 ### stopwatch()
 When you have a sequence of actions, it is inconvenient to wrap every action in 
-`time()...timeEnd()`. In this case stopwatch api is more helpful.
+`time()...timeEnd()`. In this case stopwatch API is more helpful.
 
 * `stopwatch()` — initially starts the timer.
 * `lap([...args])` — prints the ellapsed time since the previous 
@@ -325,16 +337,15 @@ fn(2); //=> logF_() [ 'Invoked!' ]
 * `debF()`
 
 Instead of printing data these functions create a breakpoint using `debugger` 
-statement. It can help to look around and walk through the call stack. An 
-underscore in function names symbolizes a pause in program execution.
+statement. It can help to look around and walk through the call stack.
 
 ### Guards
 Sometimes a watcher can produce too many outputs if it is called for too many 
 times. You may want to suppress excess outputs. Perhaps you need only the first 
-one or the first ten outputs. In this case the in-place “guard” option may 
-help. It specifies the number of times a watcher will be active. After this 
-amount runs out, it will merely proxy values without any side effects. More 
-about the [in-place configuration](#in-place-configuration) is described below.
+one or first ten outputs. In this case the in-place “guard” option may help. It 
+specifies the number of times a watcher will be active. After this amount runs 
+out, it will merely proxy values without any side effects. More about the 
+[in-place configuration](#in-place-configuration) is described below.
 
 ```js
 for (let i = 0; i < 1000; i++) {
@@ -361,16 +372,16 @@ function. But if you log that value each time it is evaluated for every unit
 test, there would be hundreds of log entries. In this case, the mute mode comes 
 to the rescue.
 
-You can use a muted watcher, that is available for any watcher under the method 
-called `mute()` (e.g. `logV.mute()`, `logV_.mute()`, `debV.mute()`, 
+You can use a muted watcher, that is available for any watcher under the 
+property called `.mute` (e.g. `logV.mute()`, `logV_.mute()`, `debV.mute()`, 
 `logF.mute()`, ...). Muted watcher doesn't produce any logs or breakpoints 
 unless you explicitly unmute it (in the failed unit test for instance).
 
 * `unmuteF(fn)` — unmute everything during this function execution
 * `unmuteRun(() => <expr>)` — runs passed function and unmutes everything while 
   it is running
-* `unmute()` — to unmute all the muted functions
-* `mute()` — to mute everything again
+* `unmute()` — unmute all the muted functions
+* `mute()` — mute everything again
 
 Example:
 
@@ -456,7 +467,7 @@ const InX = instance({
 
 ### In-place configuration
 
-Most functions have method `with()` for setting temporary local configuration 
+Most functions have a method `with()` for setting temporary local configuration 
 options only for this call.
 
 ```js
@@ -505,8 +516,7 @@ Options
 
     To offer protection against timing attacks and fingerprinting, the 
     precision of `Date.now()` might get rounded depending on the environment. 
-    So consider use of “repeat” option to increase preciseness in this case 
-    (see below).
+    So consider use of “repeat” option to increase preciseness in this case.
 
     *Default:* `"auto"`
 
@@ -757,14 +767,14 @@ import In from "introversion";
 In.v("foobar");
 ```
 
-In this case short aliases`v()`, `f()`` and their quiet alternatives `v_()`, 
-`f_()` are especially helpful.
+In this case short aliases `v()`, `f()` for `logV()`, `logF()` and their quiet 
+alternatives `v_()`, `f_()` are especially helpful.
 
 #### ImportJS
 
-If you use [ImportJS](https://github.com/Galooshi/import-js) and want it to 
-automatically add Introversion's as a default import, like in the example 
-above, then set the desired alias in the configuration file.
+If you use [ImportJS](https://github.com/Galooshi/import-js) and you want it to 
+automatically add Introversion as a default import, like in the example above, 
+then set the desired alias in the configuration file.
 
 ```js
 // .importjs.js
@@ -791,7 +801,8 @@ global.In = In; // for node
 
 #### Jest
 
-If you are using Introversion in [Jest](https://jestjs.io) unit tests:
+To make a global variable with Introversion's API available in 
+[Jest](https://jestjs.io) unit tests:
 
 ```json
 // package.json
@@ -818,8 +829,8 @@ script](https://github.com/GeneZharov/introversion/blob/master/introversion.js.f
 
 ### Zero-conf for Node.js
 
-Introversion can work with Node.js without need to initialize and write 
-imports. To make API available in scripts you need to run `node` with `-r 
+Introversion can work with Node.js with no need to initialize or add imports. 
+To make API available in scripts you need to run `node` with `-r 
 introversion/init` option, that will write API into the global variable `In`.
 
 ```sh
