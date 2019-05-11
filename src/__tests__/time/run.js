@@ -5,7 +5,6 @@ import { range } from "ramda";
 import { defaultConf } from "../../defaultConf";
 import { setDefaults, timeRun, unmuteF, unmuteRun } from "../..";
 
-const id = "id";
 const name = 9;
 
 const fn = jest.fn(x => x.name);

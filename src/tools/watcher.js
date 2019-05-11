@@ -1,16 +1,13 @@
 // @flow
 
-import { isEmpty } from "ramda";
-
 import type { Modes } from "../types/modes";
 import type { _Conf } from "../types/_conf";
-import { _warning, error } from "../errors/util";
+import { _warning } from "../errors/util";
 import { errNotCallableLastArg } from "../errors/misc";
 import { getGuard, saveGuard } from "./util/guard";
 import { logFn } from "./util/logging/fn";
 import { logVal } from "./util/logging/val";
 import { parseUserArgs, withApi } from "./util/api";
-import { specifiedThis } from "../util/func/specifiedThis";
 import { state } from "../state";
 
 function chooseBehavior(
@@ -46,8 +43,7 @@ function normalize(
   deb: boolean,
   _args: {
     extras: mixed[],
-    val: *[],
-    obj: mixed[]
+    val: *[]
   }
 } {
   const { log, deb } = chooseBehavior(modes, conf);
@@ -74,17 +70,16 @@ export const fn = withApi((_args, conf, modes) => {
     const {
       log,
       deb,
-      _args: { extras, val, obj }
+      _args: { extras, val }
     } = normalize(_args, conf, modes);
     if (typeof val[0] !== "function") {
       _warning(conf, errNotCallableLastArg(task));
       return val[0];
     }
-    const self = specifiedThis(this) || isEmpty(obj) ? this : obj[0];
     try {
       const func = (val[0]: Function);
       if (deb) debugger;
-      const result = func.apply(self, args); // <-- your function
+      const result = func.apply(this, args); // <-- your function
       if (log) logFn(task, conf, 3, false, quiet, extras, args, result);
       return result;
     } catch (error) {

@@ -6,8 +6,6 @@ import { defaultConf } from "../../defaultConf";
 import { errExtraArgsNotAllowed } from "../../errors/options-runtime";
 import { lap, setDefaults, stopwatch, unmuteF, unmuteRun } from "../..";
 
-const id = "id";
-
 const log = jest.fn();
 const warn = jest.fn();
 const timer = jest.fn(_ => 0);

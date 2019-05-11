@@ -1,7 +1,7 @@
 // @flow
 
 import { defaultConf } from "../../../defaultConf";
-import In, { setDefaults, time, timeEnd, logF, logV } from "../../..";
+import { setDefaults, time, timeEnd, logF, logV } from "../../..";
 
 const a = { a: true };
 const b = { b: true };

@@ -29,7 +29,7 @@ describe("instance()", () => {
     expect(() => instance([])).toThrow();
   });
   test("should return API", () => {
-    expect(instance({})).toEqual(map(x => expect.any(Function), In));
+    expect(instance({})).toEqual(map(() => expect.any(Function), In));
   });
   test("should apply config", () => {
     instance({ stackTraceAsync: false, log }).v(0);

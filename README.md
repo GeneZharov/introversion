@@ -11,12 +11,10 @@ Table of Contents
 * [Watchers](#watchers)
     * [`logV()`](#logV)
     * [`logF()`](#logF)
-    * [`logM()`](#logM)
 * [Timers](#timers)
     * [`time()`, `timeEnd()`](#time-timeEnd)
     * [`stopwatch()`](#stopwatch)
     * [`timeF()`](#timeF)
-    * [`timeM()`](#timeM)
     * [`timeRun()`](#timeRun)
 * [Modes](#modes)
     * [Quiet mode (`logV_()`, `v_()`...)](#quiet-mode)
@@ -198,25 +196,6 @@ logF("foo", "bar", calculate)(1, 2, 3)
 // => ... Result: 999
 ```
 
-### logM()
-
-*Alias:* `m()` (helpful with default import: `In.m()`)
-
-`logM()` (“m” stands for “method”) is similar to `logF()`, but it will call 
-your method with correct `this` value. In order to use it, you need to split a 
-method call into an object, and a string that represents a path to the method.
-
-```js
-A.B.C.method(5); // original call
-
-logM(A,".B.C.method")(5); // wrapped method
-logM(A.B,".C.method")(5); // ...the same
-logM(A.B.C,".method")(5); // ...one more way to do it
-```
-
-The rest behavior does not differ from the `logF()` watcher.
-
-
 Timers
 ------
 
@@ -295,31 +274,6 @@ array.map(timeF("foo", "bar", iterator));
 //=> timeF() [ 'foo', 'bar' ] 1 ms
 ```
 
-### timeM()
-Like `timeF()` but for methods.
-
-```js
-// original method call
-array.map(n => this.iterator(n));
-
-// wrapped method call
-array.map(n => timeM(this,".iterator")(n));
-
-//=> timeM() 4 ms
-//=> timeM() 9 ms
-//=> timeM() 1 ms
-```
-
-Optionally you can pass any arguments for printing:
-
-```js
-array.map(n => timeM("foo", "bar", this,".iterator")(n));
-
-//=> timeM() [ 'foo', 'bar' ] 4 ms
-//=> timeM() [ 'foo', 'bar' ] 9 ms
-//=> timeM() [ 'foo', 'bar' ] 1 ms
-```
-
 ### timeRun()
 
 Sometimes you suspect that some expression may be calculated for too long. In 
@@ -352,7 +306,6 @@ Modes
 
 * `logV_()`, *alias:* `v_()`
 * `logF_()`, *alias:* `f_()`
-* `logM_()`, *alias:* `m_()`
 
 Sometimes you are not interested in a wrapped value itself, but you need to 
 know, that it was calculated. For example, in React Native an attempt to log an 
@@ -370,7 +323,6 @@ fn(2); //=> logF_() [ 'Invoked!' ]
 
 * `debV()`
 * `debF()`
-* `debM()`
 
 Instead of printing data these functions create a breakpoint using `debugger` 
 statement. It can help to look around and walk through the call stack. An 
@@ -805,8 +757,8 @@ import In from "introversion";
 In.v("foobar");
 ```
 
-In this case short aliases`v()`, `f()`, `m()` and their quiet alternatives 
-`v_()`, `f_()`, `m_()` are especially helpful.
+In this case short aliases`v()`, `f()`` and their quiet alternatives `v_()`, 
+`f_()` are especially helpful.
 
 #### ImportJS
 

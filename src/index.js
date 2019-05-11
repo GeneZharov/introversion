@@ -37,23 +37,18 @@ function instance(...args: *[]): API {
 
 const logV = tool(_watch.val, { task: "logV" });
 const logF = tool(_watch.fn, { task: "logF" });
-const logM = tool(_watch.fn, { task: "logM", method: true });
 
 const logV_ = tool(_watch.val, { task: "logV_", quiet: true });
 const logF_ = tool(_watch.fn, { task: "logF_", quiet: true });
-const logM_ = tool(_watch.fn, { task: "logM_", quiet: true, method: true });
 
 const debV = tool(_watch.val, { task: "debV", deb: true });
 const debF = tool(_watch.fn, { task: "debF", deb: true });
-const debM = tool(_watch.fn, { task: "debM", deb: true, method: true });
 
 const v = tool(logV, { task: "v" });
 const f = tool(logF, { task: "f" });
-const m = tool(logM, { task: "m" });
 
 const v_ = tool(logV_, { task: "v_" });
 const f_ = tool(logF_, { task: "f_" });
-const m_ = tool(logM_, { task: "m_" });
 
 const time = tool(_time.time, { task: "time" });
 const timeEnd = tool(_time.timeEnd, { task: "timeEnd" });
@@ -62,7 +57,6 @@ const stopwatch = tool(_time.stopwatch, { task: "stopwatch" });
 const lap = tool(_time.lap, { task: "lap" });
 
 const timeF = tool(_time.timeFn, { task: "timeF" });
-const timeM = tool(_time.timeFn, { task: "timeM", method: true });
 const timeRun = tool(_time.timeRun, { task: "timeRun" });
 
 const unmute = tool(_mute.unmute, { task: "unmute" });
@@ -75,25 +69,19 @@ const tools = {
   instance,
   logV,
   logF,
-  logM,
   logV_,
   logF_,
-  logM_,
   debV,
   debF,
-  debM,
   v,
   f,
-  m,
   v_,
   f_,
-  m_,
   time,
   timeEnd,
   stopwatch,
   lap,
   timeF,
-  timeM,
   timeRun,
   unmute,
   mute,
@@ -106,25 +94,19 @@ export {
   instance,
   logV,
   logF,
-  logM,
   logV_,
   logF_,
-  logM_,
   debV,
   debF,
-  debM,
   v,
   f,
-  m,
   v_,
   f_,
-  m_,
   time,
   timeEnd,
   stopwatch,
   lap,
   timeF,
-  timeM,
   timeRun,
   unmute,
   mute,
@@ -137,25 +119,19 @@ export default {
   instance,
   logV,
   logF,
-  logM,
   logV_,
   logF_,
-  logM_,
   debV,
   debF,
-  debM,
   v,
   f,
-  m,
   v_,
   f_,
-  m_,
   time,
   timeEnd,
   stopwatch,
   lap,
   timeF,
-  timeM,
   timeRun,
   unmute,
   mute,

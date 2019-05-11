@@ -1,7 +1,6 @@
 // @flow
 
 import { defaultConf } from "../../../defaultConf";
-import { errUnknownOpt } from "../../../errors/options";
 import { logV, setDefaults } from "../../..";
 
 const log = jest.fn();
@@ -26,7 +25,6 @@ beforeEach(() => {
 
 describe('"formatErrors" option', () => {
   const conf = { kkk: 0 };
-  const [msg] = errUnknownOpt("kkk");
   test("should enable warning formatting", () => {
     logV.with(conf).with({ formatErrors: true })(0);
     expect(warn).toBeCalledWith(expect.stringContaining("\u001b[33m▒"));

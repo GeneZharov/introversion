@@ -4,7 +4,7 @@ import { isEmpty } from "ramda";
 import chalk from "chalk";
 
 import type { Auto, StackTraceItem, TimerOption } from "../../../types/conf";
-import { REPEAT_SUFFIXES } from "../../../const";
+import { REPEAT_OPT_SUFFIXES } from "../../../const";
 import { defaultConf } from "../../../defaultConf";
 import { detectConsoleTime } from "../../../util/detect/detectConsole";
 import { detectCorsAvail } from "../../../util/detect/detectCorsAvail";
@@ -71,7 +71,7 @@ export function normalizeRepeat(
   timer: TimerOption
 ): WithErr<number> {
   function toNumber(x: number | string): number {
-    return typeof x === "string" ? parseSuffix(REPEAT_SUFFIXES, x) : x;
+    return typeof x === "string" ? parseSuffix(REPEAT_OPT_SUFFIXES, x) : x;
   }
   const _repeat = toNumber(repeat);
   if (isNaN(_repeat) || _repeat === 0) {

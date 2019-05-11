@@ -1,7 +1,11 @@
 {
   "name": "introversion",
   "description": "Debugging JavaScript expressions, works great with functional code",
-  "keywords": ["js", "debug", "functional"],
+  "keywords": [
+    "js",
+    "debug",
+    "functional"
+  ],
   "license": "MIT",
   "author": "Gene Zharov <gene.zharov@gmail.com>",
   "version": "0.5.0",
@@ -13,13 +17,20 @@
   "main": "lib/introversion.js",
   "jsnext:main": "es/introversion.js",
   "module": "es/introversion.js",
-  "files": ["src", "es", "lib", "dist"],
+  "files": [
+    "src",
+    "es",
+    "lib",
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/kahless/introversion.git"
   },
   "scripts": {
     "prettify": "prettier --write 'src/**/*.js'",
+    "lint": "eslint src",
+    "flow": "flow",
     "test": "jest",
     "test:watch": "jest --watch",
     "clean": "rimraf es lib dist",
@@ -31,6 +42,9 @@
     "@babel/core": "7.4.3",
     "@babel/preset-env": "7.4.3",
     "@babel/preset-flow": "7.0.0",
+    "babel-eslint": "10.0.1",
+    "eslint": "5.16.0",
+    "eslint-plugin-flowtype": "3.8.2",
     "flow-bin": "0.97.0",
     "jest": "24.5.0",
     "prettier": "1.16.4",

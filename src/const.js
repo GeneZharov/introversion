@@ -1,3 +1,3 @@
 // @flow
 
-export const REPEAT_SUFFIXES = ["K", "M", "G"];
+export const REPEAT_OPT_SUFFIXES = ["K", "M", "G"];

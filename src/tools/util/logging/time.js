@@ -2,7 +2,7 @@
 
 import Chalk from "chalk";
 
-import { REPEAT_SUFFIXES } from "../../../const";
+import { REPEAT_OPT_SUFFIXES } from "../../../const";
 import type { TimerOption } from "../../../types/conf";
 import type { _Conf } from "../../../types/_conf";
 import { _warning } from "../../../errors/util";
@@ -42,7 +42,7 @@ export function logTime(
 ): void {
   const _clone = cloneTry(conf);
   const _round = n => round(conf.precision, n);
-  const _suffix = n => formatSuffix(REPEAT_SUFFIXES, n);
+  const _suffix = n => formatSuffix(REPEAT_OPT_SUFFIXES, n);
 
   function logTimeRaw(trace, frameIdx, frame) {
     logRaw(conf, [
