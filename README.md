@@ -1,10 +1,9 @@
 Introversion.js
 ===============
 
-
 Swiss army knife for debugging JavaScript expressions and performance 
 measurements. A wrapper around `console.log()`, `performance.now()`, 
-`debugger`, etc. with significant benefits:
+`debugger`, etc. with essential benefits:
 
 * works great with functional code (built with [React](https://reactjs.org/), 
   [Redux](https://redux.js.org/), [Ramda](https://ramdajs.com/), 
@@ -45,7 +44,7 @@ Table of Contents
     * [In-place options](#in-place-options)
 * [Advanced installation](#advanced-installation)
     * [Default import](#default-import)
-    * [Setup in global variable](#setup-in-global-variable)
+    * [Set up in global variable](#set-up-in-global-variable)
     * [Zero-conf for Node.js](#zero-conf-for-nodejs)
 * [License](#license)
 
@@ -59,7 +58,7 @@ Suppose you have an arrow function, and you need to know some value inside:
 const fn = n => n + 1; // what's in “n”?
 ```
 
-In order to use `console.log()` you'll have to rewrite this function into 
+In order to use `console.log()` you’ll have to rewrite this function into 
 multiple statements:
 
 ```js
@@ -79,8 +78,8 @@ const fn = logF(n => n + 1); // log every function call (arguments and return va
 ```
 
 
-### React component
-A real-world example for a functional React component that makes you hate 
+### React Component
+A real-world example of a functional React component that makes you hate 
 `console.log()`.
 
 ```js
@@ -109,11 +108,12 @@ wrapping the desired expression in `timeRun(() => <expr>)` right in JSX:
 ```
 
 
-### Functional programming
+### Functional Programming
 
-Since Introversion is functional, it tries not to interfere in program's logic, 
-but to seamlessly proxy input and output values, so it makes it easy to debug 
-functional code. For example, to research a function composition for issues.
+Since Introversion is functional, it tries not to interfere in the program’s 
+logic, but to seamlessly proxy input and output values, so it makes it easy to 
+debug functional code. For example, to research a function composition for 
+issues.
 
 ```js
 import { pipe, groupBy, omitBy, mapValues } from "lodash/fp";
@@ -134,8 +134,8 @@ npm install introversion --save-dev
 ```
 
 Advanced installation cases are described below ([default 
-import](#default-import), [setup in global 
-variable](#setup-in-global-variable), [zero-conf for 
+import](#default-import), [set up in global 
+variable](#set-up-in-global-variable), [zero-conf for 
 Node.js](#zero-conf-for-nodejs))
 
 
@@ -157,8 +157,8 @@ random(1); //=> logV() [ 0.5909956243063763 ]
 ```
 
 You can print any other values alongside with the wrapped expression. Just pass 
-them as arguments. Only the last argument is returned, so extra arguments won't 
-affect your code:
+them as arguments. Only the last argument is returned so that extra arguments 
+won’t affect your code:
 
 ```js
 const random = n => Math.floor(logV(num, this, "mystr", Math.random()) * n) 10;
@@ -178,9 +178,9 @@ fn(-81); //=> logV [ false, -9 ]
 
 *Alias:* `f()` (helpful with default import: `In.f()`)
 
-`logF()` (“f” stands for “function”) is designed to watch for function calls. 
-When a wrapped function is called, its arguments and a returned value are 
-logged. If a wrapped function throws an exception, that exception will be 
+`logF()` (“f” stands for “function”) is designed for watching for function 
+calls. When a wrapped function is called, its arguments and a returned value 
+are logged. If a wrapped function throws an exception, that exception will be 
 logged and then rethrown again. A wrapped in the `logF()` function can be used 
 in the same way as an unwrapped one: all arguments, `this` and a returned value 
 will be proxied.
@@ -228,9 +228,9 @@ timeEnd(); // stop the timer
 ```
 
 Just like console timing methods, these functions accept an optional name for a 
-new timer. `timeEnd()` may also accept additional arguments for printing 
-alongside with the ellapsed time (not available with `format: false` and 
-console methods as a time source).
+new timer. `timeEnd()` may also take additional arguments for printing 
+alongside with the elapsed time (not available with `format: false` and console 
+methods as a time source).
 
 ```js
 time("label"); // start the timer named "label"
@@ -242,10 +242,10 @@ timeEnd("foo", "bar", "label"); // stop the timer named "label"
 
 ### stopwatch()
 When you have a sequence of actions, it is inconvenient to wrap every action in 
-`time()...timeEnd()`. In this case stopwatch API is more helpful.
+`time()...timeEnd()`. In this case, stopwatch API is more helpful.
 
 * `stopwatch()` — initially starts the timer.
-* `lap([...args])` — prints the ellapsed time since the previous 
+* `lap([...args])` — prints the elapsed time since the previous 
   `stopwatch`/`lap()`. Also prints optional arguments and starts a new timer 
   for the next lap.
 </a>
@@ -265,7 +265,7 @@ lap("populated"); //=> lap() [ 'populated' ] 768 ms
 
 ### timeF()
 You can wrap any function with `timeF()`. The result will be a function with 
-the same behavior as a wrapped one, but additionally it will print its 
+the same behavior as a wrapped one, but additionally, it will print the 
 execution time of its synchronous code.
 
 ```js
@@ -290,7 +290,7 @@ array.map(timeF("foo", "bar", iterator));
 
 Sometimes you suspect that some expression may be calculated for too long. In 
 this case it is convenient to wrap this expression into `timeRun(() => <expr>)` 
-that will print the ellapsed time.
+that will print the elapsed time.
 
 ```js
 // original expression
@@ -307,7 +307,7 @@ Optionally you can pass any arguments for printing:
 ```js
 data = timeRun("data", src, () => [calculate(src), readState()]);
 
-//=> timeRun() [ 'data', "DATABASE" ] 349 ms
+//=> timeRun() [ 'data', 'DATABASE' ] 349 ms
 ```
 
 
@@ -323,7 +323,7 @@ Sometimes you are not interested in a wrapped value itself, but you need to
 know, that it was calculated. For example, in React Native an attempt to log an 
 event object may hang the application. Or maybe you are interested only in 
 printing additional arguments. For these cases, there are alternative quiet 
-mode watchers that don't log wrapped value itself but log all additional 
+mode watchers that don’t log wrapped value itself but log all additional 
 arguments.
 
 ```js
@@ -336,15 +336,15 @@ fn(2); //=> logF_() [ 'Invoked!' ]
 * `debV()`
 * `debF()`
 
-Instead of printing data these functions create a breakpoint using `debugger` 
+Instead of printing data, these functions create a breakpoint using `debugger` 
 statement. It can help to look around and walk through the call stack.
 
 ### Guards
 Sometimes a watcher can produce too many outputs if it is called for too many 
 times. You may want to suppress excess outputs. Perhaps you need only the first 
-one or first ten outputs. In this case the in-place “guard” option may help. It 
-specifies the number of times a watcher will be active. After this amount runs 
-out, it will merely proxy values without any side effects. More about the 
+one or first ten outputs. In this case, the in-place “guard” option may help. 
+It specifies the number of times a watcher will be active. After this amount 
+runs out, it will merely proxy values without any side effects. More about the 
 [in-place configuration](#in-place-configuration) is described below.
 
 ```js
@@ -367,14 +367,14 @@ for (let i = 0; i < 1000; i++) {
 ### Mute Mode
 
 Imagine, you have a function covered with unit tests. And 1 of 30 tests fails. 
-For debugging reasons, it's important to know a value deep inside of that 
+For debugging reasons, it’s important to know a value deep inside of that 
 function. But if you log that value each time it is evaluated for every unit 
 test, there would be hundreds of log entries. In this case, the mute mode comes 
 to the rescue.
 
 You can use a muted watcher, that is available for any watcher under the 
 property called `.mute` (e.g. `logV.mute()`, `logV_.mute()`, `debV.mute()`, 
-`logF.mute()`, ...). Muted watcher doesn't produce any logs or breakpoints 
+`logF.mute()`, ...). Muted watcher doesn’t produce any logs or breakpoints 
 unless you explicitly unmute it (in the failed unit test for instance).
 
 * `unmuteF(fn)` — unmute everything during this function execution
@@ -403,7 +403,7 @@ describe("action()", () => {
 });
 ```
 
-First we need to wrap a desired expression in a muted watcher:
+First, we need to wrap the desired expression in a muted watcher:
 
 ```js
 // module.js
@@ -447,7 +447,7 @@ setDefaults({
 });
 ```
 
-### Instance configuration
+### Instance Configuration
 
 You can have many instances of Introversions with different configurations:
 
@@ -465,7 +465,7 @@ const InX = instance({
 })
 ```
 
-### In-place configuration
+### In-Place Configuration
 
 Most functions have a method `with()` for setting temporary local configuration 
 options only for this call.
@@ -516,42 +516,44 @@ Options
 
     To offer protection against timing attacks and fingerprinting, the 
     precision of `Date.now()` might get rounded depending on the environment. 
-    So consider use of “repeat” option to increase preciseness in this case.
+    So consider the use of “repeat” option to increase preciseness in this 
+    case.
 
     *Default:* `"auto"`
 
 * **clone**
 
     * `"auto"` — clone all the values before printing if DevTools are detected
-    * `true` / `false` — whether to deeply clone all values for printing
+    * `true`/`false` — whether to deeply clone all values for printing
 
     *Default:* `"auto"`
 
 * **errorHandling**
 
-    * `"warn"` — output errors as warnings and try to fallback on default behavior
+    * `"warn"` — output errors as warnings and try to fall back on the default 
+      behavior
     * `"throw"` — always throw an exception on error
 
     *Default:* `"warn"`
 
 * **devTools**
 
-    For some options it is important if DevTools are connected to the program. 
+    For some options, it is important if DevTools are connected to the program. 
     Introversion tries to detect DevTools with a test output to the log. To 
-    skip it, you can explicitly specify presense of DevTools with this option. 
-    Or you can explicitly specify all the options that depends on DevTools 
+    skip it, you can explicitly specify presence of DevTools with this option. 
+    Or you can explicitly specify all the options that depend on DevTools 
     (currently these are “clone”, “format”, “formatErrors”).
 
     * `"auto"` — detect DevTools with a test output to the log
-    * `true` / `false` — whether DevTools are connected
+    * `true`/`false` — whether DevTools are connected
 
     *Default:* `"auto"`
 
 * **dev**
 
-    If `true` Introversion utilities will additionally print a configuration 
-    object they are using and a stack trace including the detected user code 
-    position in it that is useful for configuring “stackTraceShift” option.
+    If `true` Introversion utilities additionally print a configuration object 
+    they are using and a stack trace including the detected user code position 
+    in it that is useful for configuring “stackTraceShift” option.
 
     *Default:* `false`
 
@@ -561,12 +563,12 @@ Options
 
     * `"auto"` — detect the environment
     * `true` — optimized for browsers and sophisticated tools like DevTools
-    * `false` — optimized for text output, e.g. to a terminal by Node.js
+    * `false` — optimized for text output, e.g., to a terminal by Node.js
 
     When “format” is enabled:
 
     * stringifies printed objects in a pretty way
-    * Only single `log()` call is made with a single formatted string as an 
+    * Only a single `log()` call is made with a single formatted string as an 
       argument
     * empty line after each output
 
@@ -596,7 +598,7 @@ Options
 
     * `"auto"` — detect the environment
     * `true` — optimized for browsers and sophisticated tools like DevTools
-    * `false` — optimized for text output, e.g. to a terminal by Node.js
+    * `false` — optimized for text output, e.g., to a terminal by Node.js
 
     Not formatted output:
 
@@ -632,7 +634,7 @@ Options
 
 * **inspectOptions**
 
-    Options that will be proxied to the node's `util.inspect()`
+    Options that will be proxied to the node’s `util.inspect()`
 
     *Default:* `"auto"`
 
@@ -662,10 +664,10 @@ Options
 * **stackTraceAsync**
 
     * `"auto"` — try to log asynchronously if available.
-    * `true` — print to the log asyncronously. It allows to use source maps and 
-      guess anonymous functions but will trigger network requests for source 
-      maps.
-    * `false` — synchronous behavior, won't use source maps or guess anonymous 
+    * `true` — print to the log asynchronously. It allows the use of source 
+      maps and guess anonymous functions but will trigger network requests for 
+      source maps.
+    * `false` — synchronous behavior, won’t use source maps or guess anonymous 
       functions.
 
     *Default:* `"auto"`
@@ -706,14 +708,15 @@ Options
     watchers/timers from each other. This option is required in order to use 
     “guard” options.
 
-    ID can be of any type, but if you are using console as a time source, then 
-    the value will be internally converted to a string since it is required by 
-    the [console spec](https://console.spec.whatwg.org/#timer-table).
+    ID can be of any type, but if you are using the console as a time source, 
+    then the value will be internally converted to a string since it is 
+    required by the 
+    [console spec](https://console.spec.whatwg.org/#timer-table).
 
 * **guard**
 
-    Sets how may times a watcher or a timer will be functional. After the 
-    number of calls exceedes, the call will act just like an original 
+    Sets how many times a watcher or a timer will be functional. After the 
+    number of calls exceeds, the call will act just like an original 
     value/function/method without any additional behavior like printing or 
     debugging.
 
@@ -754,10 +757,10 @@ Options
     ```
 
 
-Advanced installation
+Advanced Installation
 ---------------------
 
-### Default import
+### Default Import
 
 Introversion has a default export:
 
@@ -784,10 +787,10 @@ module.exports = {
 };
 ```
 
-### Setup in global variable
+### Set up in Global Variable
 
-Sometimes, it is convenient to setup Introversion in global scope. In order to 
-do this you can import the following script in your main file:
+Sometimes, it is convenient to set up Introversion in the global scope. In 
+order to do this you can import the following script in your main file:
 
 ```js
 // src/globals.js
@@ -801,7 +804,7 @@ global.In = In; // for node
 
 #### Jest
 
-To make a global variable with Introversion's API available in 
+To make a global variable with Introversion’s API available in 
 [Jest](https://jestjs.io) unit tests:
 
 ```json
@@ -814,8 +817,8 @@ To make a global variable with Introversion's API available in
 
 #### Flow
 
-If you are using Introversion with [Flow](https://flow.org/), then you'll have 
-to specify type of the global variable with a libdef file:
+If you are using Introversion with [Flow](https://flow.org/), then you’ll have 
+to specify the type of the global variable with a libdef file:
 
 ```js
 // flow-typed/introversion.js
@@ -827,7 +830,7 @@ If you want to specify the shape of the API, then you can copypaste it from the
 [libdef 
 script](https://github.com/GeneZharov/introversion/blob/master/introversion.js.flow).
 
-### Zero-conf for Node.js
+### Zero-Conf for Node.js
 
 Introversion can work with Node.js with no need to initialize or add imports. 
 To make API available in scripts you need to run `node` with `-r 
@@ -857,8 +860,8 @@ INTROVERSION_CONF='{ stackTrace: false }' node -r introversion/init myfile.js
 INTROVERSION_CONF_FILE=~/.introversion-conf.js node -r introversion/init myfile.js
 ```
 
-You can go further and create an alias for node with initialized Introversion 
-for debugging small scripts that you don't want to over bloat with extra code. 
+You can go further and create an alias for Node with initialized Introversion 
+for debugging small scripts that you don’t want to over bloat with extra code. 
 You can put these commands in `~/.bashrc`, `~/.zshrc`, etc. Introversion should 
 be installed globally in this case.
 
