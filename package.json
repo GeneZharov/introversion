@@ -1,13 +1,13 @@
 {
   "name": "introversion",
-  "description": "Debugging JavaScript expressions, works great with functional code",
+  "description": "Swiss army knife for debugging JavaScript expressions and performance measurements",
   "keywords": ["js", "debug", "functional"],
   "license": "MIT",
   "author": "Gene Zharov <gene.zharov@gmail.com>",
   "version": "0.5.0",
-  "homepage": "https://github.com/kahless/introversion",
+  "homepage": "https://github.com/GeneZharov/introversion",
   "bugs": {
-    "url": "https://github.com/kahless/introversion/issues",
+    "url": "https://github.com/GeneZharov/introversion/issues",
     "email": "gene.zharov@gmail.com"
   },
   "main": "lib/introversion.js",
@@ -16,7 +16,7 @@
   "files": ["src", "es", "lib", "dist"],
   "repository": {
     "type": "git",
-    "url": "git://github.com/kahless/introversion.git"
+    "url": "git://github.com/GeneZharov/introversion.git"
   },
   "scripts": {
     "prettify": "prettier --write 'src/**/*.js'",
