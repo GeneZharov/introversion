@@ -4,7 +4,7 @@
   "keywords": ["js", "debug", "functional"],
   "license": "MIT",
   "author": "Gene Zharov <gene.zharov@gmail.com>",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "homepage": "https://github.com/GeneZharov/introversion",
   "bugs": {
     "url": "https://github.com/GeneZharov/introversion/issues",
@@ -13,7 +13,7 @@
   "main": "lib/introversion.js",
   "jsnext:main": "es/introversion.js",
   "module": "es/introversion.js",
-  "files": ["src", "es", "lib", "dist"],
+  "files": ["es", "lib", "dist"],
   "repository": {
     "type": "git",
     "url": "git://github.com/GeneZharov/introversion.git"
