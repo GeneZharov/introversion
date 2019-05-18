@@ -5,7 +5,7 @@ Swiss army knife for debugging JavaScript expressions and performance
 measurements. A wrapper around `console.log()`, `performance.now()`, 
 `debugger`, etc. with essential benefits:
 
-* works great with functional code (built with [React](https://reactjs.org/), 
+* works great with functional code (built for [React](https://reactjs.org/), 
   [Redux](https://redux.js.org/), [Ramda](https://ramdajs.com/), 
   [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide), etc.)
 * pretty and ![colorful](assets/colorful.jpeg) output
@@ -133,9 +133,15 @@ Installation
 npm install introversion --save-dev
 ```
 
-Advanced installation cases are described below ([default 
-import](#default-import), [set up in global 
-variable](#set-up-in-global-variable), [zero-conf for 
+```js
+import { logV } from "introversion";
+
+logV(val);
+```
+
+Advanced installation cases are described below ([Default 
+import](#default-import), [Set up in global 
+variable](#set-up-in-global-variable), [Zero-conf for 
 Node.js](#zero-conf-for-nodejs))
 
 
@@ -463,6 +469,9 @@ const InX = instance({
   log: (...xs) => xscript.response.write(xs.join(" ") + "\n"),
   warn (...xs) => xscript.response.write(xs.join(" ") + "\n")
 })
+
+InR.logV(val);
+InX.logV(val);
 ```
 
 ### In-Place Configuration
@@ -676,8 +685,8 @@ Options
 
     Introversion knows at what depth in the stack trace the user function call 
     should be located. But on some platforms Introversion module can be wrapped 
-    with something. For instance React Native increases stack trace depth by 1. 
-    Therefore Introversion may mistake with the location of the user function 
+    in something. For instance React Native increases stack trace depth by 1. 
+    Therefore, Introversion may mistake with the location of the user function 
     call. This option helps to correct this mistake.
 
     ```js
