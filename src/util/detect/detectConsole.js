@@ -1,13 +1,13 @@
 // @flow
 
-import { memoizeWith, identity } from "ramda";
+import { identity, memoizeWith } from "ramda";
 
 function _detectConsoleTime(): boolean {
   return (
     typeof console !== "undefined" &&
     console !== null &&
-    typeof console.time === "function" &&
-    typeof console.timeEnd === "function"
+    typeof console.time === "function" && // eslint-disable-line no-console
+    typeof console.timeEnd === "function" // eslint-disable-line no-console
   );
 }
 

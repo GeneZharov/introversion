@@ -2,16 +2,7 @@
 
 import { range } from "ramda";
 
-import {
-  debF,
-  f,
-  f_,
-  logF,
-  logF_,
-  setDefaults,
-  unmuteF,
-  unmuteRun
-} from "../..";
+import { debF, f, f_, logF, logF_, setDefaults, unmuteF, unmuteV } from "../..";
 import { defaultConf } from "../../defaultConf";
 import { errNotCallableLastArg } from "../../errors/misc";
 
@@ -28,7 +19,7 @@ beforeAll(() => {
     devTools: false,
     format: false,
     clone: false,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -57,9 +48,9 @@ describe("function's watch", () => {
       expect(log).toBeCalledWith("... Params:", [{ name }]);
       expect(log).toBeCalledWith("... Result:", 9);
     });
-    test("should log with unmuteRun() and logF.mute()", () => {
+    test("should log with unmuteV() and logF.mute()", () => {
       const action = logF.mute(1, 2, fn);
-      const result = unmuteRun(() => action({ name }));
+      const result = unmuteV(() => action({ name }));
       expect(result).toBe(name);
       expect(log.mock.calls.length).toEqual(3);
       expect(log).toBeCalledWith("logF()", [1, 2]);
@@ -124,8 +115,8 @@ describe("function's watch", () => {
       expect(result).toBe(name);
       expect(log).not.toBeCalled();
     });
-    test("should not log with unmuteRun() and debF.mute()", () => {
-      const result = unmuteRun(() => debF.mute(1, 2, fn)({ name }));
+    test("should not log with unmuteV() and debF.mute()", () => {
+      const result = unmuteV(() => debF.mute(1, 2, fn)({ name }));
       expect(result).toBe(name);
       expect(log).not.toBeCalled();
     });

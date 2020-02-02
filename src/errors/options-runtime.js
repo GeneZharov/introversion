@@ -30,7 +30,7 @@ export function errExtraArgsNotAllowed() {
     "Workaround:",
     "- remove extra arguments",
     '- alter the "timer" option',
-    '- enable the "format" option'
+    '- enable the "format" option',
   ];
 }
 

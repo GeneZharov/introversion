@@ -2,21 +2,22 @@
 
 import Chalk from "chalk";
 
-import type { _Conf } from "../../../types/_conf";
+import { type _Conf } from "../../../types/_conf";
 import { formatStackFrame } from "../../../util/format/formatStackFrame";
+
 import {
-  inspect,
   cloneTry,
   devFmt,
   devRaw,
   getTrace,
+  inspect,
   logFmt,
   logRaw,
   metaFmt,
-  metaRaw
+  metaRaw,
 } from "./util";
 
-const chalk = new Chalk.constructor();
+const chalk = new Chalk.Instance();
 
 export function logFn(
   name: string,
@@ -35,7 +36,7 @@ export function logFn(
       [
         `${name}()`,
         ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
-        ...(extras.length ? [_clone(extras)] : [])
+        ...(extras.length ? [_clone(extras)] : []),
       ],
       ...(quiet
         ? []
@@ -43,9 +44,9 @@ export function logFn(
             [metaRaw("Params"), _clone(args)],
             error
               ? [metaRaw("ERROR!"), _clone(result)]
-              : [metaRaw("Result"), _clone(result)]
+              : [metaRaw("Result"), _clone(result)],
           ]),
-      ...(conf.dev ? devRaw(_clone(conf), trace, frameIdx) : [])
+      ...(conf.dev ? devRaw(_clone(conf), trace, frameIdx) : []),
     ]);
   }
 
@@ -54,7 +55,7 @@ export function logFn(
     logFmt(conf, [
       [
         chalk.bold(`${name}()`),
-        ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
+        ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
       ],
       ...(extras.length ? [[inspect(conf, extras)]] : []),
       ...(quiet
@@ -63,9 +64,9 @@ export function logFn(
             [metaFmt("Params")],
             [inspect(conf, args)],
             [error ? metaFmt("ERROR!") : metaFmt("Result")],
-            [inspect(conf, result)]
+            [inspect(conf, result)],
           ]),
-      ...(conf.dev ? devFmt(conf, trace, frameIdx) : [])
+      ...(conf.dev ? devFmt(conf, trace, frameIdx) : []),
     ]);
   }
 

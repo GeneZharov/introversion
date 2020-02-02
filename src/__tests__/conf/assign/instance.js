@@ -2,9 +2,8 @@
 
 import { map } from "ramda";
 
-import In from "../../..";
+import In, { instance, setDefaults } from "../../..";
 import { defaultConf } from "../../../defaultConf";
-import { instance, setDefaults } from "../../..";
 
 const log = jest.fn();
 const log2 = jest.fn();
@@ -25,7 +24,7 @@ describe("instance()", () => {
     expect(() => instance(null)).toThrow();
     expect(() => instance("")).toThrow();
     expect(() => instance(4)).toThrow();
-    expect(() => instance(Symbol())).toThrow();
+    expect(() => instance(Symbol(""))).toThrow();
     expect(() => instance([])).toThrow();
   });
   test("should return API", () => {

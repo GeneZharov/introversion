@@ -8,7 +8,7 @@ measurements. A wrapper around `console.log()`, `performance.now()`,
 * works great with functional code (built for [React](https://reactjs.org/), 
   [Redux](https://redux.js.org/), [Ramda](https://ramdajs.com/), 
   [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide), etc.)
-* pretty and ![colorful](assets/colorful.jpeg) output
+* pretty and colorful output
 * easy to use:
     * automatically chooses the best time source available (`performance.now()` 
       or `console.time()` or `Date.now()`)

@@ -12,7 +12,7 @@ export function getGuard(id: mixed, guard: number): number {
 }
 
 export function saveGuard(id: mixed, guard: number): void {
-  if (0 < guard && guard < Infinity) {
+  if (guard > 0 && guard < Infinity) {
     state.guard.set(id, guard - 1);
   }
 }

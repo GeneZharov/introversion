@@ -2,8 +2,8 @@
 
 import { range } from "ramda";
 
+import { setDefaults, timeF, unmuteF, unmuteV } from "../..";
 import { defaultConf } from "../../defaultConf";
-import { setDefaults, timeF, unmuteF, unmuteRun } from "../..";
 
 const name = 9;
 
@@ -18,7 +18,7 @@ beforeAll(() => {
     clone: false,
     log,
     timer,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -47,9 +47,9 @@ describe("timeF()", () => {
       expect(timer.mock.calls.length).toEqual(2);
       expect(log).toBeCalledWith("timeF()", [1, 2], "0 ms");
     });
-    test("should log with unmuteRun()", () => {
+    test("should log with unmuteV()", () => {
       const action = timeF.mute(1, 2, fn);
-      const result = unmuteRun(() => action({ name }));
+      const result = unmuteV(() => action({ name }));
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
       expect(log).toBeCalledWith("timeF()", [1, 2], "0 ms");

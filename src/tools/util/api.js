@@ -2,19 +2,21 @@
 
 import { last } from "ramda";
 
-import type { Conf } from "../../types/conf";
-import type { Modes } from "../../types/modes";
-import type { _Conf } from "../../types/_conf";
 import { globalConf } from "../../state";
+import { type _Conf } from "../../types/_conf";
+import { type Conf } from "../../types/conf";
+import { type Modes } from "../../types/modes";
+
 import { normalizeConf } from "./normalize/conf";
 import { validateConf } from "./validate/conf";
 
 export function parseArgs(
-  args: *[]
+  args: Array<*>
 ): {
   modes: $Shape<Modes>,
   conf: Conf,
-  userArgs: *[]
+  userArgs: Array<*>,
+  ...
 } {
   const modes = args
     .filter(x => x instanceof ModeArg)
@@ -30,14 +32,15 @@ export function parseArgs(
 
 export function parseUserArgs(
   modes: $Shape<Modes>,
-  args: *[]
+  args: Array<*>
 ): {
   extras: mixed[],
-  val: mixed[]
+  val: mixed[],
+  ...
 } {
   return {
     extras: args.slice(0, -1),
-    val: args.length ? [last(args)] : []
+    val: args.length ? [last(args)] : [],
   };
 }
 
@@ -45,6 +48,7 @@ export class Arg {}
 
 export class ModeArg extends Arg {
   modes: $Shape<Modes>;
+
   constructor(modes: $Shape<Modes>) {
     super();
     this.modes = modes;
@@ -53,6 +57,7 @@ export class ModeArg extends Arg {
 
 export class ConfArg extends Arg {
   conf: $Shape<Conf>;
+
   constructor(conf: $Shape<Conf>) {
     super();
     this.conf = conf;
@@ -70,7 +75,9 @@ export function api(fn: *, ...args: mixed[]): * {
   return _fn;
 }
 
-export function withApi<T>(fn: (*[], _Conf, $Shape<Modes>) => T): (*) => T {
+export function withApi<T>(
+  fn: (Array<*>, _Conf, $Shape<Modes>) => T
+): (*) => T {
   return (...args) => {
     const { modes, conf, userArgs } = parseArgs(args);
     const _conf = normalizeConf(validateConf(conf), modes.task);

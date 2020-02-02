@@ -24,11 +24,11 @@ interface Api {
   stopwatch: Tool;
   lap: Tool;
   timeF: Tool;
-  timeRun: Tool;
+  timeV: Tool;
   unmute: Tool;
   mute: Tool;
   unmuteF: Tool;
-  unmuteRun: Tool;
+  unmuteV: Tool;
 }
 
 declare var api: Api;

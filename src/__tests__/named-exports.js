@@ -1,6 +1,7 @@
 // @flow
 
 import { defaultConf } from "../defaultConf";
+
 import { f, setDefaults, v } from "..";
 
 const name = 9;
@@ -13,7 +14,7 @@ beforeAll(() => {
     log,
     devTools: false,
     format: false,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 

@@ -1,8 +1,8 @@
 // @flow
 
+import { logV, setDefaults } from "../../..";
 import { defaultConf } from "../../../defaultConf";
 import { errUnknownOpt } from "../../../errors/options";
-import { logV, setDefaults } from "../../..";
 
 const log = jest.fn();
 const warn = jest.fn();
@@ -13,7 +13,7 @@ beforeAll(() => {
     warn,
     devTools: false,
     format: false,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 

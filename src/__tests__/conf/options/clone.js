@@ -1,7 +1,7 @@
 // @flow
 
+import { logF, logV, setDefaults, time, timeEnd } from "../../..";
 import { defaultConf } from "../../../defaultConf";
-import { setDefaults, time, timeEnd, logF, logV } from "../../..";
 
 const a = { a: true };
 const b = { b: true };
@@ -15,7 +15,7 @@ beforeAll(() => {
     log,
     devTools: false,
     format: false,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -67,7 +67,7 @@ describe('"clone" option', () => {
 
   describe("timeEnd()", () => {
     test("should create a deep clone when true", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       time(id);
       timeEnd.with({ clone: true })(a, b, id);
       const [, [_a, _b]] = log.mock.calls[0];
@@ -77,7 +77,7 @@ describe('"clone" option', () => {
       expect(_b).toEqual(b);
     });
     test("should prevent cloning when false", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       time(id);
       timeEnd.with({ clone: false })(a, b, id);
       const [, [_a, _b]] = log.mock.calls[0];

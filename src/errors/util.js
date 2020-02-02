@@ -1,24 +1,25 @@
 // @flow
 
-import Stacktrace from "stacktrace-js";
 import chalk from "chalk";
+import Stacktrace from "stacktrace-js";
 
-import type { Auto, Print } from "../types/conf";
-import {
-  errInvalidDevTools,
-  errInvalidFormatErrors,
-  errInvalidWarn
-} from "./options";
-import { formatStackFrame } from "../util/format/formatStackFrame";
 import {
   normalizeDevTools,
-  normalizeFormatErrors
+  normalizeFormatErrors,
 } from "../tools/util/normalize/options";
 import {
   validDevTools,
   validFormatErrors,
-  validWarn
+  validWarn,
 } from "../tools/util/validate/options";
+import { type Auto, type Print } from "../types/conf";
+import { formatStackFrame } from "../util/format/formatStackFrame";
+
+import {
+  errInvalidDevTools,
+  errInvalidFormatErrors,
+  errInvalidWarn,
+} from "./options";
 
 const stripe = str => {
   const bar = chalk.yellow("▒");
@@ -45,11 +46,12 @@ export function _warning(
   {
     warn,
     errorHandling,
-    formatErrors
+    formatErrors,
   }: {
     warn: Print,
     errorHandling: "warn" | "throw",
-    formatErrors: boolean
+    formatErrors: boolean,
+    ...
   },
   msg: string[]
 ): void {
@@ -65,12 +67,13 @@ export function warning(
     warn,
     errorHandling,
     devTools,
-    formatErrors
+    formatErrors,
   }: {
     warn: Print,
     errorHandling: "warn" | "throw",
     devTools: Auto<boolean>,
-    formatErrors: Auto<boolean>
+    formatErrors: Auto<boolean>,
+    ...
   },
   msg: string[]
 ): void {

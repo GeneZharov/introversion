@@ -2,20 +2,21 @@
 
 import { range } from "ramda";
 
-import type { Modes } from "../types/modes";
-import type { _Conf } from "../types/_conf";
-import { _warning } from "../errors/util";
-import { errInvalidTimerReturn } from "../errors/options-runtime";
 import {
   errNotCallableLastArg,
   errTimerIdAlreadyExists,
-  errTimerIdDoesNotExist
+  errTimerIdDoesNotExist,
 } from "../errors/misc";
-import { genTimerID } from "./util/id";
-import { getGuard, saveGuard } from "./util/guard";
-import { logTime } from "./util/logging/time";
-import { parseUserArgs, withApi } from "./util/api";
+import { errInvalidTimerReturn } from "../errors/options-runtime";
+import { _warning } from "../errors/util";
 import { state } from "../state";
+import { type _Conf } from "../types/_conf";
+import { type Modes } from "../types/modes";
+
+import { parseUserArgs, withApi } from "./util/api";
+import { getGuard, saveGuard } from "./util/guard";
+import { genTimerID } from "./util/id";
+import { logTime } from "./util/logging/time";
 
 const DEFAULT_ID = "default";
 const STOPWATCH_ID = "lap";
@@ -28,8 +29,10 @@ function normalize(
   measure: boolean,
   _args: {
     extras: mixed[],
-    val: mixed[]
-  }
+    val: mixed[],
+    ...
+  },
+  ...
 } {
   const _args = parseUserArgs(modes, args);
   const guard = getGuard(conf.id, conf.guard);
@@ -59,7 +62,7 @@ function getTime(conf: _Conf): number {
 function start(conf: _Conf, id: mixed): void {
   const { timer } = conf;
   if (timer === "console") {
-    console.time((id: any));
+    console.time((id: any)); // eslint-disable-line no-console
   } else {
     if (state.timers.has(id)) {
       _warning(conf, errTimerIdAlreadyExists(id));
@@ -72,7 +75,7 @@ function start(conf: _Conf, id: mixed): void {
 function stop(conf: _Conf, id: mixed): number {
   const { timer } = conf;
   if (timer === "console") {
-    console.timeEnd((id: any));
+    console.timeEnd((id: any)); // eslint-disable-line no-console
     return NaN;
   } else {
     const start = state.timers.get(id);
@@ -87,44 +90,40 @@ function stop(conf: _Conf, id: mixed): number {
   }
 }
 
-export const time = withApi(
-  (args, conf, modes): void => {
-    const {
-      measure,
-      _args: {
-        val: [timerID = DEFAULT_ID]
-      }
-    } = normalize(args, conf, modes);
-    if (measure) {
-      start(conf, timerID);
-    }
+export const time = withApi((args, conf, modes): void => {
+  const {
+    measure,
+    _args: {
+      val: [timerID = DEFAULT_ID],
+    },
+  } = normalize(args, conf, modes);
+  if (measure) {
+    start(conf, timerID);
   }
-);
+});
 
-export const timeEnd = withApi(
-  (args, conf, modes): void => {
-    const { task } = modes;
-    const {
-      measure,
-      _args: {
-        extras,
-        val: [timerID = DEFAULT_ID]
-      }
-    } = normalize(args, conf, modes);
-    if (measure) {
-      const ellapsed = stop(conf, timerID);
-      const _args = conf.timer === "console" ? extras : args;
-      logTime(task, conf, 4, _args, ellapsed);
-    }
+export const timeEnd = withApi((args, conf, modes): void => {
+  const { task } = modes;
+  const {
+    measure,
+    _args: {
+      extras,
+      val: [timerID = DEFAULT_ID],
+    },
+  } = normalize(args, conf, modes);
+  if (measure) {
+    const ellapsed = stop(conf, timerID);
+    const _args = conf.timer === "console" ? extras : args;
+    logTime(task, conf, 4, _args, ellapsed);
   }
-);
+});
 
 export const timeFn = withApi((args, conf, modes) => {
   return function(..._args: mixed[]): any {
     const { task } = modes;
     const {
       measure,
-      _args: { extras, val }
+      _args: { extras, val },
     } = normalize(args, conf, modes);
     if (typeof val[0] !== "function") {
       _warning(conf, errNotCallableLastArg(task));
@@ -144,48 +143,42 @@ export const timeFn = withApi((args, conf, modes) => {
   };
 });
 
-export const timeRun = withApi(
-  (args, conf, modes): any => {
-    const { task } = modes;
-    const {
-      measure,
-      _args: { extras, val }
-    } = normalize(args, conf, modes);
-    if (typeof val[0] !== "function") {
-      _warning(conf, errNotCallableLastArg(task));
+export const timeVal = withApi((args, conf, modes): any => {
+  const { task } = modes;
+  const {
+    measure,
+    _args: { extras, val },
+  } = normalize(args, conf, modes);
+  if (typeof val[0] !== "function") {
+    _warning(conf, errNotCallableLastArg(task));
+  } else {
+    if (measure) {
+      const timerID = genTimerID(conf.id);
+      start(conf, timerID);
+      const [result] = range(0, conf.repeat).map(_ => (val[0]: Function)());
+      const ellapsed = stop(conf, timerID);
+      logTime(task, conf, 4, extras, ellapsed);
+      return result;
     } else {
-      if (measure) {
-        const timerID = genTimerID(conf.id);
-        start(conf, timerID);
-        const [result] = range(0, conf.repeat).map(_ => (val[0]: Function)());
-        const ellapsed = stop(conf, timerID);
-        logTime(task, conf, 4, extras, ellapsed);
-        return result;
-      } else {
-        return (val[0]: Function)();
-      }
+      return (val[0]: Function)();
     }
   }
-);
+});
 
-export const stopwatch = withApi(
-  (args, conf, modes): void => {
-    const { measure } = normalize(args, conf, modes);
-    if (measure) {
-      state.timers.delete(STOPWATCH_ID); // Reset previous stopwatch
-      start(conf, STOPWATCH_ID);
-    }
+export const stopwatch = withApi((args, conf, modes): void => {
+  const { measure } = normalize(args, conf, modes);
+  if (measure) {
+    state.timers.delete(STOPWATCH_ID); // Reset previous stopwatch
+    start(conf, STOPWATCH_ID);
   }
-);
+});
 
-export const lap = withApi(
-  (args, conf, modes): void => {
-    const { task } = modes;
-    const { measure } = normalize(args, conf, modes);
-    if (measure) {
-      const ellapsed = stop(conf, STOPWATCH_ID);
-      logTime(task, conf, 4, args, ellapsed);
-      start(conf, STOPWATCH_ID);
-    }
+export const lap = withApi((args, conf, modes): void => {
+  const { task } = modes;
+  const { measure } = normalize(args, conf, modes);
+  if (measure) {
+    const ellapsed = stop(conf, STOPWATCH_ID);
+    logTime(task, conf, 4, args, ellapsed);
+    start(conf, STOPWATCH_ID);
   }
-);
+});

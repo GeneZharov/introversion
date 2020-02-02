@@ -2,20 +2,13 @@
 
 import { range } from "ramda";
 
+import { instance, setDefaults, time, timeEnd, unmuteF, unmuteV } from "../..";
 import { defaultConf } from "../../defaultConf";
-import { errExtraArgsNotAllowed } from "../../errors/options-runtime";
 import {
   errTimerIdAlreadyExists,
-  errTimerIdDoesNotExist
+  errTimerIdDoesNotExist,
 } from "../../errors/misc";
-import {
-  instance,
-  setDefaults,
-  time,
-  timeEnd,
-  unmuteF,
-  unmuteRun
-} from "../..";
+import { errExtraArgsNotAllowed } from "../../errors/options-runtime";
 
 const log = jest.fn();
 const warn = jest.fn();
@@ -29,7 +22,7 @@ beforeAll(() => {
     format: false,
     clone: false,
     timer,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -44,7 +37,7 @@ afterEach(() => {
 describe("time() and timeEnd()", () => {
   describe("when muted", () => {
     test("should not log anything", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       time.mute(id);
       timeEnd.mute(id);
       expect(timer.mock.calls.length).toEqual(0);
@@ -60,24 +53,24 @@ describe("time() and timeEnd()", () => {
       expect(log).toBeCalledWith("timeEnd()", "0 ms");
     });
     test("should log time with timerID", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       time(id);
       timeEnd(id);
       expect(timer.mock.calls.length).toEqual(2);
       expect(log).toBeCalledWith("timeEnd()", [id], "0 ms");
     });
-    test("should log with unmuteRun()", () => {
-      const id = Symbol();
+    test("should log with unmuteV()", () => {
+      const id = Symbol("id");
       const action = () => {
         time.mute(id);
         timeEnd.mute(id);
       };
-      unmuteRun(action);
+      unmuteV(action);
       expect(timer.mock.calls.length).toEqual(2);
       expect(log).toBeCalledWith("timeEnd()", [id], "0 ms");
     });
     test("should log with unmuteF()", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       const action = () => {
         time.mute(id);
         timeEnd.mute(id);
@@ -89,7 +82,7 @@ describe("time() and timeEnd()", () => {
   });
 
   test('should respect the "guard" option', () => {
-    const id = Symbol();
+    const id = Symbol("id");
     const log1 = jest.fn();
     const log2 = jest.fn();
     const log3 = jest.fn();
@@ -108,7 +101,7 @@ describe("time() and timeEnd()", () => {
 
   describe("should print a warning", () => {
     test("timer id already exists", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       const [msg] = errTimerIdAlreadyExists(id);
       const In = instance({ timer: "date" });
       In.time(id);
@@ -117,17 +110,17 @@ describe("time() and timeEnd()", () => {
       expect(warn).toBeCalledWith(expect.stringContaining(msg));
     });
     test("timer id does not exist", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       const [msg] = errTimerIdDoesNotExist(id);
       timeEnd.with({ timer: "date" })(id);
       expect(log).toBeCalledWith("timeEnd()", [id], "NaN ms", "by Date.now()");
       expect(warn).toBeCalledWith(expect.stringContaining(msg));
     });
     test("performance.now() is not available", () => {
-      // FIXME
+      // TODO
     });
     test("extra args are used with console timer", () => {
-      const id = Symbol();
+      const id = Symbol("id");
       const [msg] = errExtraArgsNotAllowed();
       time(id);
       timeEnd.with({ timer: "console" })(1, 2, 3, id);

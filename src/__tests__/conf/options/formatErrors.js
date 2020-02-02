@@ -1,7 +1,7 @@
 // @flow
 
-import { defaultConf } from "../../../defaultConf";
 import { logV, setDefaults } from "../../..";
+import { defaultConf } from "../../../defaultConf";
 
 const log = jest.fn();
 const warn = jest.fn();
@@ -12,7 +12,7 @@ beforeAll(() => {
     warn,
     format: false,
     stackTrace: false,
-    clone: false
+    clone: false,
   });
 });
 

@@ -1,8 +1,9 @@
 // @flow
 
-import { _warning } from "../errors/util";
 import { errExpectedFuncArg } from "../errors/misc";
+import { _warning } from "../errors/util";
 import { state } from "../state";
+
 import { withApi } from "./util/api";
 
 export function mute() {
@@ -27,7 +28,7 @@ export const unmuteF = withApi((args, conf, modes) => {
   };
 });
 
-export const unmuteRun = withApi((args, conf, modes) => {
+export const unmuteV = withApi((args, conf, modes) => {
   if (!args.length || typeof args[0] !== "function") {
     _warning(conf, errExpectedFuncArg(modes.task));
     return args[0];

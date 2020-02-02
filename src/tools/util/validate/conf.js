@@ -1,6 +1,5 @@
 // @flow
 
-import type { Conf } from "../../../types/conf";
 import { defaultConf } from "../../../defaultConf";
 import {
   errInvalidClone,
@@ -20,9 +19,11 @@ import {
   errInvalidStackTraceShift,
   errInvalidTimer,
   errInvalidWarn,
-  errUnknownOpt
+  errUnknownOpt,
 } from "../../../errors/options";
 import { error, warning } from "../../../errors/util";
+import { type Conf } from "../../../types/conf";
+
 import {
   validClone,
   validDev,
@@ -40,7 +41,7 @@ import {
   validStackTraceAsync,
   validStackTraceShift,
   validTimer,
-  validWarn
+  validWarn,
 } from "./options";
 
 const onErr = msg => () => error(msg());
@@ -62,9 +63,9 @@ const validators = {
   stackTrace: [validStackTrace, onWarn(errInvalidStackTrace)],
   stackTraceAsync: [validStackTraceAsync, onWarn(errInvalidStackTraceAsync)],
   stackTraceShift: [validStackTraceShift, onWarn(errInvalidStackTraceShift)],
-  id: [_ => true, _ => {}],
+  id: [_ => true, _ => {}], // eslint-disable-line no-empty-function
   guard: [validGuard, onWarn(errInvalidGuard)],
-  repeat: [validRepeat, onWarn(errInvalidRepeat)]
+  repeat: [validRepeat, onWarn(errInvalidRepeat)],
 };
 
 export function validateConf(conf: Object): Conf {
@@ -72,7 +73,7 @@ export function validateConf(conf: Object): Conf {
   // R.mapObjIndexed() with for-in) because it increases the depth of a stack
   // trace and conceals user calls in that stack.
   const _conf = {};
-  for (let name in conf) {
+  for (const name in conf) {
     if (name in validators) {
       const [valid, onInvalid] = validators[name];
       if (valid(conf[name])) {

@@ -2,9 +2,9 @@
 
 import { range } from "ramda";
 
+import { lap, setDefaults, stopwatch, unmuteF, unmuteV } from "../..";
 import { defaultConf } from "../../defaultConf";
 import { errExtraArgsNotAllowed } from "../../errors/options-runtime";
-import { lap, setDefaults, stopwatch, unmuteF, unmuteRun } from "../..";
 
 const log = jest.fn();
 const warn = jest.fn();
@@ -18,7 +18,7 @@ beforeAll(() => {
     format: false,
     clone: false,
     timer,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -51,14 +51,14 @@ describe("stopwatch() and lap()", () => {
       expect(timer.mock.calls.length).toEqual(7);
       expect(log).toBeCalledWith("lap()", "0 ms");
     });
-    test("should log with unmuteRun()", () => {
+    test("should log with unmuteV()", () => {
       const action = () => {
         stopwatch.mute();
         lap.mute();
         lap.mute();
         lap.mute();
       };
-      unmuteRun(action);
+      unmuteV(action);
       expect(timer.mock.calls.length).toEqual(7);
       expect(log).toBeCalledWith("lap()", "0 ms");
     });

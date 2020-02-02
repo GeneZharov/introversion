@@ -1,6 +1,9 @@
+"use strict";
+
 const In = require("./");
 
 function getGlobal() {
+  // eslint-disable-next-line no-new-func
   return Function("return this")();
 }
 
@@ -12,6 +15,7 @@ if (confObj) {
   const conf = eval(`(${confObj})`);
   In.setDefaults(conf);
 } else if (confFile) {
+  // eslint-disable-next-line import/no-dynamic-require
   const conf = require(confFile);
   In.setDefaults(conf);
 }
