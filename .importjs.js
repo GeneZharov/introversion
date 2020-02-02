@@ -1,7 +1,4 @@
-// @flow
-
-const { startsWith } = require("lodash/fp");
-const { dirname, relative } = require("path");
+"use strict";
 
 module.exports = {
   minimumVersion: "2.10.0",
@@ -14,6 +11,6 @@ module.exports = {
 
   importStatementFormatter({ importStatement }) {
     // Use double quotes
-    return importStatement.replace(/'/g, '"');
-  }
+    return importStatement.replace(/'/gu, '"');
+  },
 };

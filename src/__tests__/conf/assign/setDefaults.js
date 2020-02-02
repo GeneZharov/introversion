@@ -1,7 +1,7 @@
 // @flow
 
-import { defaultConf } from "../../../defaultConf";
 import { logV, setDefaults } from "../../..";
+import { defaultConf } from "../../../defaultConf";
 
 const log = jest.fn();
 
@@ -18,7 +18,7 @@ describe("setDefaults()", () => {
     expect(() => (setDefaults: any)(null)).toThrow();
     expect(() => (setDefaults: any)("")).toThrow();
     expect(() => (setDefaults: any)(4)).toThrow();
-    expect(() => (setDefaults: any)(Symbol())).toThrow();
+    expect(() => (setDefaults: any)(Symbol(""))).toThrow();
     expect(() => (setDefaults: any)([])).toThrow();
   });
   test("should apply config", () => {

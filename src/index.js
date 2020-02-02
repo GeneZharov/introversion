@@ -1,16 +1,18 @@
 // @flow
 
+/* eslint-disable import/no-default-export */
+
 import { init, last, map, type } from "ramda";
 
-import type { Conf } from "./types/conf";
-import { ConfArg, ModeArg, api } from "./tools/util/api";
-import type { Modes } from "./types/modes";
 import { errInvalidConfType } from "./errors/misc";
 import { error } from "./errors/util";
 import { globalConf } from "./state";
 import * as _mute from "./tools/mute";
 import * as _time from "./tools/time";
+import { ConfArg, ModeArg, api } from "./tools/util/api";
 import * as _watch from "./tools/watcher";
+import { type Conf } from "./types/conf";
+import { type Modes } from "./types/modes";
 
 const tool = (fn, modeGist: $Shape<Modes>) => api(fn, new ModeArg(modeGist));
 
@@ -23,7 +25,7 @@ function setDefaults(conf: mixed): void {
   Object.assign(globalConf, ((conf: any): $Shape<Conf>));
 }
 
-function instance(...args: *[]): API {
+function instance(...args: Array<*>): API {
   const _args = init(args);
   const conf = last(args);
   if (type(conf) !== "Object") {
@@ -57,12 +59,12 @@ const stopwatch = tool(_time.stopwatch, { task: "stopwatch" });
 const lap = tool(_time.lap, { task: "lap" });
 
 const timeF = tool(_time.timeFn, { task: "timeF" });
-const timeRun = tool(_time.timeRun, { task: "timeRun" });
+const timeV = tool(_time.timeVal, { task: "timeV" });
 
 const unmute = tool(_mute.unmute, { task: "unmute" });
 const mute = tool(_mute.mute, { task: "mute" });
 const unmuteF = tool(_mute.unmuteF, { task: "unmuteF" });
-const unmuteRun = tool(_mute.unmuteRun, { task: "unmuteRun" });
+const unmuteV = tool(_mute.unmuteV, { task: "unmuteV" });
 
 const tools = {
   setDefaults,
@@ -82,11 +84,11 @@ const tools = {
   stopwatch,
   lap,
   timeF,
-  timeRun,
+  timeV,
   unmute,
   mute,
   unmuteF,
-  unmuteRun
+  unmuteV,
 };
 
 export {
@@ -107,11 +109,11 @@ export {
   stopwatch,
   lap,
   timeF,
-  timeRun,
+  timeV,
   unmute,
   mute,
   unmuteF,
-  unmuteRun
+  unmuteV,
 };
 
 export default {
@@ -132,9 +134,9 @@ export default {
   stopwatch,
   lap,
   timeF,
-  timeRun,
+  timeV,
   unmute,
   mute,
   unmuteF,
-  unmuteRun
+  unmuteV,
 };

@@ -3,24 +3,25 @@
 import Chalk from "chalk";
 
 import { REPEAT_OPT_SUFFIXES } from "../../../const";
-import type { TimerOption } from "../../../types/conf";
-import type { _Conf } from "../../../types/_conf";
+import { errExtraArgsNotAllowed } from "../../../errors/options-runtime";
 import { _warning } from "../../../errors/util";
+import { type _Conf } from "../../../types/_conf";
+import { type TimerOption } from "../../../types/conf";
+import { formatStackFrame } from "../../../util/format/formatStackFrame";
+import { round } from "../../../util/number/round";
+import { formatSuffix } from "../../../util/number/suffix";
+
 import {
   cloneTry,
   devFmt,
   devRaw,
   getTrace,
+  inspect,
   logFmt,
   logRaw,
-  inspect
 } from "./util";
-import { errExtraArgsNotAllowed } from "../../../errors/options-runtime";
-import { formatStackFrame } from "../../../util/format/formatStackFrame";
-import { formatSuffix } from "../../../util/number/suffix";
-import { round } from "../../../util/number/round";
 
-const chalk = new Chalk.constructor();
+const chalk = new Chalk.Instance();
 
 function formatTimer(timer: TimerOption): string {
   switch (timer) {
@@ -58,15 +59,15 @@ export function logTime(
                 ? [
                     `(${_suffix(conf.repeat)} repeats in ${_round(
                       ellapsed
-                    )} ms)`
+                    )} ms)`,
                   ]
                 : []),
               ...(typeof conf.timer !== "function"
                 ? [`by ${formatTimer(conf.timer)}`]
-                : [])
-            ]
+                : []),
+            ],
           ]),
-      ...(conf.dev ? devRaw(_clone(conf), trace, frameIdx) : [])
+      ...(conf.dev ? devRaw(_clone(conf), trace, frameIdx) : []),
     ]);
   }
 
@@ -78,7 +79,7 @@ export function logTime(
         : [
             [
               chalk.bold(`${name}()`),
-              ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
+              ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
             ],
             ...(args.length ? [[inspect(conf, args)]] : []),
             [
@@ -87,15 +88,15 @@ export function logTime(
                 ? [
                     `(${_suffix(conf.repeat)} repeats in ${_round(
                       ellapsed
-                    )} ms)`
+                    )} ms)`,
                   ]
                 : []),
               ...(typeof conf.timer !== "function"
                 ? [`by ${formatTimer(conf.timer)}`]
-                : [])
-            ]
+                : []),
+            ],
           ]),
-      ...(conf.dev ? devFmt(conf, trace, frameIdx) : [])
+      ...(conf.dev ? devFmt(conf, trace, frameIdx) : []),
     ]);
   }
 

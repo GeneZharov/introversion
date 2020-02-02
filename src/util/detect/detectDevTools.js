@@ -1,10 +1,10 @@
 // @flow
 
-import { memoizeWith, identity } from "ramda";
+import { identity, memoizeWith } from "ramda";
 
 function _detectDevTools(): boolean {
   let opened: boolean = false;
-  const sample = /check/;
+  const sample = /check/u;
   Object.defineProperty(
     (sample: any),
     "toString",
@@ -12,9 +12,10 @@ function _detectDevTools(): boolean {
       get() {
         opened = true;
         return () => "Done";
-      }
+      },
     }: any)
   );
+  // eslint-disable-next-line no-console
   console.log(
     "Introversion is detecting DevTools...",
     sample,

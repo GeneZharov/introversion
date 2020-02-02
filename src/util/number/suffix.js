@@ -17,7 +17,7 @@ export function errMustBeString() {
 const options = [
   [10 ** 9, SUFFIX_GIGA],
   [10 ** 6, SUFFIX_MEGA],
-  [10 ** 3, SUFFIX_KILO]
+  [10 ** 3, SUFFIX_KILO],
 ];
 
 function filterOptions(suffixes: Suffix[]): Array<[number, Suffix]> {
@@ -29,7 +29,7 @@ export function formatSuffix(suffixes: Suffix[], num: number): string {
     throw errMustBeNumber();
   }
   if (num !== Infinity) {
-    for (let [group, suffix] of filterOptions(suffixes)) {
+    for (const [group, suffix] of filterOptions(suffixes)) {
       if (Math.abs(num) >= group) {
         return (num / group).toString() + suffix;
       }
@@ -44,12 +44,12 @@ export function parseSuffix(suffixes: Suffix[], str: string): number {
   } else if (str.length === 0) {
     return NaN;
   } else if (str.length === 1) {
-    return +str;
+    return Number(str);
   } else {
     const c = str[str.length - 1];
     const match = filterOptions(suffixes).find(([, suffix]) => {
       return suffix.toLowerCase() === c.toLowerCase();
     });
-    return match ? +str.slice(0, -1) * match[0] : +str;
+    return match ? Number(str.slice(0, -1)) * match[0] : Number(str);
   }
 }

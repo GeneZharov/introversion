@@ -1,7 +1,11 @@
 {
   "name": "introversion",
   "description": "Swiss army knife for debugging JavaScript expressions and performance measurements",
-  "keywords": ["js", "debug", "functional"],
+  "keywords": [
+    "js",
+    "debug",
+    "functional"
+  ],
   "license": "MIT",
   "author": "Gene Zharov <gene.zharov@gmail.com>",
   "version": "0.5.1",
@@ -13,48 +17,55 @@
   "main": "lib/introversion.js",
   "jsnext:main": "es/introversion.js",
   "module": "es/introversion.js",
-  "files": ["es", "lib", "dist"],
+  "files": [
+    "es",
+    "lib",
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/GeneZharov/introversion.git"
   },
   "scripts": {
     "prettify": "prettier --write 'src/**/*.js'",
-    "lint": "eslint src",
-    "flow": "flow",
+    "lint": "eslint --cache src",
+    "flow": "flow check",
+    "flow:watch": "flow",
     "test": "jest",
     "test:watch": "jest --watch",
     "clean": "rimraf es lib dist",
+    "checkall": "yarn prettify --loglevel=warn && yarn flow && yarn lint && yarn test",
     "build": "rollup -c",
     "build:watch": "rollup -c -w ",
     "build:types": "cp introversion.d.ts introversion.js.flow lib",
-    "prepublishOnly": "yarn lint && yarn flow && yarn test && yarn clean && yarn build && yarn build:types"
+    "prepublishOnly": "yarn checkall && yarn clean && yarn build && yarn build:types"
   },
   "devDependencies": {
-    "@babel/core": "7.4.4",
-    "@babel/preset-env": "7.4.4",
-    "@babel/preset-flow": "7.0.0",
-    "babel-eslint": "10.0.1",
-    "eslint": "5.16.0",
-    "eslint-plugin-flowtype": "3.8.2",
-    "flow-bin": "0.98.1",
-    "jest": "24.8.0",
-    "prettier": "1.17.1",
-    "rimraf": "2.6.3",
-    "rollup": "1.11.3",
-    "rollup-plugin-babel": "4.3.2",
-    "rollup-plugin-commonjs": "9.3.4",
+    "@babel/core": "7.8.4",
+    "@babel/preset-env": "7.8.4",
+    "@babel/preset-flow": "7.8.3",
+    "@rollup/plugin-commonjs": "11.0.2",
+    "@rollup/plugin-node-resolve": "7.1.0",
+    "babel-eslint": "10.0.3",
+    "eslint": "6.8.0",
+    "eslint-plugin-flowtype": "4.6.0",
+    "eslint-plugin-import": "2.20.1",
+    "flow-bin": "0.117.0",
+    "jest": "25.1.0",
+    "prettier": "1.19.1",
+    "rimraf": "3.0.1",
+    "rollup": "1.31.0",
+    "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-ignore": "1.0.5",
     "rollup-plugin-node-builtins": "2.1.2",
     "rollup-plugin-node-globals": "1.4.0",
-    "rollup-plugin-node-resolve": "4.2.4",
-    "rollup-plugin-terser": "4.0.4"
+    "rollup-plugin-terser": "5.2.0"
   },
   "dependencies": {
-    "chalk": "2.4.2",
+    "chalk": "3.0.0",
     "ramda": "0.26.1",
-    "stacktrace-js": "2.0.0",
+    "stacktrace-js": "2.0.2",
     "url-parse": "1.4.7",
-    "util": "0.12.0"
+    "util": "0.12.1"
   }
 }

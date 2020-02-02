@@ -2,15 +2,15 @@
 
 import util from "util";
 
-import { clone, fromPairs } from "ramda";
 import Chalk from "chalk";
+import { clone, fromPairs } from "ramda";
 import Stacktrace from "stacktrace-js";
 
-import type { StackFrame } from "../../../types/conf";
-import type { _Conf } from "../../../types/_conf";
+import { type _Conf } from "../../../types/_conf";
+import { type StackFrame } from "../../../types/conf";
 import { formatStackFrame } from "../../../util/format/formatStackFrame";
 
-const chalk = new Chalk.constructor();
+const chalk = new Chalk.Instance();
 
 export const cloneTry = (conf: _Conf) => <T>(val: T): T =>
   conf.clone ? clone(val) : val;
@@ -51,9 +51,9 @@ export function devRaw(
             const frameStr = formatStackFrame(conf.stackTrace, frame);
             return [idxStr, frameStr];
           })
-        )
-      ]
-    ]
+        ),
+      ],
+    ],
   ];
 }
 
@@ -70,7 +70,7 @@ export function devFmt(
       const idxStr = idx === frameIdx ? `[${idx}]` : ` ${idx} `;
       const frameStr = formatStackFrame(conf.stackTrace, frame);
       return `${idxStr} — ${frameStr}`;
-    })
+    }),
   ];
 }
 

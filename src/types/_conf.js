@@ -2,10 +2,15 @@
 
 // Normalized Configuration
 
-import type { Auto, Conf, StackTraceItem, TimerOption } from "./conf";
+import {
+  type Auto,
+  type Conf,
+  type StackTraceItem,
+  type TimerOption,
+} from "./conf";
 
 export type _Conf = {
-  ...$Diff<$Exact<Conf>, { devTools: Auto<boolean> }>,
+  ...$Diff<$Exact<Conf>, { devTools: Auto<boolean>, ... }>,
 
   timer: TimerOption,
   clone: boolean,
@@ -23,5 +28,7 @@ export type _Conf = {
   inspectOptions: util$InspectOptions,
 
   // in-place options
-  repeat: number
+  repeat: number,
+
+  ...
 };

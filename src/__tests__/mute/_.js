@@ -1,8 +1,8 @@
 // @flow
 
+import { setDefaults, unmuteF, unmuteV } from "../..";
 import { defaultConf } from "../../defaultConf";
 import { errExpectedFuncArg } from "../../errors/misc";
-import { setDefaults, unmuteF, unmuteRun } from "../..";
 
 const log = jest.fn();
 const warn = jest.fn();
@@ -14,7 +14,7 @@ beforeAll(() => {
     devTools: false,
     format: false,
     clone: false,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -36,10 +36,10 @@ describe("unmuteF()", () => {
   });
 });
 
-describe("unmuteRun()", () => {
+describe("unmuteV()", () => {
   test("not callable argument", () => {
-    const [msg] = errExpectedFuncArg("unmuteRun");
-    const result = unmuteRun(null);
+    const [msg] = errExpectedFuncArg("unmuteV");
+    const result = unmuteV(null);
     expect(result).toBe(null);
     expect(log).not.toBeCalled();
     expect(warn).toBeCalledWith(expect.stringContaining(msg));

@@ -1,8 +1,11 @@
 // @flow
 
-import type { Conf, Print } from "./types/conf";
+import { type Conf, type Print } from "./types/conf";
 
+// eslint-disable-next-line no-console
 export const nativeLog: Print = (...xs) => console.log(...xs);
+
+// eslint-disable-next-line no-console
 export const nativeWarn: Print = (...xs) => console.warn(...xs);
 
 export const defaultConf: Conf = {
@@ -29,5 +32,5 @@ export const defaultConf: Conf = {
   // in-place options
   id: undefined,
   guard: Infinity,
-  repeat: 1
+  repeat: 1,
 };

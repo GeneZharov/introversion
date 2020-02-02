@@ -1,26 +1,30 @@
 // @flow
 
-import { isEmpty } from "ramda";
 import chalk from "chalk";
+import { isEmpty } from "ramda";
 
-import type { Auto, StackTraceItem, TimerOption } from "../../../types/conf";
 import { REPEAT_OPT_SUFFIXES } from "../../../const";
 import { defaultConf } from "../../../defaultConf";
-import { detectConsoleTime } from "../../../util/detect/detectConsole";
-import { detectCorsAvail } from "../../../util/detect/detectCorsAvail";
-import { detectDevTools } from "../../../util/detect/detectDevTools";
-import { detectPerformance } from "../../../util/detect/detectPerformance";
-import { detectReactNative } from "../../../util/detect/detectReactNative";
-import { detectTerminal } from "../../../util/detect/detectTerminal";
+import { errInvalidRepeat } from "../../../errors/options";
 import {
   errConsoleNotAvail,
   errFormatErrorsNotAvail,
   errFormatNotAvail,
   errPerformanceNotAvail,
   errRepeatNotAllowed,
-  errStackTraceAsyncNotAllowed
+  errStackTraceAsyncNotAllowed,
 } from "../../../errors/options-runtime";
-import { errInvalidRepeat } from "../../../errors/options";
+import {
+  type Auto,
+  type StackTraceItem,
+  type TimerOption,
+} from "../../../types/conf";
+import { detectConsoleTime } from "../../../util/detect/detectConsole";
+import { detectCorsAvail } from "../../../util/detect/detectCorsAvail";
+import { detectDevTools } from "../../../util/detect/detectDevTools";
+import { detectPerformance } from "../../../util/detect/detectPerformance";
+import { detectReactNative } from "../../../util/detect/detectReactNative";
+import { detectTerminal } from "../../../util/detect/detectTerminal";
 import { parseSuffix } from "../../../util/number/suffix";
 import { stringView } from "../../../util/string/stringView";
 
@@ -104,7 +108,7 @@ export function normalizeStackTraceAsync(
   } else if (stackTraceAsync === "auto") {
     return [
       timer !== "console" && !detectReactNative() && detectCorsAvail(),
-      null
+      null,
     ];
   } else {
     return [stackTraceAsync, null];
@@ -132,7 +136,7 @@ export function normalizeFormat(
       format === "auto"
         ? (detectTerminal() || detectReactNative()) && !getDevTools()
         : format,
-      null
+      null,
     ];
   }
 }
@@ -148,7 +152,7 @@ export function normalizeFormatErrors(
       formatErrors === "auto"
         ? detectTerminal() && !getDevTools()
         : formatErrors,
-      null
+      null,
     ];
   }
 }

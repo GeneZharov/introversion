@@ -1,5 +1,6 @@
 // @flow
 
+import { logV, setDefaults } from "../../..";
 import { defaultConf } from "../../../defaultConf";
 import {
   errInvalidClone,
@@ -19,9 +20,8 @@ import {
   errInvalidStackTraceShift,
   errInvalidTimer,
   errInvalidWarn,
-  errUnknownOpt
+  errUnknownOpt,
 } from "../../../errors/options";
-import { logV, setDefaults } from "../../..";
 
 const log = jest.fn();
 const warn = jest.fn();
@@ -32,7 +32,7 @@ beforeAll(() => {
     warn,
     devTools: false,
     format: false,
-    clone: false
+    clone: false,
   });
 });
 

@@ -4,5 +4,6 @@ export type Modes = {
   task: string,
   quiet: boolean,
   deb: boolean,
-  mute: boolean
+  mute: boolean,
+  ...
 };

@@ -1,10 +1,10 @@
 // @flow
 
 import {
+  errMustBeNumber,
+  errMustBeString,
   formatSuffix,
   parseSuffix,
-  errMustBeNumber,
-  errMustBeString
 } from "./suffix";
 
 const k = n => n * 10 ** 3;
@@ -22,7 +22,9 @@ describe("formatSuffix()", () => {
     expect(() => formatSuffix(any, ("abc": any))).toThrow(errMustBeNumber());
     expect(() => formatSuffix(any, ({}: any))).toThrow(errMustBeNumber());
     expect(() => formatSuffix(any, (false: any))).toThrow(errMustBeNumber());
-    expect(() => formatSuffix(any, (Symbol(): any))).toThrow(errMustBeNumber());
+    expect(() => formatSuffix(any, (Symbol(""): any))).toThrow(
+      errMustBeNumber()
+    );
     expect(() => formatSuffix(any, (Object: any))).toThrow(errMustBeNumber());
   });
   test("should return stringified special numbers", () => {
@@ -81,7 +83,9 @@ describe("parseSuffix()", () => {
     expect(() => parseSuffix(any, (999: any))).toThrow(errMustBeString());
     expect(() => parseSuffix(any, ({}: any))).toThrow(errMustBeString());
     expect(() => parseSuffix(any, (false: any))).toThrow(errMustBeString());
-    expect(() => parseSuffix(any, (Symbol(): any))).toThrow(errMustBeString());
+    expect(() => parseSuffix(any, (Symbol(""): any))).toThrow(
+      errMustBeString()
+    );
     expect(() => parseSuffix(any, (Object: any))).toThrow(errMustBeString());
   });
   test("should return parsed simple numbers", () => {

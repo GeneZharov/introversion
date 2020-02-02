@@ -1,7 +1,7 @@
 // @flow
 
-import { defaultConf } from "../../../defaultConf";
 import { instance, setDefaults } from "../../..";
+import { defaultConf } from "../../../defaultConf";
 
 const log = jest.fn();
 const log2 = jest.fn();
@@ -21,11 +21,11 @@ describe(".with()", () => {
   test("should beat setDefaults() and instance()", () => {
     setDefaults({
       stackTraceAsync: false,
-      log
+      log,
     });
     const In = instance({
       stackTraceAsync: false,
-      log: log2
+      log: log2,
     });
     In.v.with({ log: log3 })();
     expect(log).not.toBeCalled();

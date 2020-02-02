@@ -7,7 +7,8 @@ export type StackFrame = {
   fileName?: string,
   lineNumber?: number,
   columnNumber?: number,
-  source?: string // ${functionName}@${fileName}:${lineNumber}${columnNumber}
+  source?: string, // ${functionName}@${fileName}:${lineNumber}${columnNumber}
+  ...
 };
 
 export type Print = (...xs: mixed[]) => void;
@@ -40,5 +41,7 @@ export type Conf = {
   // in-place options
   id: mixed,
   guard: number,
-  repeat: number | string
+  repeat: number | string,
+
+  ...
 };

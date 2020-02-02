@@ -2,16 +2,7 @@
 
 import { range } from "ramda";
 
-import {
-  debV,
-  logV,
-  logV_,
-  setDefaults,
-  unmuteF,
-  unmuteRun,
-  v,
-  v_
-} from "../..";
+import { debV, logV, logV_, setDefaults, unmuteF, unmuteV, v, v_ } from "../..";
 import { defaultConf } from "../../defaultConf";
 
 const name = 9;
@@ -24,7 +15,7 @@ beforeAll(() => {
     devTools: false,
     format: false,
     clone: false,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -49,8 +40,8 @@ describe("value's watcher", () => {
       expect(result).toBe(name);
       expect(log).toBeCalledWith("v()", [1, 2, name]);
     });
-    test("should log with unmuteRun() and logV.mute()", () => {
-      const result = unmuteRun(() => logV.mute(1, 2, name));
+    test("should log with unmuteV() and logV.mute()", () => {
+      const result = unmuteV(() => logV.mute(1, 2, name));
       expect(result).toBe(name);
       expect(log).toBeCalledWith("logV()", [1, 2, name]);
     });
@@ -85,8 +76,8 @@ describe("value's watcher", () => {
       expect(result).toBe(name);
       expect(log).toBeCalledWith("v_()", [1, 2]);
     });
-    test("should log with unmuteRun() and logV_.mute()", () => {
-      const result = unmuteRun(() => logV_.mute(1, 2, name));
+    test("should log with unmuteV() and logV_.mute()", () => {
+      const result = unmuteV(() => logV_.mute(1, 2, name));
       expect(result).toBe(name);
       expect(log).toBeCalledWith("logV_()", [1, 2]);
     });
@@ -129,8 +120,8 @@ describe("value's watcher", () => {
       expect(result).toBe(name);
       expect(log).not.toBeCalled();
     });
-    test("should not log with unmuteRun() and debV.mute()", () => {
-      const result = unmuteRun(() => debV.mute(1, 2, name));
+    test("should not log with unmuteV() and debV.mute()", () => {
+      const result = unmuteV(() => debV.mute(1, 2, name));
       expect(result).toBe(name);
       expect(log).not.toBeCalled();
     });

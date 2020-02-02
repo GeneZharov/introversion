@@ -6,9 +6,9 @@ export function round(places: number, num: number): number {
     // Shift with exponential notation to avoid floating-point issues.
     // See [MDN](https://mdn.io/round#Examples) for more details.
     let pair = `${num}e`.split("e");
-    const value = Math.round(+`${pair[0]}e${+pair[1] + places}`);
+    const value = Math.round(Number(`${pair[0]}e${Number(pair[1]) + places}`));
     pair = `${value}e`.split("e");
-    return +`${pair[0]}e${+pair[1] - places}`;
+    return Number(`${pair[0]}e${Number(pair[1]) - places}`);
   }
   return Math.round(num);
 }

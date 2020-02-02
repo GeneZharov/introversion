@@ -1,8 +1,9 @@
 // @flow
 
-import { contains, isNil, isEmpty } from "ramda";
+import { contains, isEmpty, isNil } from "ramda";
 
-import type { StackFrame, StackTraceItem } from "../../types/conf";
+import { type StackFrame, type StackTraceItem } from "../../types/conf";
+
 import { formatFileName } from "./formatFileName";
 
 export function formatStackFrame(
@@ -18,7 +19,7 @@ export function formatStackFrame(
     functionName: func,
     fileName: file,
     lineNumber: line,
-    columnNumber: col
+    columnNumber: col,
   } = stackFrame;
 
   function fmtFile(file: any, line: any, col: any): string[] {
@@ -26,7 +27,7 @@ export function formatStackFrame(
       ? [
           ...(!showFile ? [] : [formatFileName(file)]),
           ...(!showLine || isNil(line) ? [] : [":" + line]),
-          ...(!showCol || isNil(line) || isNil(col) ? [] : [":" + col])
+          ...(!showCol || isNil(line) || isNil(col) ? [] : [":" + col]),
         ]
       : [];
     return data.length
@@ -43,6 +44,6 @@ export function formatStackFrame(
     "at",
     ..._func,
     ..._file,
-    ...(isEmpty(_func) && isEmpty(_file) ? ["<unknown>"] : [])
+    ...(isEmpty(_func) && isEmpty(_file) ? ["<unknown>"] : []),
   ].join(" ");
 }

@@ -1,10 +1,12 @@
-import { terser } from "rollup-plugin-terser";
+/* eslint-disable camelcase, import/no-default-export */
+
+import commonjs from "@rollup/plugin-commonjs";
+import resolve from "@rollup/plugin-node-resolve";
 import babel from "rollup-plugin-babel";
-import builtins from "rollup-plugin-node-builtins";
-import commonjs from "rollup-plugin-commonjs";
-import globals from "rollup-plugin-node-globals";
 import ignore from "rollup-plugin-ignore";
-import resolve from "rollup-plugin-node-resolve";
+import builtins from "rollup-plugin-node-builtins";
+import globals from "rollup-plugin-node-globals";
+import { terser } from "rollup-plugin-terser";
 
 import pkg from "./package.json";
 
@@ -15,13 +17,13 @@ export default [
     output: {
       file: "lib/introversion.js",
       format: "cjs",
-      exports: "named"
+      exports: "named",
     },
     external: [
       ...Object.keys(pkg.dependencies || {}),
-      ...Object.keys(pkg.peerDependencies || {})
+      ...Object.keys(pkg.peerDependencies || {}),
     ],
-    plugins: [babel(), resolve({ preferBuiltins: true })]
+    plugins: [babel(), resolve({ preferBuiltins: true })],
   },
 
   // ES
@@ -29,13 +31,13 @@ export default [
     input: "src/index.js",
     output: {
       file: "es/introversion.js",
-      format: "es"
+      format: "es",
     },
     external: [
       ...Object.keys(pkg.dependencies || {}),
-      ...Object.keys(pkg.peerDependencies || {})
+      ...Object.keys(pkg.peerDependencies || {}),
     ],
-    plugins: [babel()]
+    plugins: [babel()],
   },
 
   // ES for Browsers
@@ -43,11 +45,11 @@ export default [
     input: "src/index.js",
     output: {
       file: "es/introversion.mjs",
-      format: "es"
+      format: "es",
     },
     external: [
       ...Object.keys(pkg.dependencies || {}),
-      ...Object.keys(pkg.peerDependencies || {})
+      ...Object.keys(pkg.peerDependencies || {}),
     ],
     plugins: [
       babel(),
@@ -57,10 +59,10 @@ export default [
           pure_getters: true,
           unsafe: true,
           unsafe_comps: true,
-          warnings: false
-        }
-      })
-    ]
+          warnings: false,
+        },
+      }),
+    ],
   },
 
   // UMD Development
@@ -71,7 +73,7 @@ export default [
       format: "umd",
       name: "Introversion",
       exports: "named",
-      indent: false
+      indent: false,
     },
     plugins: [
       ignore(["chalk", "util"]),
@@ -79,8 +81,8 @@ export default [
       resolve({ preferBuiltins: true }),
       commonjs(),
       globals(),
-      builtins()
-    ]
+      builtins(),
+    ],
   },
 
   // UMD Production
@@ -91,7 +93,7 @@ export default [
       format: "umd",
       name: "Introversion",
       exports: "named",
-      indent: false
+      indent: false,
     },
     plugins: [
       ignore(["chalk", "util"]),
@@ -105,9 +107,9 @@ export default [
           pure_getters: true,
           unsafe: true,
           unsafe_comps: true,
-          warnings: false
-        }
-      })
-    ]
-  }
+          warnings: false,
+        },
+      }),
+    ],
+  },
 ];

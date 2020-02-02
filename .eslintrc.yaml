@@ -1,0 +1,176 @@
+root: true
+
+extends:
+  - eslint:recommended
+  - plugin:flowtype/recommended
+
+ignorePatterns:
+  - "flow-typed"
+  - "!.importjs.js"
+
+parser: babel-eslint
+
+parserOptions:
+  ecmaVersion: 2018
+  sourceType: module
+
+plugins:
+  - flowtype
+  - import
+
+settings:
+  flowtype:
+    onlyFilesWithFlowAnnotation: true
+
+env:
+  browser: true
+  es6: true
+  node: true
+  jest: true
+
+rules:
+  no-warning-comments: [error, { terms: [fixme] }]
+
+  # eslint:recommended that are fixed by Prettier
+  no-extra-semi: off
+  no-irregular-whitespace": off
+  no-mixed-spaces-and-tabs": off
+  curly": off
+
+  # Redundancy Code
+  no-useless-computed-key: error
+  no-useless-constructor: error
+  no-unneeded-ternary: error
+  no-useless-return: error
+  no-new: error
+  require-await: error
+  no-setter-return: error
+  no-return-await: error
+  no-useless-rename: error
+  no-self-compare: error
+  no-lone-blocks: error
+  no-undef-init: error
+  no-extra-bind: error
+  no-unused-vars:
+    - error
+    - argsIgnorePattern: "^_"
+      varsIgnorePattern: "^_"
+      args: after-used
+
+  # Codestyle
+  array-callback-return: error
+  eqeqeq: error
+  prefer-const: error
+  camelcase: [error, { allow: ["^_"] }]
+  symbol-description: error
+  sort-imports: [error, { ignoreDeclarationSort: true }]
+  no-implicit-coercion: error
+  multiline-comment-style: [error, separate-lines]
+  spaced-comment: error
+  one-var: [error, never]
+  default-param-last: error
+  yoda: error
+  prefer-promise-reject-errors: error
+  prefer-spread: error
+  grouped-accessor-pairs: error
+  prefer-numeric-literals: error
+  lines-between-class-members: error
+  prefer-arrow-callback: error
+  no-useless-concat: error
+  consistent-this: error
+  func-name-matching: error
+
+  # Fault Tolerance
+  no-extend-native: error
+  no-empty-function: error
+  no-bitwise: error
+
+  # Language Fixes
+  no-var: error
+  object-shorthand: error
+  prefer-rest-params: error
+  require-unicode-regexp: error
+  prefer-exponentiation-operator: error
+  no-proto: error
+  no-new-wrappers: error
+  no-array-constructor: error
+  no-new-object: error
+  no-implied-eval: error
+  no-new-func: error
+  no-octal-escape: error
+  no-caller: error
+  no-labels: error
+  no-iterator: error
+
+  # Developer Assistance
+  no-import-assign: error
+  no-dupe-else-if: error
+
+  # Warnings
+  no-console: warn
+
+  # ===========
+  # Flow Plugin
+  # ===========
+
+  no-dupe-args: off
+  no-prototype-builtins: off
+  no-undef: off
+  no-this-before-super: off
+  no-obj-calls: off
+  no-unsafe-negation: off
+
+  flowtype/require-inexact-type: error
+  flowtype/newline-after-flow-annotation: error
+  flowtype/no-flow-fix-me-comments: error
+  flowtype/no-primitive-constructor-types: error
+  flowtype/no-dupe-keys: error
+  flowtype/array-style-complex-type: error
+  flowtype/array-style-simple-type: [error, shorthand]
+  flowtype/define-flow-type: error
+  flowtype/use-flow-type: error
+  flowtype/require-readonly-react-props: error
+  flowtype/type-id-match: [error, "^_?[A-Z].*"]
+  flowtype/type-import-style: error
+  flowtype/require-valid-file-annotation:
+    - error
+    - always
+    - annotationStyle: line
+  flowtype/no-unused-expressions:
+    - error
+    - allowTernary: true
+      allowShortCircuit: true
+
+  # =============
+  # Import Plugin
+  # =============
+
+  import/no-useless-path-segments: error
+  import/no-extraneous-dependencies: error
+  import/no-default-export: error
+  import/newline-after-import: error
+  import/no-duplicates: error
+  import/first: error
+  import/export: error
+  import/no-dynamic-require: error
+  import/no-unassigned-import:
+    - error
+    - allow:
+        - "**/*.css"
+        - "**/*.scss"
+  import/extensions:
+    - error
+    - always
+    - js: never
+      jsx: never
+  import/order:
+    - error
+    - newlines-between: always
+      alphabetize: { order: asc }
+      groups:
+        - builtin
+        - external
+        - internal
+        - parent
+        - sibling
+        - index

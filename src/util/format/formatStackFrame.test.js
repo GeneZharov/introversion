@@ -1,20 +1,22 @@
 // @flow
 
-import type { StackFrame } from "../../types/conf";
+import { type StackFrame } from "../../types/conf";
+
 import { formatStackFrame } from "./formatStackFrame";
 
 function frame(frame: {
   func?: string,
   file?: string,
   line?: number,
-  col?: number
+  col?: number,
+  ...
 }): StackFrame {
   const { func, file, line, col } = frame;
   return {
     functionName: func,
     fileName: file,
     lineNumber: line,
-    columnNumber: col
+    columnNumber: col,
   };
 }
 

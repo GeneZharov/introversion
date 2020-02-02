@@ -2,8 +2,8 @@
 
 import { range } from "ramda";
 
+import { setDefaults, timeV, unmuteF, unmuteV } from "../..";
 import { defaultConf } from "../../defaultConf";
-import { setDefaults, timeRun, unmuteF, unmuteRun } from "../..";
 
 const name = 9;
 
@@ -18,7 +18,7 @@ beforeAll(() => {
     format: false,
     clone: false,
     timer,
-    stackTrace: false
+    stackTrace: false,
   });
 });
 
@@ -30,10 +30,10 @@ afterEach(() => {
   timer.mockClear();
 });
 
-describe("timeRun()", () => {
+describe("timeV()", () => {
   describe("when muted", () => {
     test("should not log anything", () => {
-      const result = timeRun.mute(1, 2, () => fn({ name }));
+      const result = timeV.mute(1, 2, () => fn({ name }));
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(0);
       expect(log).not.toBeCalled();
@@ -42,34 +42,34 @@ describe("timeRun()", () => {
 
   describe("when unmuted", () => {
     test("should log time", () => {
-      const result = timeRun(1, 2, () => fn({ name }));
+      const result = timeV(1, 2, () => fn({ name }));
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
-      expect(log).toBeCalledWith("timeRun()", [1, 2], "0 ms");
+      expect(log).toBeCalledWith("timeV()", [1, 2], "0 ms");
     });
-    test("should log with unmuteRun()", () => {
-      const action = () => timeRun.mute(1, 2, () => fn({ name }));
-      const result = unmuteRun(action);
+    test("should log with unmuteV()", () => {
+      const action = () => timeV.mute(1, 2, () => fn({ name }));
+      const result = unmuteV(action);
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
-      expect(log).toBeCalledWith("timeRun()", [1, 2], "0 ms");
+      expect(log).toBeCalledWith("timeV()", [1, 2], "0 ms");
     });
     test("should log with unmuteF()", () => {
-      const action = () => timeRun.mute(1, 2, () => fn({ name }));
+      const action = () => timeV.mute(1, 2, () => fn({ name }));
       const result = unmuteF(action)();
       expect(result).toBe(name);
       expect(timer.mock.calls.length).toEqual(2);
-      expect(log).toBeCalledWith("timeRun()", [1, 2], "0 ms");
+      expect(log).toBeCalledWith("timeV()", [1, 2], "0 ms");
     });
   });
 
   describe("should repeat measurements", () => {
     test("should log time", () => {
-      timeRun.with({ repeat: 5 })(() => fn({ name }));
+      timeV.with({ repeat: 5 })(() => fn({ name }));
       expect(fn.mock.calls.length).toEqual(5);
     });
     test("should log time", () => {
-      timeRun.with({ repeat: "1k" })(() => fn({ name }));
+      timeV.with({ repeat: "1k" })(() => fn({ name }));
       expect(fn.mock.calls.length).toEqual(1000);
     });
   });
@@ -79,9 +79,9 @@ describe("timeRun()", () => {
     const log2 = jest.fn();
     const log3 = jest.fn();
     range(0, 100).forEach(_ => {
-      timeRun.with({ log: log1, guard: 3 })(() => fn({ name }));
-      timeRun.with({ log: log2, guard: 1, id: 2 })(() => fn({ name }));
-      timeRun.with({ log: log3, guard: 6, id: 3 })(() => fn({ name }));
+      timeV.with({ log: log1, guard: 3 })(() => fn({ name }));
+      timeV.with({ log: log2, guard: 1, id: 2 })(() => fn({ name }));
+      timeV.with({ log: log3, guard: 6, id: 3 })(() => fn({ name }));
     });
     expect(log1.mock.calls.length).toBe(3);
     expect(log2.mock.calls.length).toBe(1);

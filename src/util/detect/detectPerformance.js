@@ -1,6 +1,6 @@
 // @flow
 
-import { memoizeWith, identity } from "ramda";
+import { identity, memoizeWith } from "ramda";
 
 function _detectPerformance(): boolean {
   return (

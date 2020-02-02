@@ -2,8 +2,10 @@
 
 import { dissoc, once } from "ramda";
 
-import type { Conf } from "../../../types/conf";
-import type { _Conf } from "../../../types/_conf";
+import { warning } from "../../../errors/util";
+import { type _Conf } from "../../../types/_conf";
+import { type Conf } from "../../../types/conf";
+
 import {
   normalizeClone,
   normalizeDevTools,
@@ -16,9 +18,8 @@ import {
   normalizeStackTrace,
   normalizeStackTraceAsync,
   normalizeStackTraceShift,
-  normalizeTimer
+  normalizeTimer,
 } from "./options";
-import { warning } from "../../../errors/util";
 
 export function normalizeConf(conf: Conf, task?: string): _Conf {
   const getDevTools = once(() => normalizeDevTools(conf.devTools));
@@ -69,6 +70,6 @@ export function normalizeConf(conf: Conf, task?: string): _Conf {
 
     // in-place options
     id,
-    repeat
+    repeat,
   }): any);
 }

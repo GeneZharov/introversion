@@ -6,7 +6,7 @@ export function detectCorsAvail(): boolean {
     "data:",
     "chrome:",
     "chrome-extension:",
-    "https:"
+    "https:",
   ];
   return (
     typeof location !== "undefined" &&

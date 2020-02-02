@@ -2,19 +2,20 @@
 
 import Chalk from "chalk";
 
-import type { _Conf } from "../../../types/_conf";
+import { type _Conf } from "../../../types/_conf";
 import { formatStackFrame } from "../../../util/format/formatStackFrame";
+
 import {
-  inspect,
   cloneTry,
   devFmt,
   devRaw,
   getTrace,
+  inspect,
   logFmt,
-  logRaw
+  logRaw,
 } from "./util";
 
-const chalk = new Chalk.constructor();
+const chalk = new Chalk.Instance();
 
 export function logVal(
   name: string,
@@ -31,9 +32,9 @@ export function logVal(
       [
         `${name}()`,
         ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
-        [..._clone(extras), ...(quiet ? [] : _clone(val))]
+        [..._clone(extras), ...(quiet ? [] : _clone(val))],
       ],
-      ...(conf.dev ? devRaw(_clone(conf), trace, frameIdx) : [])
+      ...(conf.dev ? devRaw(_clone(conf), trace, frameIdx) : []),
     ]);
   }
 
@@ -42,10 +43,10 @@ export function logVal(
     logFmt(conf, [
       [
         chalk.bold(`${name}()`),
-        ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : [])
+        ...(frame ? [formatStackFrame(conf.stackTrace, frame)] : []),
       ],
       [inspect(conf, [...extras, ...(quiet ? [] : val)])],
-      ...(conf.dev ? devFmt(conf, trace, frameIdx) : [])
+      ...(conf.dev ? devFmt(conf, trace, frameIdx) : []),
     ]);
   }
 

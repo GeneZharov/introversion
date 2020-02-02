@@ -8,12 +8,12 @@ measurements. A wrapper around `console.log()`, `performance.now()`,
 * works great with functional code (built for [React](https://reactjs.org/), 
   [Redux](https://redux.js.org/), [Ramda](https://ramdajs.com/), 
   [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide), etc.)
-* pretty and ![colorful](assets/colorful.jpeg) output
+* pretty and colorful output
 * easy to use:
     * automatically chooses the best time source available (`performance.now()` 
       or `console.time()` or `Date.now()`)
     * logged objects are deeply cloned to prevent confusing results in DevTools
-    * many tools for various scenarios
+    * lots of tools for various scenarios
 
 
 Table of Contents
@@ -25,9 +25,9 @@ Table of Contents
     * [`logF()`](#logF)
 * [Timers](#timers)
     * [`time()`, `timeEnd()`](#time-timeEnd)
-    * [`stopwatch()`](#stopwatch)
+    * [`stopwatch()`, `lap()`](#stopwatch-lap)
     * [`timeF()`](#timeF)
-    * [`timeRun()`](#timeRun)
+    * [`timeV()`](#timeV)
 * [Modes](#modes)
     * [Quiet mode (`logV_()`, `v_()`...)](#quiet-mode)
     * [Breakpoint mode (`debV()`, ...)](#breakpoint-mode)
@@ -68,8 +68,7 @@ const fn = n => {
 };
 ```
 
-Introversion allows you to simply wrap the desired value without rewriting 
-anything:
+Introversion allows you to simply wrap the desired value without rewriting:
 
 ```js
 const fn = n => logV(n) + 1; // log value
@@ -97,14 +96,14 @@ renderSuggestion={item => (
 
 Imagine you need to check if a function call is fast enough to decide whether 
 you need to cache it somewhere. With Introversion you can do it by simply 
-wrapping the desired expression in `timeRun(() => <expr>)` right in JSX:
+wrapping the desired expression in `timeV(() => <expr>)` right in JSX:
 
 ```js
 // before
 <Select options={states.map(transform) /* is map() too slow? */} />
 
 // after
-<Select options={timeRun(() => states.map(transform)) /* prints 2.73ms */} />
+<Select options={timeV(() => states.map(transform)) /* prints 2.73ms */} />
 ```
 
 
@@ -131,6 +130,8 @@ Installation
 
 ```sh
 npm install introversion --save-dev
+# or
+yarn add introversion --dev
 ```
 
 ```js
@@ -153,17 +154,19 @@ Watchers
 *Alias:* `v()` (helpful with default import: `In.v()`)
 
 `logV()` (“v” stands for “value”) merely prints an array of its arguments. The 
-main difference between `console.log()` is that the last argument is returned. 
+main difference from `console.log()` is that the last argument is returned. 
 Therefore it is safe to wrap any expression in `logV()` without breaking your 
 code down.
 
 ```js
+import { logV } from "introversion";
+
 const random = n => Math.floor(logV(Math.random()) * n) + 10;
 random(1); //=> logV() [ 0.5909956243063763 ]
 ```
 
 You can print any other values alongside with the wrapped expression. Just pass 
-them as arguments. Only the last argument is returned so that extra arguments 
+them as arguments. Only the last argument is returned so extra arguments 
 won’t affect your code:
 
 ```js
@@ -184,7 +187,7 @@ fn(-81); //=> logV [ false, -9 ]
 
 *Alias:* `f()` (helpful with default import: `In.f()`)
 
-`logF()` (“f” stands for “function”) is designed for watching for function 
+`logF()` (“f” stands for “function”) is designed to watch for function 
 calls. When a wrapped function is called, its arguments and a returned value 
 are logged. If a wrapped function throws an exception, that exception will be 
 logged and then rethrown again. A wrapped in the `logF()` function can be used 
@@ -192,6 +195,8 @@ in the same way as an unwrapped one: all arguments, `this` and a returned value
 will be proxied.
 
 ```js
+import { logF } from "introversion";
+
 [1, 2].map(logF(n => 2 * n));
 
 //=> logF()
@@ -203,7 +208,7 @@ will be proxied.
 //=> ... Result: 4
 ```
 
-`logF()` can also accept additional arguments for printing just like `logV()` 
+`logF()` can also accept additional arguments that will be printed just like `logV()` 
 does:
 
 ```js
@@ -226,8 +231,10 @@ of time available:
 3. `Date.now()`
 
 ```js
+import { time, timeEnd } from "introversion";
+
 time(); // start the timer
-calculateEverything();
+calculateSomething();
 timeEnd(); // stop the timer
 
 //=> timeEnd() 203 ms
@@ -246,7 +253,7 @@ timeEnd("foo", "bar", "label"); // stop the timer named "label"
 //=> timeEnd() [ 'foo', 'bar', 'label' ] 203 ms
 ```
 
-### stopwatch()
+### stopwatch(), lap()
 When you have a sequence of actions, it is inconvenient to wrap every action in 
 `time()...timeEnd()`. In this case, stopwatch API is more helpful.
 
@@ -257,6 +264,8 @@ When you have a sequence of actions, it is inconvenient to wrap every action in
 </a>
 
 ```js
+import { stopwatch, lap } form "introversion";
+
 stopwatch();
 
 createTables();
@@ -270,11 +279,13 @@ lap("populated"); //=> lap() [ 'populated' ] 768 ms
 ```
 
 ### timeF()
-You can wrap any function with `timeF()`. The result will be a function with 
+You can wrap any function in `timeF()`. The result will be a function with 
 the same behavior as a wrapped one, but additionally, it will print the 
 execution time of its synchronous code.
 
 ```js
+import { timeF } form "introversion";
+
 array.map(timeF(iterator));
 
 //=> timeF() 4 ms
@@ -292,28 +303,30 @@ array.map(timeF("foo", "bar", iterator));
 //=> timeF() [ 'foo', 'bar' ] 1 ms
 ```
 
-### timeRun()
+### timeV()
 
-Sometimes you suspect that some expression may be calculated for too long. In 
-this case it is convenient to wrap this expression into `timeRun(() => <expr>)` 
+Sometimes you may suspect that some expression is calculated for too long. In 
+this case it is convenient to wrap that expression in `timeV(() => <expr>)` 
 that will print the elapsed time.
 
 ```js
+import { timeV } form "introversion";
+
 // original expression
 data = [calculate(src), readState()];
 
 // wrapped expression
-data = timeRun(() => [calculate(src), readState()]);
+data = timeV(() => [calculate(src), readState()]);
 
-//=> timeRun() 349 ms
+//=> timeV() 349 ms
 ```
 
 Optionally you can pass any arguments for printing:
 
 ```js
-data = timeRun("data", src, () => [calculate(src), readState()]);
+data = timeV("data", src, () => [calculate(src), readState()]);
 
-//=> timeRun() [ 'data', 'DATABASE' ] 349 ms
+//=> timeV() [ 'data', 'DATABASE' ] 349 ms
 ```
 
 
@@ -326,13 +339,15 @@ Modes
 * `logF_()`, *alias:* `f_()`
 
 Sometimes you are not interested in a wrapped value itself, but you need to 
-know, that it was calculated. For example, in React Native an attempt to log an 
+know, if it was calculated. For example, in React Native an attempt to log an 
 event object may hang the application. Or maybe you are interested only in 
 printing additional arguments. For these cases, there are alternative quiet 
 mode watchers that don’t log wrapped value itself but log all additional 
 arguments.
 
 ```js
+import { logF_ } from "introversion";
+
 const fn = logF_("Invoked!", n => n + 1);
 fn(2); //=> logF_() [ 'Invoked!' ]
 ```
@@ -354,6 +369,8 @@ runs out, it will merely proxy values without any side effects. More about the
 [in-place configuration](#in-place-configuration) is described below.
 
 ```js
+import { logV } from "introversion";
+
 for (let i = 0; i < 1000; i++) {
   logV.with({ guard: 1 })(i); // prints only once
 }
@@ -364,6 +381,8 @@ amount of executed calls. So if you have more than one guard, you need to
 explicitly identify a call with the “id” option:
 
 ```js
+import { logV } from "introversion";
+
 for (let i = 0; i < 1000; i++) {
   logV.with({ id: 1, guard: 1 })(i); // prints only once
   logV.with({ id: 2, guard: 10 })(arr[i]); // prints for the first 10 times
@@ -384,7 +403,7 @@ property called `.mute` (e.g. `logV.mute()`, `logV_.mute()`, `debV.mute()`,
 unless you explicitly unmute it (in the failed unit test for instance).
 
 * `unmuteF(fn)` — unmute everything during this function execution
-* `unmuteRun(() => <expr>)` — runs passed function and unmutes everything while 
+* `unmuteV(() => <expr>)` — runs passed function and unmutes everything while 
   it is running
 * `unmute()` — unmute all the muted functions
 * `mute()` — mute everything again
@@ -413,6 +432,8 @@ First, we need to wrap the desired expression in a muted watcher:
 
 ```js
 // module.js
+import { logV } from "introversion";
+
 function action(x) {
   ...
   return logV.mute(y) ^ Math.PI;
@@ -420,16 +441,17 @@ function action(x) {
 ```
 
 Then we need to unmute a muted watcher at the desired moment (in the failed 
-unit test in this case):
+unit test):
 
 ```js
 // module.spec.js
+import { mute, unmute, unmuteF, unmuteV } from "introversion";
 
 // unmute a function
 const res = unmuteF(action)(2);
 
 // or unmute an expression
-const res = unmuteRun(() => action(2));
+const res = unmuteV(() => action(2));
 
 // or unmute anything in a low level imperative style
 unmute();
@@ -446,6 +468,8 @@ Configuration
 You can pass any number of default options as object properties:
 
 ```js
+import { setDefaults } from "introversion";
+
 setDefaults({
   format: false,
   log: (...xs) => Reactotron.log(xs),
@@ -458,6 +482,8 @@ setDefaults({
 You can have many instances of Introversions with different configurations:
 
 ```js
+import { instance } from "introversion";
+
 const InR = instance({
   format: false,
   log: (...xs) => Reactotron.log(xs),
@@ -480,6 +506,8 @@ Most functions have a method `with()` for setting temporary local configuration
 options only for this call.
 
 ```js
+import { logV } from "introversion";
+
 logV.with({ depth: Infinity })(myobj);
 ```
 
@@ -734,6 +762,7 @@ Options
     *Default:* `Infinity`
 
     ```js
+    import { logF } from "introversion";
     const fn = logF.with({ id: 0, guard: 1 })(n => n % 2); // prints only once
     [1, 2, 3, 4, 5].map(fn);
 
@@ -758,11 +787,13 @@ Options
     *Default:* 1
 
     ```js
-    timeRun.with({ repeat: 5000 })(mergeDatabases);
-    // ...or
-    timeRun.with({ repeat: "5K" })(mergeDatabases);
+    import { timeV } from "introversion";
 
-    //=> timeRun() 0.113 ms
+    timeV.with({ repeat: 5000 })(mergeDatabases);
+    // ...or
+    timeV.with({ repeat: "5K" })(mergeDatabases);
+
+    //=> timeV() 0.113 ms
     ```
 
 
